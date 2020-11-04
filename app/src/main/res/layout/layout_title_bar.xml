@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/commonTitleBar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dp_title_height"
+    android:background="@color/white"
+    app:title_actionTextColor="@color/colorTitleText"
+    app:title_dividerBackground="@color/colorTitleDivider"
+    app:title_dividerHeight="@dimen/dp_line_size"
+    app:title_leftTextColor="@color/colorTitleText"
+    app:title_rightTextColor="@color/colorTitleText"
+    app:title_titleMainTextColor="@color/colorTitleText"
+    app:title_titleSubTextColor="@color/colorTitleText" />
+
+
+

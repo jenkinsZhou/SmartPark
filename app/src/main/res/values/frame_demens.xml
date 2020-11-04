@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--TitleBarView 高度-->
+    <dimen name="dp_title_height">@dimen/dp_40</dimen>
+
+    <!--主页tab高度-->
+    <dimen name="dp_tab_height">@dimen/dp_45</dimen>
+    <!--主页tab icon宽高-->
+    <dimen name="dp_tab_icon">@dimen/dp_24</dimen>
+    <!--主页tab 文字与icon边距-->
+    <dimen name="dp_tab_margin">0dp</dimen>
+    <!--主页tab文字字号-->
+    <dimen name="dp_tab_text_size">@dimen/dp_11</dimen>
+    <!--主页tab 上划线宽度-->
+    <dimen name="dp_tab_underline">@dimen/dp_0_5</dimen>
+
+    <!--glide加载圆角图片占位图圆角弧度-->
+    <dimen name="dp_placeholder_radius">@dimen/dp_0_5</dimen>
+
+    <!--LoadMoreView 文本字号-->
+    <dimen name="dp_load_more_text_size">@dimen/dp_14</dimen>
+
+
+</resources>

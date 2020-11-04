@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue5087FF">#5087FF</color>
+    <color name="blue629BFF">#629BFF</color>
+    <color name="blueEFF3FF">#EFF3FF</color>
+    <color name="blue4989E5">#4989E5</color>
+    <color name="blue7EADFF">#7EADFF</color>
+
+    <color name="colorPrimary">@color/blue5087FF</color>
+    <color name="colorPrimaryDark">#004D8E</color>
+    <color name="blue55A9FF">#55A9FF</color>
+    <color name="colorAccent">@color/blue55A9FF</color>
+    <color name="transparent">#00000000</color>
+    <color name="color_000000">#000000</color>
+    <color name="colorRadiusDefaultRipple">#c8cccccc</color>
+    <!--Glide加载图片默认占位图背景色-->
+    <color name="colorPlaceholder">#CCCCCC</color>
+
+    <!--TitleBarView背景色-->
+    <color name="colorTitleBackground">#FFFFFF</color>
+    <!--TitleBarView 文字颜色-->
+    <color name="colorTitleText">#393939</color>
+    <!--TitleBarView 下划线颜色-->
+    <color name="colorTitleDivider">#DCDCDC</color>
+    <!--LoadMoreView 文本颜色-->
+    <color name="colorLoadMoreText">@color/colorTitleText</color>
+    <!--LoadMoreView loading颜色-->
+    <color name="colorLoadMoreProgress">@color/colorTitleText</color>
+
+    <!--普通有灰色背景的用这个-->
+    <color name="colorBackground">#f8f8f8</color>
+    <color name="colorTextBlack">#333333</color>
+    <color name="colorTextBlackLight">#636363</color>
+    <color name="colorTextGray">#666666</color>
+    <color name="colorTextLittleGray">#CCCCCC</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorWhitePressed">#DCDCDC</color>
+    <color name="colorBlackTitle">#333333</color>
+    <color name="colorGraySmallText">#A2A2A2</color>
+</resources>

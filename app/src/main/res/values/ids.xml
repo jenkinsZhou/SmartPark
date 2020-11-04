@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="fake_navigation_layout" type="id"/>
+    <item name="fake_navigation_view" type="id"/>
+    <item name="fake_status_layout" type="id"/>
+    <item name="fake_status_view" type="id"/>
+
+
+    <item name="lLayout_rootActionSheetDialog" type="id"/>
+    <item name="lv_containerActionSheetDialog" type="id"/>
+    <item name="gv_containerActionSheetDialog" type="id"/>
+    <item name="tv_titleActionSheetDialog" type="id"/>
+    <item name="tv_cancelActionSheetDialog" type="id"/>
+
+    <item name="lLayout_rootProgressDialog" type="id"/>
+    <item name="tv_messageProgressDialog" type="id"/>
+
+    <item name="lLayout_leftTitleBarView" type="id"/>
+    <item name="lLayout_centerTitleBarView" type="id"/>
+    <item name="lLayout_rightTitleBarView" type="id"/>
+    <item name="v_statusTitleBarView" type="id"/>
+    <item name="v_dividerTitleBarView" type="id"/>
+</resources>
