@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F6F6"
+    android:orientation="vertical"
+  >
+
+    <include layout="@layout/layout_title_bar" />
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/dp_14"
+        android:layout_marginEnd="@dimen/dp_14"
+        android:layout_marginTop="@dimen/dp_15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_radius_15_white"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/dp_14"
+        android:paddingTop="@dimen/dp_19"
+        android:paddingEnd="@dimen/dp_14"
+        android:paddingBottom="@dimen/dp_19">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/menuTextStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="原密码"
+                android:textSize="@dimen/sp_14" />
+
+            <EditText
+                style="@style/textBlackLittle15Style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_weight="1.5"
+                android:background="@null"
+                android:hint="请输入原密码"
+                android:padding="@dimen/dp_5"
+                android:textColorHint="#A2A2A2"
+                android:textSize="@dimen/sp_14" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="@dimen/dp_5"
+                android:src="@mipmap/ic_eyes_blue" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/menuTextStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="新密码"
+                android:textSize="@dimen/sp_14" />
+
+            <EditText
+                style="@style/textBlackLittle15Style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_weight="1.5"
+                android:background="@null"
+                android:hint="请输入新密码"
+                android:padding="@dimen/dp_5"
+                android:textColorHint="#A2A2A2"
+                android:textSize="@dimen/sp_14" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="@dimen/dp_5"
+                android:src="@mipmap/ic_eyes_blue" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/menuTextStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.4"
+                android:text="确认密码"
+                android:textSize="@dimen/sp_14" />
+
+            <EditText
+                style="@style/textBlackLittle15Style"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_weight="1.5"
+                android:background="@null"
+                android:hint="请再次输入新密码"
+                android:padding="@dimen/dp_5"
+                android:textColorHint="#A2A2A2"
+                android:textSize="@dimen/sp_14" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="@dimen/dp_5"
+                android:src="@mipmap/ic_eyes_blue" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvConfirm"
+            style="@style/buttonMatchWidthBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:layout_marginBottom="@dimen/dp_28"
+            android:background="@drawable/bg_select_primary"
+            android:text="确认" />
+
+    </RelativeLayout>
+</LinearLayout>

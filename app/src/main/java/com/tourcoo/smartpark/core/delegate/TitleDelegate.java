@@ -48,7 +48,7 @@ public class TitleDelegate {
                         activity.onBackPressed();
                     }
                 })
-                .setTextColorResource(R.color.colorTitleText)
+//                .setTextColorResource(R.color.colorTitleText)
                 //.setRightTextDrawableTintResource(R.color.colorTitleText)
                 //.setActionTintResource(R.color.colorTitleText)
                 .setTitleMainText(getTitle(activity));

@@ -34,6 +34,7 @@
         <item name="android:textColor">@color/colorBlackTitle</item>
         <item name="android:textSize">@dimen/sp_16</item>
         <item name="android:gravity">center|start</item>
+        <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
@@ -41,8 +42,27 @@
     <style name="textBlackLittle15Style">
         <item name="android:textColor">@color/colorTextBlackLight</item>
         <item name="android:textSize">@dimen/sp_15</item>
+        <item name="android:layout_gravity">center_vertical</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    #CCCCCC
+    <style name="textBlackStyle14" parent="menuTextStyle">
+        <item name="android:textSize">@dimen/sp_14</item>
+    </style>
+
+    <style name="buttonMatchWidthBlue">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">@dimen/dp_12</item>
+        <item name="android:paddingBottom">@dimen/dp_12</item>
+        <item name="android:textSize">@dimen/sp_15</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="background">@drawable/bg_select_primary</item>
+    </style>
+    <!-- android:paddingTop="@dimen/dp_12"
+     android:paddingBottom="@dimen/dp_12"-->
 </resources>

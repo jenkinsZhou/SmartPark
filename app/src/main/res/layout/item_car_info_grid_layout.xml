@@ -3,14 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_radius_15_white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingTop="@dimen/dp_12"
+    android:minHeight="@dimen/dp_120"
+    android:paddingBottom="@dimen/dp_12">
 
     <TextView
+        android:id="@+id/tvParkingNum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
         android:text="A01001"
         android:textColor="@color/colorBlackTitle"
-        android:textSize="@dimen/sp_14" />
+        android:textSize="@dimen/sp_14"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/ivParkingStatus"
+        android:layout_width="@dimen/dp_30"
+        android:layout_height="@dimen/dp_30"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_10"
+        android:src="@mipmap/ic_car_gray_small" />
+
+    <TextView
+        android:id="@+id/tvPlantNum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dp_12"
+        android:background="@drawable/bg_radius_30_primary"
+        android:paddingStart="@dimen/dp_11"
+        android:textSize="@dimen/sp_12"
+        android:layout_marginStart="@dimen/dp_10"
+        android:layout_marginEnd="@dimen/dp_10"
+        android:paddingTop="@dimen/dp_3_5"
+        android:paddingEnd="@dimen/dp_11"
+        android:paddingBottom="@dimen/dp_3_5"
+        android:text="苏B·A3456"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
 </LinearLayout>

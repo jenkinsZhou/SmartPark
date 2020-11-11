@@ -2,16 +2,20 @@ package com.tourcoo;
 
 import android.app.Application;
 
+
 import com.apkfuns.log2file.LogFileEngineFactory;
 import com.apkfuns.logutils.LogUtils;
 import com.simple.spiderman.SpiderMan;
-import com.squareup.leakcanary.LeakCanary;
+import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
 import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConstant;
+import com.tourcoo.smartpark.core.manager.GlideManager;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
+
+import leakcanary.LeakCanary;
 
 /**
  * @author :JenkinsZhou
@@ -30,11 +34,8 @@ public class SmartParkApplication extends Application {
         SpiderMan.init(context);
         initLog();
         initConfig();
-        // 判断当前进程是否是LeakCanary专门用于分析heap内存的而创建的那个进程，即HeapAnalyzerService所在的进程，如果是的话，则不进行Application中的初始化功能
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            return;
-        }
-        LeakCanary.install(this);
+
+
     }
 
     private void initLog() {
@@ -82,7 +83,6 @@ public class SmartParkApplication extends Application {
                 .setQuitAppControl(impl)
                 //设置ToastUtil全局控制
                 .setToastControl(impl);
-
         //初始化Retrofit配置
         RetrofitHelper.getInstance()
                 //配置全局网络请求BaseUrl

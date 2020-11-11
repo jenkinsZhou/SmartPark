@@ -13,7 +13,13 @@
     <color name="blue4989E5">#4989E5</color>
     <color name="blue7EADFF">#7EADFF</color>
 
-    <color name="colorPrimary">@color/blue5087FF</color>
+    <color name="shape1">#5d8df7</color>
+<!--绿色区域-->
+    <color name="green4EBF8B">#4EBF8B</color>
+
+    <color name="whiteEFEFEF">#EFEFEF</color>
+    <color name="whiteF5F5F5">#F5F5F5</color>
+    <color name="colorPrimary">@color/blue629BFF</color>
     <color name="colorPrimaryDark">#004D8E</color>
     <color name="blue55A9FF">#55A9FF</color>
     <color name="colorAccent">@color/blue55A9FF</color>

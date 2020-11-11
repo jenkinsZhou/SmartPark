@@ -7,6 +7,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.parfoismeng.slidebacklib.SlideBack;
+import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.core.utils.StackUtil;
+
 /**
  * @author :JenkinsZhou
  * @description :
@@ -14,7 +18,7 @@ import androidx.annotation.Nullable;
  * @date 2020年10月28日16:18
  * @Email: 971613168@qq.com
  */
-public class ActivityLifecycleCallbacksImpl  implements Application.ActivityLifecycleCallbacks{
+public class ActivityLifecycleCallbacksImpl implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
 
@@ -37,7 +41,10 @@ public class ActivityLifecycleCallbacksImpl  implements Application.ActivityLife
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-
+        //统一于滑动返回动画
+        if (activity.isFinishing()) {
+            activity.overridePendingTransition(0, R.anim.activity_swipeback_exit);
+        }
     }
 
     @Override
@@ -47,6 +54,6 @@ public class ActivityLifecycleCallbacksImpl  implements Application.ActivityLife
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-
+        SlideBack.unregister(activity);
     }
 }

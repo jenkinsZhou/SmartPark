@@ -26,12 +26,10 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.security.MessageDigest;
 
+
 /**
- * @author :JenkinsZhou
- * @description :图片加载管理类
- * @company :途酷科技
- * @date 2020年10月28日17:21
- * @Email: 971613168@qq.com
+ * Function: Glide 工具类支持加载常规、圆角、圆形图片
+ * Description:
  */
 public class GlideManager {
 
@@ -122,23 +120,37 @@ public class GlideManager {
      * @param iv
      * @param placeholder
      */
-    public static void loadImg(Object obj, ImageView iv, Drawable placeholder) {
-        Glide.with(iv.getContext()).load(obj).apply(getRequestOptions()
+    public static void loadImgCenterCrop(Object obj, ImageView iv, Drawable placeholder) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsCenterCrop()
                 .error(placeholder)
                 .placeholder(placeholder)
                 .fallback(placeholder)
-                .dontAnimate())
-                .into(iv);
+                .dontAnimate()).into(iv);
+    }
+    public static void loadImgAuto(Object obj, ImageView iv, Drawable placeholder) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsAuto()
+                .error(placeholder)
+                .placeholder(placeholder)
+                .fallback(placeholder)
+                .dontAnimate()).into(iv);
     }
 
+    public static void loadImgAuto(Object obj, ImageView iv) {
+        loadImgAuto(obj, iv, sCommonPlaceholder);
+    }
 
-    public static void loadImg(Object obj, ImageView iv, int placeholderResource) {
+    public static void loadImgAuto(Object obj, ImageView iv, int placeholderResource) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
-        loadImg(obj, iv, drawable != null ? drawable : sCommonPlaceholderDrawable);
+        loadImgAuto(obj, iv, drawable != null ? drawable : sCommonPlaceholderDrawable);
     }
 
-    public static void loadImg(Object obj, ImageView iv) {
-        loadImg(obj, iv, sCommonPlaceholder);
+    public static void loadImgCenterCrop(Object obj, ImageView iv, int placeholderResource) {
+        Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
+        loadImgCenterCrop(obj, iv, drawable != null ? drawable : sCommonPlaceholderDrawable);
+    }
+
+    public static void loadImgCenterCrop(Object obj, ImageView iv) {
+        loadImgCenterCrop(obj, iv, sCommonPlaceholder);
     }
 
     /**
@@ -148,8 +160,8 @@ public class GlideManager {
      * @param iv
      * @param placeholder 占位图
      */
-    public static void loadCircleImg(Object obj, ImageView iv, Drawable placeholder) {
-        Glide.with(iv.getContext()).load(obj).apply(getRequestOptions()
+    public static void loadCircleImgCenterCrop(Object obj, ImageView iv, Drawable placeholder) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsCenterCrop()
                 .error(placeholder)
                 .placeholder(placeholder)
                 .fallback(placeholder)
@@ -157,13 +169,13 @@ public class GlideManager {
                 .transform(new CircleCrop())).into(iv);
     }
 
-    public static void loadCircleImg(Object obj, ImageView iv, int placeholderResource) {
+    public static void loadCircleImgCenterCrop(Object obj, ImageView iv, int placeholderResource) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
-        loadCircleImg(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
+        loadCircleImgCenterCrop(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
     }
 
     public static void loadCircleImg(Object obj, ImageView iv) {
-        loadCircleImg(obj, iv, sCirclePlaceholder);
+        loadCircleImgCenterCrop(obj, iv, sCirclePlaceholder);
     }
 
     /**
@@ -175,8 +187,8 @@ public class GlideManager {
      * @param placeholder         -占位图
      * @param isOfficial-是否官方模式圆角
      */
-    public static void loadRoundImg(Object obj, ImageView iv, float dp, Drawable placeholder, boolean isOfficial) {
-        Glide.with(iv.getContext()).load(obj).apply(getRequestOptions()
+    public static void loadRoundImgCenterCrop(Object obj, ImageView iv, float dp, Drawable placeholder, boolean isOfficial) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsCenterCrop()
                 .error(placeholder)
                 .placeholder(placeholder)
                 .fallback(placeholder)
@@ -184,13 +196,13 @@ public class GlideManager {
                 .transform(isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
     }
 
-    public static void loadRoundImg(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
+    public static void loadRoundImgCenterCrop(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
-        loadRoundImg(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
+        loadRoundImgCenterCrop(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
     }
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp, boolean isOfficial) {
-        loadRoundImg(obj, iv, dp, sRoundPlaceholder, isOfficial);
+        loadRoundImgCenterCrop(obj, iv, dp, sRoundPlaceholder, isOfficial);
     }
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp) {
@@ -205,7 +217,7 @@ public class GlideManager {
         loadRoundImg(obj, iv, true);
     }
 
-    private static RequestOptions getRequestOptions() {
+    private static RequestOptions getRequestOptionsCenterCrop() {
         RequestOptions requestOptions = new RequestOptions()
                 // 填充方式
                 .centerCrop()
@@ -216,6 +228,14 @@ public class GlideManager {
         return requestOptions;
     }
 
+    private static RequestOptions getRequestOptionsAuto() {
+        RequestOptions requestOptions = new RequestOptions()
+                //优先级
+                .priority(Priority.HIGH)
+                //缓存策略
+                .diskCacheStrategy(DiskCacheStrategy.ALL);
+        return requestOptions;
+    }
     private static int dp2px(float dipValue) {
         final float scale = Resources.getSystem().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);

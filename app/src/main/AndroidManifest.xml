@@ -32,7 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LoginActivity" />
+        <activity android:name=".ui.account.LoginActivity" />
+        <activity android:name=".ui.account.EditPassActivity" />
+        <activity android:name=".ui.pay.PayResultActivity" />
+
     </application>
 
 </manifest>

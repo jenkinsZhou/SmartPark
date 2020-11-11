@@ -146,7 +146,7 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
             if (activity instanceof IStatusBar) {
                 isInit = ((IStatusBar) activity).setStatusBar(activity, statusViewHelper, topView);
             }
-            if (isInit) {
+          /*  if (isInit) {
                 //状态栏黑色文字图标flag被覆盖问题--临时解决
                 RxJavaManager.getInstance().setTimer(10)
                         .subscribe(new BaseObserver<Long>() {
@@ -159,7 +159,7 @@ public class ApplicationLifecycleCallbacks extends FragmentManager.FragmentLifec
                                 activity.getIntent().putExtra(CommonConstant.IS_SET_STATUS_VIEW_HELPER, true);
                             }
                         });
-            }
+            }*/
         }
     }
 

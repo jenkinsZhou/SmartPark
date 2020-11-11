@@ -146,10 +146,6 @@ public class UiManager {
             ToastUtil.init(mApplication);
             //注册activity生命周期
             mApplication.registerActivityLifecycleCallbacks(new ApplicationLifecycleCallbacks());
-
-            //初始化Glide
-            GlideManager.setPlaceholderColor(ContextCompat.getColor(mApplication, R.color.colorPlaceholder));
-            GlideManager.setPlaceholderRoundRadius(mApplication.getResources().getDimension(R.dimen.dp_placeholder_radius));
         }
         return getInstance();
     }
@@ -161,7 +157,7 @@ public class UiManager {
 
     /**
      * 设置Adapter统一加载更多相关脚布局
-     * 最终调用{@link FastRefreshLoadDelegate#initRecyclerView()}
+     * 最终调用{@link RefreshLoadDelegate#initRecyclerView()}
      *
      * @param mLoadMoreFoot
      * @return
@@ -192,7 +188,7 @@ public class UiManager {
 
     /**
      * 设置SmartRefreshLayout 下拉刷新头
-     * 最终调用{@link FastRefreshDelegate#initRefreshHeader()}
+     * 最终调用{@link RefreshDelegate#initRefreshHeader()}
      *
      * @param control
      * @return
@@ -208,7 +204,7 @@ public class UiManager {
 
     /**
      * 设置多状态布局--加载中/空数据/错误/无网络
-     * 最终调用{@link FastRefreshDelegate#initRefreshHeader()}
+     * 最终调用{@link RefreshDelegate#initRefreshHeader()}
      *
      * @param control
      * @return
@@ -224,7 +220,7 @@ public class UiManager {
 
     /**
      * 设置全局网络请求等待Loading提示框如登录等待loading
-     * 最终调用{@link FastLoadingObserver#FastLoadingObserver(Activity)}
+     * 最终调用{@link BaseLoadingObserver#FastLoadingObserver(Activity)}
      *
      * @param control
      * @return

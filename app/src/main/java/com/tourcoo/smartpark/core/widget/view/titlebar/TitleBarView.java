@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -23,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.apkfuns.logutils.LogUtils;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
@@ -30,6 +33,7 @@ import com.tourcoo.smartpark.core.utils.DrawableUtil;
 import com.tourcoo.smartpark.core.utils.NotchUtil;
 import com.tourcoo.smartpark.core.utils.ResourceUtil;
 import com.tourcoo.smartpark.core.utils.StatusBarUtil;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.view.alpha.AlphaImageView;
 import com.tourcoo.smartpark.core.widget.view.alpha.AlphaTextView;
 import com.tourcoo.smartpark.core.widget.view.titlebar.util.ViewGroupUtils;
@@ -42,7 +46,6 @@ import com.tourcoo.smartpark.core.widget.view.titlebar.util.ViewGroupUtils;
  * @Email: 971613168@qq.com
  */
 public class TitleBarView extends ViewGroup {
-
     /**
      * 默认透明度--5.0以上优化半透明状态栏一致
      */
@@ -304,7 +307,7 @@ public class TitleBarView extends ViewGroup {
      */
     private void initView(Context context) {
         LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT);
-        LayoutParams dividerParams = new LayoutParams(LayoutParams.MATCH_PARENT, mDividerHeight);
+        LayoutParams dividerParams = new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, mDividerHeight);
 
         mLLayoutLeft = new LinearLayout(context);
         mLLayoutCenter = new LinearLayout(context);
@@ -350,10 +353,9 @@ public class TitleBarView extends ViewGroup {
         mStatusBarHeight = getNeedStatusBarHeight();
         if (context instanceof Activity) {
             setImmersible((Activity) context, mImmersible);
-         /*   if (mStatusBarLightMode) {
-                setStatusBarLightMode((Activity) context);
-            }*/
-            setStatusBarLightMode((Activity) context);
+            if (mStatusBarLightMode) {
+                setStatusBarLightMode(true);
+            }
         }
         setOutPadding(mOutPadding);
         setActionPadding(mActionPadding);
@@ -508,7 +510,7 @@ public class TitleBarView extends ViewGroup {
         Window window = activity.getWindow();
         //Android 4.4以上
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mVStatus.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, mStatusBarHeight));
+            mVStatus.setLayoutParams(new ViewGroup.LayoutParams(LayoutParams.MATCH_PARENT, mStatusBarHeight));
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             //Android 5.1以上
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -600,7 +602,7 @@ public class TitleBarView extends ViewGroup {
      * @return
      */
     public TitleBarView setHeight(int height) {
-        LayoutParams params = getLayoutParams();
+        ViewGroup.LayoutParams params = getLayoutParams();
         if (params != null) {
             if (params.height != height) {
                 mHeight = -1;
@@ -613,7 +615,7 @@ public class TitleBarView extends ViewGroup {
 
     @Override
     public void setLayoutParams(LayoutParams params) {
-        LayoutParams par = getLayoutParams();
+        ViewGroup.LayoutParams par = getLayoutParams();
         if (par != null && params != null && par.height != params.height) {
             mHeight = -1;
         }
@@ -1112,7 +1114,7 @@ public class TitleBarView extends ViewGroup {
             mTvTitleMain.setFocusable(true);
             mTvTitleMain.setFocusableInTouchMode(true);
             mTvTitleMain.requestFocus();
-            mTvTitleMain.setOnFocusChangeListener(new OnFocusChangeListener() {
+            mTvTitleMain.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if (!hasFocus && mTitleMainTextMarquee) {
@@ -1233,7 +1235,7 @@ public class TitleBarView extends ViewGroup {
             mTvTitleSub.setFocusable(true);
             mTvTitleSub.setFocusableInTouchMode(true);
             mTvTitleSub.requestFocus();
-            mTvTitleSub.setOnFocusChangeListener(new OnFocusChangeListener() {
+            mTvTitleSub.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if (!hasFocus && mTitleSubTextMarquee) {
@@ -1879,16 +1881,5 @@ public class TitleBarView extends ViewGroup {
         } catch (Exception e) {
         }
         return had;
-    }
-
-    /**
-     * 状态栏高亮模式(白色背景 黑色字体)
-     *
-     * @param activity
-     */
-    private void setStatusBarLightMode(Activity activity) {
-        //状态栏字体是深色，不写默认为亮色
-        ImmersionBar.with(activity)
-                .statusBarColor(R.color.colorWhite).statusBarDarkFont(true, 0.5f).init();
     }
 }

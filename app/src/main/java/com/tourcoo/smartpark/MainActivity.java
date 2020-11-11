@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.tourcoo.smartpark.core.base.activity.BaseActivity;
 import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
-import com.tourcoo.smartpark.ui.LoginActivity;
+import com.tourcoo.smartpark.ui.account.LoginActivity;
 
 public class MainActivity extends BaseActivity implements QuitAppControl {
 private TextView tvHello;

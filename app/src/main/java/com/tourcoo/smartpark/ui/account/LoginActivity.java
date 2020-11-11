@@ -1,4 +1,4 @@
-package com.tourcoo.smartpark.ui;
+package com.tourcoo.smartpark.ui.account;
 
 import android.os.Bundle;
 import android.view.View;

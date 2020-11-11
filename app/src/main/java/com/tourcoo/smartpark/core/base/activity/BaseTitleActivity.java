@@ -25,7 +25,7 @@ public abstract class BaseTitleActivity extends BaseActivity implements ITitleVi
 
     @Override
     protected void onDestroy() {
-        mTitleBar = null;
         super.onDestroy();
+        mTitleBar = null;
     }
 }

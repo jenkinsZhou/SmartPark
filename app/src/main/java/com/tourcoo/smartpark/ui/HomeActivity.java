@@ -9,11 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.gyf.immersionbar.BarProperties;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
-import com.tourcoo.smartpark.core.utils.ToastUtil;
+import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
+import com.tourcoo.smartpark.core.utils.SizeUtil;
+import com.tourcoo.smartpark.entity.ParkInfo;
+import com.tourcoo.smartpark.ui.account.EditPassActivity;
+import com.tourcoo.smartpark.ui.account.LoginActivity;
+import com.tourcoo.smartpark.util.GridDividerItemDecoration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author :JenkinsZhou
@@ -27,20 +39,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
     private boolean drawerOpenStatus = false;
+    private RecyclerView parkingRecyclerView;
+    private HomeGridParkAdapter homeGridParkAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_activity);
         initView();
+        initTestData();
+        findViewById(R.id.tvCarRecord).setOnClickListener(this);
+        initImmersionBar();
+        ImmersionBar.with(this).titleBar(homeToolBar)
+                .navigationBarColor(R.color.shape1).titleBarMarginTop(homeToolBar)
+                .init();
+        ImmersionBar.with(this)
+                .statusBarDarkFont(true)
+                .navigationBarDarkIcon(true)
+                .init();
     }
 
     private void initView() {
         homeToolBar = findViewById(R.id.homeToolBar);
-        ImmersionBar.with(this)
-                .statusBarColor(R.color.colorWhite).statusBarDarkFont(true, 0.5f).init();
         ivMenu = findViewById(R.id.ivMenu);
         drawerLayout = findViewById(R.id.drawerLayout);
+        parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
         findViewById(R.id.tvLogout).setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
@@ -82,13 +105,51 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case  R.id.tvLogout:
+            case R.id.tvLogout:
                 Intent intent = new Intent();
-                intent.setClass(HomeActivity.this,LoginActivity.class);
+                intent.setClass(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
+                break;
+            case R.id.tvCarRecord:
+                Intent intent1 = new Intent();
+                intent1.setClass(HomeActivity.this, EditPassActivity.class);
+                startActivity(intent1);
                 break;
             default:
                 break;
         }
+    }
+
+
+    private void initTestData() {
+        parkingRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this,R.color.whiteF5F5F5), false));
+        homeGridParkAdapter = new HomeGridParkAdapter();
+        List<ParkInfo> parkInfoList = new ArrayList<>();
+        ParkInfo parkInfo;
+        int size = 10;
+        for (int i = 0; i < size; i++) {
+            parkInfo = new ParkInfo();
+            parkInfo.setParkingNum("A02568" + i);
+            parkInfo.setPlantNum("皖A·761M" + i);
+            if (i % 2 != 0) {
+                parkInfo.setStatus(1);
+            } else {
+                parkInfo.setStatus(0);
+            }
+            parkInfoList.add(parkInfo);
+
+        }
+        homeGridParkAdapter.setNewData(parkInfoList);
+        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);
+    }
+
+    /**
+     * 初始化沉浸式
+     * Init immersion bar.
+     */
+    protected void initImmersionBar() {
+        //设置共同沉浸式样式
+        ImmersionBar.with(this).navigationBarColor(R.color.colorPrimary).init();
     }
 }
