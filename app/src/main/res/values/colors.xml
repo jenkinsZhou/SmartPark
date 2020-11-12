@@ -29,6 +29,7 @@
     <!--Glide加载图片默认占位图背景色-->
     <color name="colorPlaceholder">#CCCCCC</color>
 
+    <color name="commonBgColor">#EEEEEE</color>
     <!--TitleBarView背景色-->
     <color name="colorTitleBackground">#FFFFFF</color>
     <!--TitleBarView 文字颜色-->

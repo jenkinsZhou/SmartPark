@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.core.base.activity;
 
 import android.os.Bundle;
 
+import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.core.control.ITitleView;
 import com.tourcoo.smartpark.core.utils.FindViewUtil;
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView;
@@ -21,6 +22,10 @@ public abstract class BaseTitleActivity extends BaseActivity implements ITitleVi
     public void beforeInitView(Bundle savedInstanceState) {
         super.beforeInitView(savedInstanceState);
         mTitleBar = FindViewUtil.getTargetView(mContentView, TitleBarView.class);
+        ImmersionBar.with(this)
+                .statusBarDarkFont(true)
+                .navigationBarDarkIcon(true)
+                .init();
     }
 
     @Override

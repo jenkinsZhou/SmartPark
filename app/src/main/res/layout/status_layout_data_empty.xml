@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:src="@mipmap/ic_no_data" />
+
+        <TextView
+            style="@style/textBlackStyle14"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_38"
+            android:text="暂无车辆"
+            android:textSize="@dimen/sp_16"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_18"
+            android:letterSpacing="0.2"
+            android:text="抱歉 未找到您输入的车牌号"
+            android:textColor="@color/colorGraySmallText"
+            android:textSize="@dimen/sp_14" />
+    </LinearLayout>
+
+</RelativeLayout>

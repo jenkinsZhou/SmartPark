@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/layout_title_bar" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/dp_18"
+        android:paddingBottom="@dimen/dp_18">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="宜兴XXXX停车场"
+                android:textColor="@color/blue629BFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="2020-09-20"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="@dimen/sp_36"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="收费员姓名"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="2020-09-09  12:30"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="收费员编号"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="2020-09-09  12:30"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_36"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="总车次（次）"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="2020-09-09  12:30"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text=" 总应收（元）"
+                android:textStyle="bold" />
+
+            <!--<TextView
+                style="@style/textBlackStyle14"
+                android:text="［忽略］"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12"
+                android:textStyle="bold" />-->
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="¥ 0.00"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="总实收（元）"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="¥ 10.00"
+                android:textColor="@color/colorGraySmallText" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="线上支付（元）"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="¥ 10.00"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_18"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/dp_28"
+            android:paddingEnd="@dimen/dp_28">
+
+            <TextView
+                style="@style/textBlackStyle14"
+                android:text="线下支付（元）"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dp_10"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="¥ 10.00"
+                />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

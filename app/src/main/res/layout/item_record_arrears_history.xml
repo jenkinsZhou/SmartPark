@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+     android:padding="@dimen/dp_14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@mipmap/ic_checked_blue_small" />
+
+
+
+    <LinearLayout
+        android:layout_marginStart="@dimen/dp_14"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@mipmap/ic_locate_small_yello"
+                android:drawablePadding="@dimen/dp_5"
+                android:text="停车位置"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="宜兴停车场"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/dp_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@mipmap/ic_enter_time_small"
+                android:drawablePadding="@dimen/dp_5"
+                android:text="入场时间"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2020-09-15  21:00:00"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/dp_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@mipmap/ic_exit_time_small"
+                android:drawablePadding="@dimen/dp_5"
+                android:text="离场时间"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2020-09-15  23:00:00"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/dp_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@mipmap/ic_alarm_small_yello"
+                android:drawablePadding="@dimen/dp_5"
+                android:text="计费时长"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+
+            <TextView
+                android:layout_marginStart="@dimen/dp_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2小时0分10秒"
+                android:textColor="@color/colorGraySmallText"
+                android:textSize="@dimen/sp_12" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginStart="@dimen/dp_14"
+        android:layout_marginEnd="@dimen/dp_14"
+        android:text="8"
+        android:layout_gravity="center_vertical"
+        android:textSize="@dimen/sp_18"
+        android:textColor="#E54E3F"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

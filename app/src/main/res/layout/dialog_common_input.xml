@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_76"
+        android:background="@drawable/bg_radius_15_white"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/dp_15"
+        android:paddingEnd="@dimen/dp_15"
+        android:paddingBottom="@dimen/dp_20">
+
+        <TextView
+            style="@style/textBlackStyle14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_50"
+            android:text="请修改初始密码" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_20"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@null"
+                android:digits="@string/register_name_digits"
+                android:hint="请输入新密码"
+                android:inputType="text"
+                android:maxLength="15"
+                android:padding="@dimen/dp_15"
+                android:textColorHint="#CCCCCC"
+                android:textSize="@dimen/sp_14" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="@dimen/dp_15"
+                android:src="@mipmap/ic_eye_blue_open" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_15"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvPositive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginStart="@dimen/dp_20"
+                android:layout_marginEnd="@dimen/dp_20"
+                android:layout_weight="1"
+                android:background="@drawable/bg_select_primary_blue"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:paddingStart="@dimen/dp_30"
+                android:paddingTop="@dimen/dp_6"
+                android:paddingEnd="@dimen/dp_30"
+                android:paddingBottom="@dimen/dp_6"
+                android:text="确认"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_13" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/ic_bg_reset_pass" />
+
+
+</RelativeLayout>

@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:padding="@dimen/dp_5"
-                android:src="@mipmap/ic_eyes_blue" />
+                android:src="@mipmap/ic_eye_blue_closed" />
         </LinearLayout>
 
         <LinearLayout
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:padding="@dimen/dp_5"
-                android:src="@mipmap/ic_eyes_blue" />
+                android:src="@mipmap/ic_eye_blue_closed" />
         </LinearLayout>
 
         <LinearLayout
@@ -121,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:padding="@dimen/dp_5"
-                android:src="@mipmap/ic_eyes_blue" />
+                android:src="@mipmap/ic_eye_blue_closed" />
         </LinearLayout>
 
     </LinearLayout>

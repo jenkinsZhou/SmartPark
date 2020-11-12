@@ -35,6 +35,7 @@
         <activity android:name=".ui.account.LoginActivity" />
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
+        <activity android:name=".ui.pay.ExitPayFeeActivity" />
 
     </application>
 

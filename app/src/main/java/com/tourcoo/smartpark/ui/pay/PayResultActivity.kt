@@ -14,7 +14,7 @@ import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
  */
 class PayResultActivity : BaseTitleActivity() {
     override fun getContentLayout(): Int {
-       return R.layout.activity_pay_result
+        return R.layout.activity_pay_result
     }
 
     override fun initView(savedInstanceState: Bundle?) {
