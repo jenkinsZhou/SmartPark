@@ -15,5 +15,5 @@ public class RequestConstant {
 
     public static final int REQUEST_SUCCESS = 200;
 
-    public static final String BASE_URL = "http:www.baidu.com";
+    public static final String BASE_URL = "http://192.168.0.201:8007/";
 }

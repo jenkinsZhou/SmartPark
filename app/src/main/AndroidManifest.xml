@@ -3,7 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tourcoo.smartpark">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <application
         android:name="com.tourcoo.SmartParkApplication"
         android:allowBackup="true"
@@ -36,6 +48,8 @@
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
         <activity android:name=".ui.pay.ExitPayFeeActivity" />
+        <activity android:name=".ui.record.RecordCarInfoConfirmActivity" />
+        <activity android:name=".ui.report.FeeDailyReportActivity" />
 
     </application>
 

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/ic_bg_login"
     android:orientation="vertical">
 
     <include layout="@layout/layout_title_bar" />
@@ -30,7 +31,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_radius_30_gray_f5f5f5"
                 android:layout_marginTop="@dimen/dp_60"
+                android:paddingTop="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_9"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -57,13 +61,18 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:padding="@dimen/dp_5"
-                    android:src="@mipmap/ic_delete_red" />
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_30"
+                    android:src="@mipmap/ic_delete_red_small" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_20"
+                android:background="@drawable/bg_radius_30_gray_f5f5f5"
+                android:paddingTop="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_9"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -90,10 +99,15 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:padding="@dimen/dp_5"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_30"
                     android:src="@mipmap/ic_arrow_bottom_blue" />
             </LinearLayout>
 
             <LinearLayout
+                android:background="@drawable/bg_radius_30_gray_f5f5f5"
+                android:paddingTop="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dp_20"
@@ -123,7 +137,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:padding="@dimen/dp_5"
-                    android:src="@mipmap/ic_delete_red" />
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_30"
+                    android:src="@mipmap/ic_delete_red_small" />
             </LinearLayout>
 
             <TextView

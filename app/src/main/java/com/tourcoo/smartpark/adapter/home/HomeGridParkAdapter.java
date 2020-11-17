@@ -8,7 +8,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.manager.GlideManager;
-import com.tourcoo.smartpark.entity.ParkInfo;
+import com.tourcoo.smartpark.bean.ParkInfo;
 
 /**
  * @author :JenkinsZhou

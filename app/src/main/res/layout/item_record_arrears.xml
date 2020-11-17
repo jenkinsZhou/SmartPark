@@ -2,15 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/dp_12"
-    android:paddingBottom="@dimen/dp_12"
-    android:background="@color/white"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/dp_12">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:background="@drawable/bg_left_radius_15_right_30_white"
         android:orientation="vertical">
 
         <TextView
@@ -48,12 +47,18 @@
 
     </LinearLayout>
 
+    <!--  <View
+          android:layout_width="@dimen/dp_1"
+          android:layout_height="@dimen/dp_100"
+          android:background="@color/black" />-->
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.6"
-        android:orientation="vertical">
+        android:background="@drawable/bg_left_radius_30_right_15_white"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/dp_10">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -92,9 +97,9 @@
             android:textStyle="bold" />
 
         <LinearLayout
-            android:layout_marginTop="@dimen/dp_10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dp_10"
             android:orientation="horizontal">
 
             <TextView
@@ -109,9 +114,9 @@
                 android:textStyle="bold" />
 
             <ImageView
-                android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginEnd="@dimen/dp_15"
                 android:src="@mipmap/ic_ali_pay_small" />
         </LinearLayout>

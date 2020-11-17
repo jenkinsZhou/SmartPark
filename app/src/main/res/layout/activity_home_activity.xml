@@ -87,6 +87,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvPayExit"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_15"

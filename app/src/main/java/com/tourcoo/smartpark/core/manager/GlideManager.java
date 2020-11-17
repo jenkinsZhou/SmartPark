@@ -196,10 +196,27 @@ public class GlideManager {
                 .transform(isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
     }
 
+    public static void loadRoundImgAuto(Object obj, ImageView iv, float dp, Drawable placeholder, boolean isOfficial) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsAuto()
+                .error(placeholder)
+                .placeholder(placeholder)
+                .fallback(placeholder)
+                .dontAnimate()
+                .transform(isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
+    }
     public static void loadRoundImgCenterCrop(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
         loadRoundImgCenterCrop(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
     }
+    public static void loadRoundImgAuto(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
+        Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
+        loadRoundImgAuto(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
+    }
+
+    public static void loadRoundImgAuto(Object obj, ImageView iv, float dp, boolean isOfficial) {
+        loadRoundImgAuto(obj, iv, dp, sRoundPlaceholder, isOfficial);
+    }
+
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp, boolean isOfficial) {
         loadRoundImgCenterCrop(obj, iv, dp, sRoundPlaceholder, isOfficial);
@@ -207,6 +224,9 @@ public class GlideManager {
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp) {
         loadRoundImg(obj, iv, dp, true);
+    }
+    public static void loadRoundImgAuto(Object obj, ImageView iv, float dp) {
+        loadRoundImgAuto(obj, iv, dp, true);
     }
 
     public static void loadRoundImg(Object obj, ImageView iv, boolean isOfficial) {

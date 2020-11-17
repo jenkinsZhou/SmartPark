@@ -16,12 +16,15 @@
     <color name="shape1">#5d8df7</color>
 <!--绿色区域-->
     <color name="green4EBF8B">#4EBF8B</color>
-
+    <color name="green5BC896">#5BC896</color>
     <color name="whiteEFEFEF">#EFEFEF</color>
     <color name="whiteF5F5F5">#F5F5F5</color>
     <color name="colorPrimary">@color/blue629BFF</color>
     <color name="colorPrimaryDark">#004D8E</color>
     <color name="blue55A9FF">#55A9FF</color>
+
+    <color name="grayF0F5FF">#F0F5FF</color>
+
     <color name="colorAccent">@color/blue55A9FF</color>
     <color name="transparent">#00000000</color>
     <color name="color_000000">#000000</color>
@@ -51,4 +54,46 @@
     <color name="colorWhitePressed">#DCDCDC</color>
     <color name="colorBlackTitle">#333333</color>
     <color name="colorGraySmallText">#A2A2A2</color>
+
+
+    <color name="black231717">#231717</color>
+    <color name="black171717">#171717</color>
+
+    <color name="grayF7F5F6">#F7F5F6</color>
+    <color name="gray444444">#444444</color>
+    <color name="grayF5F5F5">#F5F5F5</color>
+    <color name="grayEEEEEE">#EEEEEE</color>
+    <color name="grayF6F6F6">#F6F6F6</color>
+    <color name="grayE0E0E0">#E0E0E0</color>
+    <color name="grayA2A2A2">#A2A2A2</color>
+    <color name="grayCCCCCC">#CCCCCC</color>
+    <color name="grayAAAAAA">#AAAAAA</color>
+    <color name="grayDDDDDD">#DDDDDD</color>
+
+
+    <color name="commonBg">@color/grayF5F5F5</color>
+
+
+
+    <color name="king_keyboard_key_text_color">#ff333333</color>
+
+    <color name="king_keyboard_key_special_text_color">#ff333333</color>
+
+    <color name="king_keyboard_key_done_text_color">#ffeeeeee</color>
+
+    <color name="king_keyboard_key_none_text_color">#7f999999</color>
+
+    <color name="king_keyboard_key_icon_color">#ff333333</color>
+
+    <color name="king_keyboard_key_bg_normal">#ffffffff</color>
+    <color name="king_keyboard_key_bg_pressed">#ffbbbbbb</color>
+
+    <color name="king_keyboard_special_key_bg_normal">#ffa8afbf</color>
+    <color name="king_keyboard_special_key_bg_pressed">#ff989faf</color>
+
+    <color name="king_keyboard_done_key_bg_normal">#ff0477ff</color>
+    <color name="king_keyboard_done_key_bg_pressed">#ff0467ef</color>
+
+    <color name="king_keyboard_none_key_bg_normal">#ffefefef</color>
+    <color name="king_keyboard_none_key_bg_pressed">#ffefefef</color>
 </resources>

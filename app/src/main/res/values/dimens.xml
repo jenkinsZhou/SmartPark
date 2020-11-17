@@ -16,7 +16,7 @@
     <dimen name="dp_min_height_loading">65dp</dimen>
     <dimen name="dp_action_sheet_list_line_height">@dimen/dp_line_size</dimen>
     <dimen name="sp_size_item_study_training_record">@dimen/sp_15</dimen>
-
+    <dimen name="input_plant_num_size">@dimen/dp_36</dimen>
     <!-- dp and sp values, must be defind in this file! -->
     <!-- view size,you can add if there is no one -->
     <dimen name="common_margin">@dimen/dp_15</dimen>

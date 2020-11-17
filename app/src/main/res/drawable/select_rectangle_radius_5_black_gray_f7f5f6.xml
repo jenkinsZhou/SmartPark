@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/shape_rectangle_radius_5_gray_f7f5f6_hollow_white" android:state_enabled="true" android:state_focused="false" />
+    <item android:drawable="@drawable/shape_rectangle_radius_5_white_hollow_blue_00b4ff" android:state_enabled="true" android:state_focused="true" />
+    <item android:drawable="@drawable/shape_rectangle_radius_5_gray_f7f5f6_hollow_white" />
+</selector>

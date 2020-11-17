@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -14,18 +15,34 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.gyf.immersionbar.BarProperties;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
+import com.tourcoo.smartpark.bean.BaseResult;
+import com.tourcoo.smartpark.core.CommonUtil;
+import com.tourcoo.smartpark.core.retrofit.UploadProgressBody;
+import com.tourcoo.smartpark.core.retrofit.UploadRequestListener;
+import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
-import com.tourcoo.smartpark.entity.ParkInfo;
+import com.tourcoo.smartpark.bean.ParkInfo;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.account.LoginActivity;
+import com.tourcoo.smartpark.ui.pay.PayResultActivity;
+import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
+import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * @author :JenkinsZhou
@@ -41,6 +58,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private boolean drawerOpenStatus = false;
     private RecyclerView parkingRecyclerView;
     private HomeGridParkAdapter homeGridParkAdapter;
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,14 +67,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         initView();
         initTestData();
         findViewById(R.id.tvCarRecord).setOnClickListener(this);
-        initImmersionBar();
-        ImmersionBar.with(this).titleBar(homeToolBar)
-                .navigationBarColor(R.color.shape1).titleBarMarginTop(homeToolBar)
-                .init();
-        ImmersionBar.with(this)
-                .statusBarDarkFont(true)
-                .navigationBarDarkIcon(true)
-                .init();
+        findViewById(R.id.tvPayExit).setOnClickListener(this);
+        findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
+        setImmersionBar(true);
     }
 
     private void initView() {
@@ -65,6 +78,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         drawerLayout = findViewById(R.id.drawerLayout);
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
         findViewById(R.id.tvLogout).setOnClickListener(this);
+        findViewById(R.id.tvHomeEditPass).setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -74,11 +88,13 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDrawerOpened(@NonNull View drawerView) {
                 drawerOpenStatus = true;
+                setImmersionBar(false);
             }
 
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
                 drawerOpenStatus = false;
+                setImmersionBar(true);
             }
 
             @Override
@@ -115,6 +131,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 intent1.setClass(HomeActivity.this, EditPassActivity.class);
                 startActivity(intent1);
                 break;
+            case R.id.tvPayExit:
+                Intent intent2 = new Intent();
+                intent2.setClass(HomeActivity.this, RecordCarInfoConfirmActivity.class);
+                startActivity(intent2);
+                break;
+            case R.id.tvHomeReportFee:
+                Intent intent3 = new Intent();
+                intent3.setClass(HomeActivity.this, FeeDailyReportActivity.class);
+                startActivity(intent3);
+                break;
+            case R.id.tvHomeEditPass:
+                CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
+                break;
             default:
                 break;
         }
@@ -123,7 +152,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initTestData() {
         parkingRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
-        parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this,R.color.whiteF5F5F5), false));
+        parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this, R.color.whiteF5F5F5), false));
         homeGridParkAdapter = new HomeGridParkAdapter();
         List<ParkInfo> parkInfoList = new ArrayList<>();
         ParkInfo parkInfo;
@@ -148,8 +177,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化沉浸式
      * Init immersion bar.
      */
-    protected void initImmersionBar() {
-        //设置共同沉浸式样式
-        ImmersionBar.with(this).navigationBarColor(R.color.colorPrimary).init();
+    protected void setImmersionBar(boolean darkFont) {
+        ImmersionBar.with(HomeActivity.this).titleBar(homeToolBar)
+                .navigationBarColor(R.color.shape1).titleBarMarginTop(homeToolBar).statusBarDarkFont(darkFont).navigationBarDarkIcon(darkFont)
+                .init();
     }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerOpenStatus) {
+            drawerLayout.close();
+            return;
+        }
+        super.onBackPressed();
+    }
+
+
 }

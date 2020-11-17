@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/commonBg"
     android:orientation="vertical">
 
     <include layout="@layout/layout_title_bar" />
@@ -10,7 +10,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_20"
+        android:layout_margin="@dimen/dp_15"
+        android:background="@drawable/bg_radius_15_white"
         android:orientation="vertical">
 
         <TextView
@@ -18,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_12"
             android:gravity="center"
             android:text="A01001"
             android:textColor="@color/colorBlackTitle"
@@ -41,7 +43,7 @@
             android:layout_marginTop="@dimen/dp_12"
             android:layout_marginEnd="@dimen/dp_10"
             android:layout_marginBottom="@dimen/dp_10"
-            android:background="@drawable/bg_radius_30_green_4ebbf"
+            android:background="@drawable/bg_radius_30_green_4ebf8b"
             android:paddingStart="@dimen/dp_11"
             android:paddingTop="@dimen/dp_3_5"
             android:paddingEnd="@dimen/dp_11"
@@ -53,14 +55,13 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_15"
-        android:background="@color/commonBgColor" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_15"
+        android:layout_marginEnd="@dimen/dp_15"
+        android:background="@drawable/bg_radius_15_white"
         android:orientation="vertical"
         android:paddingTop="@dimen/dp_18"
         android:paddingBottom="@dimen/dp_18">
@@ -69,8 +70,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -92,8 +93,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_18"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -115,8 +116,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_18"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -139,8 +140,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_18"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -164,13 +165,21 @@
                 android:textColor="@color/colorGraySmallText" />
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_1"
+            android:layout_marginStart="@dimen/dp_15"
+            android:layout_marginTop="@dimen/dp_18"
+            android:layout_marginEnd="@dimen/dp_15"
+            android:background="@color/grayEEEEEE" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dp_36"
+            android:layout_marginTop="@dimen/dp_18"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -192,8 +201,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_18"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/dp_28"
-            android:paddingEnd="@dimen/dp_28">
+            android:paddingStart="@dimen/dp_15"
+            android:paddingEnd="@dimen/dp_15">
 
             <TextView
                 style="@style/textBlackStyle14"
@@ -212,15 +221,11 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_15"
-        android:background="@color/commonBgColor" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F6F6F6">
+        >
 
         <LinearLayout
             android:id="@+id/llBottomLayout"
