@@ -8,14 +8,18 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Streaming;
 
 /**
  * @author :JenkinsZhou
@@ -37,9 +41,29 @@ public interface ApiService {
     /**
      * 多个文件上传
      *
-     * @param files
+     * @param file
      * @return
      */
     @POST("file/upload")
-    Call<BaseResult<List<String>>> uploadFiles(@Body RequestBody files);
+    Call<BaseResult<List<String>>> uploadFiles(@Body RequestBody file);
+
+    /**
+     * 单个文件上传
+     *
+     * @param file
+     * @return
+     */
+    @Multipart
+    @POST("file/upload")
+    Call<BaseResult<List<String>>> uploadFile(@Part MultipartBody.Part file);
+
+    /**
+     * 多个文件上传
+     *
+     * @param files
+     * @return
+     */
+    @Multipart
+    @POST("file/upload")
+    Call<BaseResult<List<String>>> uploadFiles(@Part List<MultipartBody.Part> files);
 }

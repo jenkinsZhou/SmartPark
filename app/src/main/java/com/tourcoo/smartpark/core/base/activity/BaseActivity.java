@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.core.base.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -17,6 +18,8 @@ import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.utils.StackUtil;
+import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
+import com.tourcoo.smartpark.core.widget.dialog.loading.LoadingDialogWrapper;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
@@ -37,6 +40,8 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
     protected boolean mIsFirstBack = true;
     protected long mDelayBack = 2000;
     private QuitAppControl mQuitAppControl;
+    private IosLoadingDialog loadingDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,12 +66,13 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
         mIsViewLoaded = true;
         beforeInitView(savedInstanceState);
         initView(savedInstanceState);
+        loadingDialog = new IosLoadingDialog(mContext, "加载中...");
     }
 
 
-    private void beforeLazyLoadData(){
+    private void beforeLazyLoadData() {
         //确保视图加载及视图绑定完成避免刷新UI抛出异常
-        if(mIsViewLoaded){
+        if (mIsViewLoaded) {
             RxJavaManager.getInstance().setTimer(10)
                     .compose(this.<Long>bindUntilEvent(ActivityEvent.DESTROY))
                     .subscribe(new BaseObserver<Long>() {
@@ -75,12 +81,12 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
                             beforeLazyLoadData();
                         }
                     });
-        }else {
+        } else {
             lazyLoadData();
         }
     }
 
-    protected void lazyLoadData(){
+    protected void lazyLoadData() {
         if (mIsFirstShow) {
             mIsFirstShow = false;
             loadData();
@@ -137,6 +143,27 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
     public void beforeInitView(Bundle savedInstanceState) {
         if (UiManager.getInstance().getActivityFragmentControl() != null) {
             UiManager.getInstance().getActivityFragmentControl().setContentViewBackground(mContentView, this.getClass());
+        }
+    }
+
+    protected void showLoading(String msg) {
+        if (loadingDialog != null && !loadingDialog.isShowing()) {
+            if (!TextUtils.isEmpty(msg)) {
+                loadingDialog.setLoadingText(msg);
+            }
+            loadingDialog.show();
+        }
+    }
+
+    protected void showLoading() {
+        if (loadingDialog != null && !loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    protected void closeLoading() {
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
         }
     }
 }

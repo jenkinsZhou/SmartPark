@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="external_cache_dir">smart_park_external_cache_dir</string>
+    <string name="cache_dir">smart_park_cache_dir</string>
+    <string name="external_storage_directory">smart_park_external_storage_directory</string>
+    <string name="external_files_dir">smart_park_external_files_dir</string>
+    <string name="files_dir">smart_park_files_dir</string>
+</resources>

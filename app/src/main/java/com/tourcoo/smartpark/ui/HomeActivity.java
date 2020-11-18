@@ -1,6 +1,7 @@
 package com.tourcoo.smartpark.ui;
 
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -32,6 +33,8 @@ import com.tourcoo.smartpark.ui.pay.PayResultActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -192,5 +195,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onBackPressed();
     }
 
+private void test(){
+        File file = new File("");
+    RequestBody requestBody =  RequestBody.create(MediaType.parse("image/jpg"), file);
+    MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
+   /* ApiRepository.getInstance().getApiService().uploadFiles(body).enqueue(new Callback<BaseResult<List<String>>>() {
+        @Override
+        public void onResponse(@NotNull Call<BaseResult<List<String>>> call, Response<BaseResult<List<String>>> response) {
+
+        }
+
+        @Override
+        public void onFailure(@NotNull Call<BaseResult<List<String>>> call, Throwable t) {
+
+        }
+    });*/
+}
 
 }

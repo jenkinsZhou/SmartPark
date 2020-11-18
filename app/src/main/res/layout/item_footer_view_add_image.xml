@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/rlAddImage"
     android:layout_margin="@dimen/dp_5">
 
     <ImageView
@@ -14,11 +15,5 @@
         android:layout_marginEnd="@dimen/dp_10"
         android:scaleType="fitCenter" />
 
-    <ImageView
-        android:id="@+id/ivDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:padding="@dimen/dp_10"
-        android:src="@mipmap/ic_delete_red_middle" />
+
 </RelativeLayout>

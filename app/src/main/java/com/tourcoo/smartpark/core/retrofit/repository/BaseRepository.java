@@ -2,7 +2,7 @@ package com.tourcoo.smartpark.core.retrofit.repository;
 
 import android.accounts.NetworkErrorException;
 
-import com.tourcoo.smartpark.core.base.entity.BaseResult;
+import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.core.retrofit.DataNullException;
 import com.tourcoo.smartpark.core.retrofit.RetryWhen;
 import com.tourcoo.smartpark.core.retrofit.ThreadTransformer;
@@ -31,8 +31,8 @@ public class BaseRepository {
         return ThreadTransformer.switchSchedulers(
                 observable.retryWhen(new RetryWhen())
                         .flatMap((Function<BaseResult<T>, ObservableSource<T>>) result -> {
-                            if (result.code == REQUEST_SUCCESS) {
-                                return result.data != null ? Observable.just(result.data)
+                            if (result.getCode() == REQUEST_SUCCESS) {
+                                return result.getData() != null ? Observable.just(result.getData())
                                         : Observable.error(new DataNullException());
                             } else {
                                 return Observable.error(new NetworkErrorException());

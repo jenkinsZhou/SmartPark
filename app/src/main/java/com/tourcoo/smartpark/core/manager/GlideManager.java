@@ -14,15 +14,24 @@ import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.MultiTransformation;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.core.utils.SizeUtil;
 
 import java.security.MessageDigest;
 
@@ -42,7 +51,7 @@ public class GlideManager {
     private static Drawable sRoundPlaceholderDrawable;
     @ColorInt
     private static int mPlaceholderColor = Color.LTGRAY;
-    private static float mPlaceholderRoundRadius = 4f;
+    private static float mPlaceholderRoundRadius = SizeUtil.dp2px(5);
 
     private static void setDrawable(GradientDrawable gd, float radius) {
         gd.setColor(mPlaceholderColor);
@@ -127,6 +136,7 @@ public class GlideManager {
                 .fallback(placeholder)
                 .dontAnimate()).into(iv);
     }
+
     public static void loadImgAuto(Object obj, ImageView iv, Drawable placeholder) {
         Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsAuto()
                 .error(placeholder)
@@ -178,6 +188,10 @@ public class GlideManager {
         loadCircleImgCenterCrop(obj, iv, sCirclePlaceholder);
     }
 
+    public static void loadRoundImageAuto(Object obj, ImageView iv) {
+        loadRoundImgAuto(obj, iv, mPlaceholderRoundRadius);
+    }
+
     /**
      * 加载圆角图片
      *
@@ -187,13 +201,15 @@ public class GlideManager {
      * @param placeholder         -占位图
      * @param isOfficial-是否官方模式圆角
      */
+    @SuppressWarnings("unchecked")
     public static void loadRoundImgCenterCrop(Object obj, ImageView iv, float dp, Drawable placeholder, boolean isOfficial) {
-        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsCenterCrop()
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsCenterCrop())
                 .error(placeholder)
                 .placeholder(placeholder)
                 .fallback(placeholder)
                 .dontAnimate()
-                .transform(isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
+                .transform(new MultiTransformation(new CenterCrop(), isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
+
     }
 
     public static void loadRoundImgAuto(Object obj, ImageView iv, float dp, Drawable placeholder, boolean isOfficial) {
@@ -204,10 +220,12 @@ public class GlideManager {
                 .dontAnimate()
                 .transform(isOfficial ? new RoundedCorners(dp2px(dp)) : new GlideRoundTransform(dp2px(dp)))).into(iv);
     }
+
     public static void loadRoundImgCenterCrop(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
         loadRoundImgCenterCrop(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
     }
+
     public static void loadRoundImgAuto(Object obj, ImageView iv, float dp, int placeholderResource, boolean isOfficial) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
         loadRoundImgAuto(obj, iv, dp, drawable != null ? drawable : sRoundPlaceholderDrawable, isOfficial);
@@ -220,13 +238,20 @@ public class GlideManager {
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp, boolean isOfficial) {
         loadRoundImgCenterCrop(obj, iv, dp, sRoundPlaceholder, isOfficial);
+
+
     }
 
     public static void loadRoundImg(Object obj, ImageView iv, float dp) {
         loadRoundImg(obj, iv, dp, true);
     }
+
     public static void loadRoundImgAuto(Object obj, ImageView iv, float dp) {
         loadRoundImgAuto(obj, iv, dp, true);
+    }
+
+    public static void loadRoundImgAuto(Object obj, ImageView iv, boolean isOfficial) {
+        loadRoundImg(obj, iv, mPlaceholderRoundRadius, isOfficial);
     }
 
     public static void loadRoundImg(Object obj, ImageView iv, boolean isOfficial) {
@@ -234,6 +259,10 @@ public class GlideManager {
     }
 
     public static void loadRoundImg(Object obj, ImageView iv) {
+        loadRoundImg(obj, iv, true);
+    }
+
+    public static void loadRoundImgAuto(Object obj, ImageView iv) {
         loadRoundImg(obj, iv, true);
     }
 
@@ -256,6 +285,7 @@ public class GlideManager {
                 .diskCacheStrategy(DiskCacheStrategy.ALL);
         return requestOptions;
     }
+
     private static int dp2px(float dipValue) {
         final float scale = Resources.getSystem().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);

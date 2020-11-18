@@ -26,6 +26,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="o">
+        <provider
+            android:name=".SmartParkFileProvider"
+            android:authorities="${applicationId}.SmartParkFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/smart_park_file_path"/>
+        </provider>
         <meta-data
             android:name="android.max_aspect"
             android:value="2.4" />

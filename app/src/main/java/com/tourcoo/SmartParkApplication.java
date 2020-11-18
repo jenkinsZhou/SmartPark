@@ -44,7 +44,6 @@ public class SmartParkApplication extends Application {
         //不写入文件
         LogUtils.getLog2FileConfig().configLog2FileEnable(false);
         LogUtils.getLogConfig().configShowBorders(false);
-        LogUtils.i("SmartParkApplication--->执行了");
     }
 
     public static Application getContext(){
