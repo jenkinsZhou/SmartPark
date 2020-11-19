@@ -9,13 +9,13 @@ import android.widget.ImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.bean.LocalImage;
 import com.tourcoo.smartpark.core.manager.GlideManager;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 /**
@@ -29,7 +29,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public static final int TYPE_CAMERA = 1;
     public static final int TYPE_PICTURE = 2;
     private LayoutInflater mInflater;
-    private List<String> list = new ArrayList<>();
+    private List<LocalImage> list = new ArrayList<>();
     private int selectMax = 6;
     private Context context;
     /**
@@ -51,12 +51,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         this.selectMax = selectMax;
     }
 
-    public void setList(List<String> list) {
+    public void setList(List<LocalImage> list) {
         this.list = list;
     }
 
-    public List<String> getList() {
-       return list;
+    public List<LocalImage> getList() {
+        return list;
     }
 
 
@@ -82,7 +82,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         public ViewHolder(View view) {
             super(view);
             ivDelete = view.findViewById(R.id.ivDelete);
-            ivLocalPhoto =  view.findViewById(R.id.ivLocalPhoto);
+            ivLocalPhoto = view.findViewById(R.id.ivLocalPhoto);
         }
     }
 
@@ -141,6 +141,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                 @Override
                 public void onClick(View view) {
                     int index = viewHolder.getAdapterPosition();
+                    if(mOnItemDeleteClickListener!= null){
+                        mOnItemDeleteClickListener.onItemDelete(index,view);
+                    }
                     // 这里有时会返回-1造成数据下标越界,具体可参考getAdapterPosition()源码，
                     // 通过源码分析应该是bindViewHolder()暂未绘制完成导致，知道原因的也可联系我~感谢
                     if (index != RecyclerView.NO_POSITION) {
@@ -150,8 +153,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                     }
                 }
             });
-            String imagePath = list.get(position);
-            GlideManager.loadRoundImg(imagePath,viewHolder.ivLocalPhoto);
+            String imagePath = list.get(position).getImagePath();
+            GlideManager.loadRoundImg(imagePath, viewHolder.ivLocalPhoto);
             //itemView 的点击事件
             if (mItemClickListener != null) {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -167,12 +170,64 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     protected OnItemClickListener mItemClickListener;
 
+    private OnItemDeleteClickListener mOnItemDeleteClickListener;
+
+
+
+    public void setOnItemDeleteClickListener(OnItemDeleteClickListener mOnItemDeleteClickListener) {
+        this.mOnItemDeleteClickListener = mOnItemDeleteClickListener;
+    }
+
     public interface OnItemClickListener {
         void onItemClick(int position, View v);
+    }
+
+    public interface OnItemDeleteClickListener {
+        void onItemDelete(int position, View v);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.mItemClickListener = listener;
     }
+
+    public void addData(LocalImage localImage) {
+        if (localImage == null) {
+            return;
+        }
+        if (hasOrcPhoto()) {
+            //说明当前有拍照识别照片 需要替换 而不是追加
+            if (localImage.isRecognize()) {
+                //这里直接替换第一张图 因为默认第一张图就是识别的照片
+                list.set(0, localImage);
+            } else {
+                //如果当前图片不是识别照片 则直接添加
+                list.add(localImage);
+            }
+        } else {
+            //没有拍照识别的照片
+            if (localImage.isRecognize()) {
+                //这里直接追加到第一张图
+               list.add(0,localImage);
+            } else {
+                //如果当前图片不是识别照片 则直接添加
+                list.add(localImage);
+            }
+        }
+        this.notifyDataSetChanged();
+    }
+
+
+    private boolean hasOrcPhoto() {
+        for (LocalImage localImage : list) {
+            if (localImage == null) {
+                continue;
+            }
+            if (localImage.isRecognize()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 }

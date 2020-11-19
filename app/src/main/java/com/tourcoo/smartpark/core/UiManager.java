@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreator;
+import com.tourcoo.SmartParkApplication;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.control.ActivityDispatchEventControl;
 import com.tourcoo.smartpark.core.control.ActivityFragmentControl;
@@ -38,9 +39,9 @@ public class UiManager {
     public static final String TAG = "UiManager";
     //原本在Provider中默认进行初始化,如果app出现多进程使用该模式可避免调用异常出现
     static {
-        Application application = CommonUtil.getApplication();
+        Application application = SmartParkApplication.getContext();
         if (application != null) {
-            Log.i("FastManager", "initSuccess");
+            Log.i(TAG, "initSuccess");
             init(application);
         }
     }

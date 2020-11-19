@@ -15,10 +15,14 @@ import com.tourcoo.smartpark.core.control.RequestConstant;
 import com.tourcoo.smartpark.core.manager.GlideManager;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
+import com.tourcoo.smartpark.event.EventConstant;
+import com.tourcoo.smartpark.event.OrcInitEvent;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
 import com.tourcoo.smartpark.ui.HomeActivity;
 import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
+
+import org.greenrobot.eventbus.EventBus;
 
 import leakcanary.LeakCanary;
 
@@ -110,11 +114,13 @@ public class SmartParkApplication extends Application {
             PredictorWrapper.setListener(new OrcPlantInitListener() {
                 @Override
                 public void initSuccess() {
+                    EventBus.getDefault().post(new OrcInitEvent(EventConstant.EVENT_INIT_ORC_SUCCESS));
                     ToastUtil.showSuccessDebug("初始化成功:");
                 }
 
                 @Override
                 public void initFailed(Throwable e) {
+                    EventBus.getDefault().post(new OrcInitEvent(EventConstant.EVENT_INIT_ORC_FAILED));
                     ToastUtil.showFailedDebug("车牌识别sdk初始化失败:" + e.toString());
                 }
 

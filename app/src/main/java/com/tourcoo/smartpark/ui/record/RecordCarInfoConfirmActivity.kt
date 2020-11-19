@@ -17,10 +17,13 @@ import android.view.View
 import android.widget.EditText
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import com.alibaba.fastjson.JSON
 import com.apkfuns.logutils.LogUtils
 import com.kaopiz.kprogresshud.KProgressHUD
+import com.luck.picture.lib.tools.StringUtils
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
+import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
@@ -28,7 +31,9 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.FileUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.event.OrcInitEvent
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager
+import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.keyboard.InputCompleteListener
 import com.tourcoo.smartpark.widget.keyboard.KeyboardUtils
 import com.tourcoo.smartpark.widget.keyboard.KingKeyboard
@@ -41,6 +46,9 @@ import kotlinx.android.synthetic.main.activity_record_confirm.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -72,6 +80,9 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private var compressPath: String? = null
     private var needOrc: Boolean = false
 
+    //后台返回的图片地址
+    private val serviceImageUrlList = ArrayList<String>()
+
     companion object {
         const val REQUEST_CODE_TAKE_PHOTO = 1001
     }
@@ -82,11 +93,17 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
     override fun initView(savedInstanceState: Bundle?) {
 //        llContentView.setOnClickListener(this)
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this)
+        }
         llTakePhoto.setOnClickListener(this)
         tvConfirmRecord.setOnClickListener(this)
         initKeyboard()
         initPhotoAdapter()
         takePhoto.text = "车辆拍照"
+        if (!PredictorWrapper.isInitSuccess()) {
+            showLoading("正在初始化组件...")
+        }
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -197,6 +214,18 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         photoAdapter = PhotoAdapter(this, onAddPicClickListener)
         photoAdapter!!.list = ArrayList()
         photoAdapter!!.setSelectMax(6)
+        photoAdapter!!.setOnItemDeleteClickListener { position, v ->
+            if (position < 0) {
+                return@setOnItemDeleteClickListener
+            }
+            if (photoAdapter!!.list.size < position || serviceImageUrlList.size < position) {
+                LogUtils.tag(TAG).e("删除被拦截")
+                return@setOnItemDeleteClickListener
+            }
+            val deletePath = photoAdapter!!.list[position].imagePath
+            val success = serviceImageUrlList.remove(deletePath)
+            LogUtils.tag(TAG).d("数据删除状态:$success，删除的路径--->$deletePath")
+        }
         photoRecyclerView.adapter = photoAdapter
 
     }
@@ -260,6 +289,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
      * 这里是真正上传图片的方法
      */
     private fun uploadImages(file: File) {
+        compressPath = file.path
         val builder = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
         //注意，file是后台约定的参数，如果是多图，files，如果是单张图片，file就行
@@ -284,12 +314,11 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
             override fun onResponse(call: Call<BaseResult<List<String>?>?>, response: Response<BaseResult<List<String>?>?>) {
                 closeHudProgressDialog()
                 //图片上传成功回调
-                compressPath = file.path
                 handleUploadSuccess(response)
             }
 
             override fun onFailure(call: Call<BaseResult<List<String>?>?>, t: Throwable) {
-                LogUtils.e("上传图片：$t")
+                LogUtils.e("上传图片失败：$t")
                 closeHudProgressDialog()
                 if (t is SocketException) {
                     ToastUtil.showFailed("文件过大 请重新拍摄后重试")
@@ -353,11 +382,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private fun handleUploadSuccess(response: Response<BaseResult<List<String>?>?>) {
         if (response.isSuccessful && response.body() != null) {
             val resp: BaseResult<List<String>?>? = response.body()
-            val imageUrlList: ArrayList<String> = ArrayList()
-            if (resp != null && resp.data != null) {
-                imageUrlList.addAll(resp.data!!)
-                photoAdapter?.list?.add(compressPath!!)
-                photoAdapter?.notifyDataSetChanged()
+            if (resp != null && resp.data != null && resp.data!!.isNotEmpty()) {
+                val serviceImageUrl = StringUtil.getNotNullValue(resp.data!![0])
+                serviceImageUrlList.add(serviceImageUrl)
+                addDataToRecyclerView(compressPath, serviceImageUrl, needOrc)
             }
         } else {
             ToastUtil.showNormal("服务器异常，请稍后重试")
@@ -394,9 +422,12 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
                     LogUtils.i("获取的路径:$currentImagePath")
                     mSelectImagePathList.add(currentImagePath)
                     if (needOrc) {
-                        doRecognisePlant(currentImagePath)
+                        //这里先不上传 先识别 然后直接将图片添加到recyclerview里面
+                        compressImagesAndAddToDataToRecyclerview(File(currentImagePath))
+                    } else {
+                        //这里如果不是拍照识别车牌的话 就先上传
+                        doUpload()
                     }
-                    doUpload()
                 }
             }
             else -> {
@@ -428,6 +459,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         val path = getPath()
         val success = FileUtil.deleteFolder(path)
         LogUtils.i("是否删除了图片数据:$success" + "文件路径:" + path)
+        EventBus.getDefault().unregister(this)
         super.onDestroy()
     }
 
@@ -493,6 +525,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         etPlantNumber3.setText(number.subSequence(4, 5))
         etPlantNumber4.setText(number.subSequence(5, 6))
         etPlantNumber5.setText(number.subSequence(6, 7))
+        etPlantNumber6.setText("")
     }
 
     private fun fillGreenPlant(number: String) {
@@ -501,5 +534,51 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         }
         fillBluePlant(number)
         etPlantNumber6.setText(number.subSequence(7, 8))
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onMessageEvent(event: OrcInitEvent?) {
+        closeLoading()
+        LogUtils.tag(TAG).i("onMessageEvent--->event=" + JSON.toJSON(event))
+        if (event == null) {
+            return
+        }
+    }
+
+    private fun addDataToRecyclerView(imagePath: String?, imageUrl: String?, isOrc: Boolean) {
+        val localImage = LocalImage(StringUtil.getNotNullValue(imagePath), isOrc)
+        localImage.serviceImageUrl = imageUrl
+        photoAdapter?.addData(localImage)
+    }
+
+    private fun compressImagesAndAddToDataToRecyclerview(file: File) {
+        Luban.with(this)
+                .load(file)
+                .ignoreBy(100)
+                .setTargetDir(getPath())
+                .filter { path -> !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif")) }
+                .setCompressListener(object : OnCompressListener {
+                    override fun onStart() {
+                        showLoading("正在处理图片数据...")
+                    }
+
+                    override fun onSuccess(file: File?) {
+                        closeLoading()
+                        if (file == null) {
+                            ToastUtil.showFailed("压缩失败")
+                            return
+                        }
+                        doRecognisePlant(file.path)
+                        //这里不做上传 直接显示到列表中
+                        addDataToRecyclerView(file.path, null, true)
+                    }
+
+                    override fun onError(e: Throwable?) {
+                        closeLoading()
+                        ToastUtil.showFailed("图片压缩失败：原因:" + e.toString())
+                    }
+                }).launch()
+
+
     }
 }

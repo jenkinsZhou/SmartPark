@@ -196,7 +196,5 @@ public class PredictorWrapper {
         return initSuccess;
     }
 
-    public static void setInitSuccess(boolean initSuccess) {
-        PredictorWrapper.initSuccess = initSuccess;
-    }
+
 }
