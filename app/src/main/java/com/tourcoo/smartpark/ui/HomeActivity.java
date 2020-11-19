@@ -1,11 +1,12 @@
 package com.tourcoo.smartpark.ui;
 
 import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,33 +20,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
-import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.core.CommonUtil;
-import com.tourcoo.smartpark.core.retrofit.UploadProgressBody;
-import com.tourcoo.smartpark.core.retrofit.UploadRequestListener;
-import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.bean.ParkInfo;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
+import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
+import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.account.LoginActivity;
-import com.tourcoo.smartpark.ui.pay.PayResultActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
+import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
+import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
 
-import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * @author :JenkinsZhou
@@ -62,16 +54,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView parkingRecyclerView;
     private HomeGridParkAdapter homeGridParkAdapter;
     private Handler mHandler = new Handler();
+    private TextView tvCarRecord;
+    private IosLoadingDialog loadingDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_activity);
+        loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
         initView();
+        intiPlantOrcSdk();
         initTestData();
-        findViewById(R.id.tvCarRecord).setOnClickListener(this);
-        findViewById(R.id.tvPayExit).setOnClickListener(this);
-        findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
         setImmersionBar(true);
     }
 
@@ -80,6 +73,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         ivMenu = findViewById(R.id.ivMenu);
         drawerLayout = findViewById(R.id.drawerLayout);
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
+        tvCarRecord = findViewById(R.id.tvCarRecord);
+        tvCarRecord.setOnClickListener(this);
+        findViewById(R.id.tvPayExit).setOnClickListener(this);
+        findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
         findViewById(R.id.tvLogout).setOnClickListener(this);
         findViewById(R.id.tvHomeEditPass).setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -195,21 +192,44 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onBackPressed();
     }
 
-private void test(){
-        File file = new File("");
-    RequestBody requestBody =  RequestBody.create(MediaType.parse("image/jpg"), file);
-    MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestBody);
-   /* ApiRepository.getInstance().getApiService().uploadFiles(body).enqueue(new Callback<BaseResult<List<String>>>() {
-        @Override
-        public void onResponse(@NotNull Call<BaseResult<List<String>>> call, Response<BaseResult<List<String>>> response) {
+    private void intiPlantOrcSdk() {
+        showLoading("正在初始化组件...");
+        ThreadPoolManager.getThreadPoolProxy().execute(() -> {
+            PredictorWrapper.setListener(new OrcPlantInitListener() {
+                @Override
+                public void initSuccess() {
+                    closeLoading();
+                }
 
+                @Override
+                public void initFailed() {
+                    closeLoading();
+                    ToastUtil.showFailed("车牌识别sdk初始化失败");
+                }
+            });
+            //授权初始化
+            if (!PredictorWrapper.initLicense(HomeActivity.this)) {
+                return;
+            }
+            // 初始化模型
+            PredictorWrapper.initModel(HomeActivity.this);
+        });
+    }
+
+    protected void showLoading(String msg) {
+        if (loadingDialog != null) {
+            if (!TextUtils.isEmpty(msg)) {
+                loadingDialog.setLoadingText(msg);
+            }
+            loadingDialog.show();
         }
+    }
 
-        @Override
-        public void onFailure(@NotNull Call<BaseResult<List<String>>> call, Throwable t) {
 
+
+    protected void closeLoading() {
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
         }
-    });*/
-}
-
+    }
 }

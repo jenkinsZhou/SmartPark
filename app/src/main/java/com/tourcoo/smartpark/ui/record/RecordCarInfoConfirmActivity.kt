@@ -3,6 +3,8 @@ package com.tourcoo.smartpark.ui.record
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -26,9 +28,14 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.FileUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.threadpool.ThreadPoolManager
 import com.tourcoo.smartpark.widget.keyboard.InputCompleteListener
 import com.tourcoo.smartpark.widget.keyboard.KeyboardUtils
 import com.tourcoo.smartpark.widget.keyboard.KingKeyboard
+import com.tourcoo.smartpark.widget.orc.PredictorWrapper
+import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_BLUE
+import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_GREEN
+import com.tourcoo.smartpark.widget.orc.RecogniseListener
 import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
 import kotlinx.android.synthetic.main.activity_record_confirm.*
 import okhttp3.MediaType
@@ -63,6 +70,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private val mHandler = MyHandler(this)
     private var imageUri: Uri? = null
     private var compressPath: String? = null
+    private var needOrc: Boolean = false
 
     companion object {
         const val REQUEST_CODE_TAKE_PHOTO = 1001
@@ -172,6 +180,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
                 kingKeyboard.hideKeyboard()
             }
             R.id.llTakePhoto -> {
+                needOrc = true
                 takePhoto()
             }
             R.id.tvConfirmRecord -> {
@@ -189,30 +198,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         photoAdapter!!.list = ArrayList()
         photoAdapter!!.setSelectMax(6)
         photoRecyclerView.adapter = photoAdapter
-        /*  photoRecyclerView.layoutManager = GridLayoutManager(mContext, 3)
-          photoAdapter?.bindToRecyclerView(photoRecyclerView)
-          val footView = View.inflate(mContext, R.layout.item_footer_view_add_image, null)
-          photoAdapter?.addFooterView(footView, LinearLayout.HORIZONTAL)
-          photoAdapter?.setOnItemClickListener(BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-             *//* when (view.id) {
-                R.id.rlAddImage -> {
-                    ToastUtil.showNormal("添加图片")
-                }
-            }*//*
 
-        })
-        photoAdapter?.setOnItemChildClickListener { adapter, view, position ->
-            when (view.id) {
-                R.id.ivLocalPhoto -> {
-                    ToastUtil.showSuccess("查看图片")
-                }
-                R.id.ivDelete -> {
-                    ToastUtil.showNormal("删除图片")
-                }
-                else -> {
-                }
-            }
-        }*/
     }
 
 
@@ -304,6 +290,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
             override fun onFailure(call: Call<BaseResult<List<String>?>?>, t: Throwable) {
                 LogUtils.e("上传图片：$t")
+                closeHudProgressDialog()
                 if (t is SocketException) {
                     ToastUtil.showFailed("文件过大 请重新拍摄后重试")
                 }
@@ -402,10 +389,13 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
             REQUEST_CODE_TAKE_PHOTO -> {
                 if (imageUri != null && resultCode == Activity.RESULT_OK) {
                     mSelectImagePathList.clear()
-                    val result = FileUtil.getFilePathByUri(imageUri)
-                    scanFile(mContext, result)
-                    LogUtils.i("获取的路径:$result")
-                    mSelectImagePathList.add(result)
+                    val currentImagePath = FileUtil.getFilePathByUri(imageUri)
+                    scanFile(mContext, currentImagePath)
+                    LogUtils.i("获取的路径:$currentImagePath")
+                    mSelectImagePathList.add(currentImagePath)
+                    if (needOrc) {
+                        doRecognisePlant(currentImagePath)
+                    }
                     doUpload()
                 }
             }
@@ -430,13 +420,75 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
     private val onAddPicClickListener = PhotoAdapter.onAddPicClickListener {
         // 进入相册 以下是例子：不需要的api可以不写
+        needOrc = false
         takePhoto()
     }
 
     override fun onDestroy() {
-        val path =getPath()
+        val path = getPath()
         val success = FileUtil.deleteFolder(path)
-        LogUtils.i("是否删除了图片数据:$success"+"文件路径:"+path)
+        LogUtils.i("是否删除了图片数据:$success" + "文件路径:" + path)
         super.onDestroy()
+    }
+
+
+    private fun doRecognisePlant(photoPath: String) {
+        PredictorWrapper.setRecogniseListener(object : RecogniseListener {
+            override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
+                LogUtils.tag("识别成功").i(result)
+                closeHudProgressDialog()
+                handleReconCallback(result)
+            }
+
+            override fun recogniseFailed() {
+                closeHudProgressDialog()
+//                ToastUtil.showFailed("识别失败")
+            }
+
+        })
+        ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
+            val bitmap: Bitmap = BitmapFactory.decodeFile(photoPath)
+            PredictorWrapper.syncTestOneImage(mContext, bitmap)
+        })
+    }
+
+    private fun handleReconCallback(result: com.baidu.vis.ocrplatenumber.Response?) {
+        if (result == null) {
+            return
+        }
+        when (result.type) {
+            PLANT_TYPE_GREEN -> {
+                //绿牌
+                fillGreenPlant(result.plate_number)
+            }
+            PLANT_TYPE_BLUE -> {
+                //蓝牌
+                fillBluePlant(result.plate_number)
+            }
+            else -> {
+            }
+        }
+        kingKeyboard.hideKeyboard()
+    }
+
+    private fun fillBluePlant(number: String) {
+        if (number.length < 7) {
+            return
+        }
+        etPlantName.setText(number.subSequence(0, 1))
+        etPlantLetter.setText(number.subSequence(1, 2))
+        etPlantNumber1.setText(number.subSequence(2, 3))
+        etPlantNumber2.setText(number.subSequence(3, 4))
+        etPlantNumber3.setText(number.subSequence(4, 5))
+        etPlantNumber4.setText(number.subSequence(5, 6))
+        etPlantNumber5.setText(number.subSequence(6, 7))
+    }
+
+    private fun fillGreenPlant(number: String) {
+        if (number.length < 8) {
+            return
+        }
+        fillBluePlant(number)
+        etPlantNumber6.setText(number.subSequence(7, 8))
     }
 }

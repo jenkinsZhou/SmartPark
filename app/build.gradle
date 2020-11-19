@@ -28,6 +28,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    sourceSets.main.jniLibs.srcDirs = [
+            '../ocrplatenumber-lib/output/libs',
+    ]
 }
 
 dependencies {
@@ -86,6 +89,9 @@ dependencies {
     implementation 'com.github.LuckSiege.PictureSelector:picture_library:v2.5.9'
     implementation 'top.zibin:Luban:1.1.8'
     implementation 'com.kaopiz:kprogresshud:1.2.0'
+    implementation files('../ocrplatenumber-lib/output/libs/bd_unifylicense.jar')
+    implementation files('../ocrplatenumber-lib/output/libs/ocrplatenumber.jar')
+    implementation files('../ocrplatenumber-lib/output/libs/liantian.jar')
 }
 repositories {
     mavenCentral()
