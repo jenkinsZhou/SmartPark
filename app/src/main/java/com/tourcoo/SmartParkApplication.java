@@ -14,6 +14,11 @@ import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConstant;
 import com.tourcoo.smartpark.core.manager.GlideManager;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
+import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
+import com.tourcoo.smartpark.ui.HomeActivity;
+import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
+import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
 
 import leakcanary.LeakCanary;
 
@@ -34,7 +39,7 @@ public class SmartParkApplication extends Application {
         SpiderMan.init(context);
         initLog();
         initConfig();
-
+        intiPlantOrcSdk();
 
     }
 
@@ -46,11 +51,11 @@ public class SmartParkApplication extends Application {
         LogUtils.getLogConfig().configShowBorders(false);
     }
 
-    public static Application getContext(){
+    public static Application getContext() {
         return context;
     }
 
-    private void initConfig(){
+    private void initConfig() {
         //以下为更丰富自定义方法-可不设置即使用默认配置
         //全局UI配置参数-按需求设置
         AppImpl impl = new AppImpl(context);
@@ -98,5 +103,29 @@ public class SmartParkApplication extends Application {
                 //默认20 s
                 .setTimeout(30);
 
+    }
+
+    private void intiPlantOrcSdk() {
+        ThreadPoolManager.getThreadPoolProxy().execute(() -> {
+            PredictorWrapper.setListener(new OrcPlantInitListener() {
+                @Override
+                public void initSuccess() {
+                    ToastUtil.showSuccessDebug("初始化成功:");
+                }
+
+                @Override
+                public void initFailed(Throwable e) {
+                    ToastUtil.showFailedDebug("车牌识别sdk初始化失败:" + e.toString());
+                }
+
+
+            });
+            //授权初始化
+            if (!PredictorWrapper.initLicense(this)) {
+                return;
+            }
+            // 初始化模型
+            PredictorWrapper.initModel(this);
+        });
     }
 }

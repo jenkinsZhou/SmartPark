@@ -9,5 +9,5 @@ package com.tourcoo.smartpark.widget.orc;
  */
 public interface OrcPlantInitListener {
     void initSuccess();
-    void initFailed();
+    void initFailed(Throwable e);
 }

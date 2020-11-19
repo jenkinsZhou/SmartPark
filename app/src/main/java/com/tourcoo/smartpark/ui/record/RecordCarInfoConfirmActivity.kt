@@ -433,23 +433,34 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
 
     private fun doRecognisePlant(photoPath: String) {
-        PredictorWrapper.setRecogniseListener(object : RecogniseListener {
-            override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
-                LogUtils.tag("识别成功").i(result)
-                closeHudProgressDialog()
-                handleReconCallback(result)
-            }
+        if (!PredictorWrapper.isInitSuccess()) {
+            //todo 目前先拦截
+            ToastUtil.showNormalDebug("当前sdk未初始化")
+            return
+        }
+        try {
+            PredictorWrapper.setRecogniseListener(object : RecogniseListener {
+                override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
+                    LogUtils.tag("识别成功").i(result)
+                    closeHudProgressDialog()
+                    handleReconCallback(result)
+                }
 
-            override fun recogniseFailed() {
-                closeHudProgressDialog()
+                override fun recogniseFailed() {
+                    closeHudProgressDialog()
 //                ToastUtil.showFailed("识别失败")
-            }
+                }
 
-        })
-        ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
-            val bitmap: Bitmap = BitmapFactory.decodeFile(photoPath)
-            PredictorWrapper.syncTestOneImage(mContext, bitmap)
-        })
+            })
+            ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
+                val bitmap: Bitmap = BitmapFactory.decodeFile(photoPath)
+                PredictorWrapper.syncTestOneImage(mContext, bitmap)
+            })
+        } catch (e: Exception) {
+            ToastUtil.showFailedDebug("车牌识别失败:$e")
+            e.printStackTrace()
+        }
+
     }
 
     private fun handleReconCallback(result: com.baidu.vis.ocrplatenumber.Response?) {

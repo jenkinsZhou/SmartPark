@@ -63,7 +63,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home_activity);
         loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
         initView();
-        intiPlantOrcSdk();
         initTestData();
         setImmersionBar(true);
     }
@@ -192,29 +191,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         super.onBackPressed();
     }
 
-    private void intiPlantOrcSdk() {
-        showLoading("正在初始化组件...");
-        ThreadPoolManager.getThreadPoolProxy().execute(() -> {
-            PredictorWrapper.setListener(new OrcPlantInitListener() {
-                @Override
-                public void initSuccess() {
-                    closeLoading();
-                }
-
-                @Override
-                public void initFailed() {
-                    closeLoading();
-                    ToastUtil.showFailed("车牌识别sdk初始化失败");
-                }
-            });
-            //授权初始化
-            if (!PredictorWrapper.initLicense(HomeActivity.this)) {
-                return;
-            }
-            // 初始化模型
-            PredictorWrapper.initModel(HomeActivity.this);
-        });
-    }
 
     protected void showLoading(String msg) {
         if (loadingDialog != null) {

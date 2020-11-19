@@ -19,7 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 
+import com.tourcoo.smartpark.BuildConfig;
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.config.AppConfig;
 
 import java.lang.ref.SoftReference;
 
@@ -312,34 +314,58 @@ public final class ToastUtil {
 
     /**
      * 成功吐司
+     *
      * @param content
      */
     public static void showSuccess(CharSequence content) {
-        showCustomLayout(R.layout.toast_view_layout_success,content);
+        showCustomLayout(R.layout.toast_view_layout_success, content);
     }
+
+    public static void showSuccessDebug(CharSequence content) {
+        if (AppConfig.DEBUG_BODE) {
+            showSuccess(content);
+        }
+    }
+
     public static void showSuccess(int stringResource) {
         showSuccess(mApp.getText(stringResource));
     }
+
     /**
      * 失败吐司
+     *
      * @param content
      */
     public static void showFailed(CharSequence content) {
-        showCustomLayout(R.layout.toast_view_layout_failed,content);
+        showCustomLayout(R.layout.toast_view_layout_failed, content);
+    }
+
+    public static void showFailedDebug(CharSequence content) {
+        if (AppConfig.DEBUG_BODE) {
+            showFailed(content);
+        }
     }
 
     /**
      * 普通吐司
+     *
      * @param content
      */
     public static void showNormal(CharSequence content) {
-        showCustomLayout(R.layout.toast_view_layout_normal,content);
+        showCustomLayout(R.layout.toast_view_layout_normal, content);
     }
+
+    public static void showNormalDebug(CharSequence content) {
+        if (AppConfig.DEBUG_BODE) {
+            showNormal(content);
+        }
+    }
+
     public static void showNormal(int stringResource) {
         showNormal(mApp.getText(stringResource));
     }
 
-    private static void showCustomLayout(int layout ,CharSequence content){
+    private static void showCustomLayout(int layout, CharSequence content) {
         if (!isMainThread()) {
             return;
         }

@@ -1,7 +1,10 @@
 package com.tourcoo.smartpark.widget.orc;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -26,16 +29,18 @@ public class PredictorWrapper {
     public static final int PLANT_TYPE_BLUE = 0;
     public static final int PLANT_TYPE_GREEN = 2;
     public static final int PLANT_TYPE_YELLOW = 1;
+    private static Handler mHandler = new Handler(Looper.getMainLooper());
+    private static boolean initSuccess = false;
 
-    public static boolean initLicense(Activity activity) {
+    public static boolean initLicense(Context context) {
         // 获取鉴权相关本地设备及应用相关信息
-        BDLicenseLocalInfo bdLicenseLocalInfo = AndroidLicenser.getInstance().authGetLocalInfo(activity, Predictor.getAlgorithmId());
+        BDLicenseLocalInfo bdLicenseLocalInfo = AndroidLicenser.getInstance().authGetLocalInfo(context, Predictor.getAlgorithmId());
         Log.d(TAG, "BDLicenseLocalInfo :" + bdLicenseLocalInfo.toString());
 
         // 使用申请的license-key 及 收钱文件进行本地授权
       /*  AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(activity, "ocrplatenumberdemo_test_license",
                 "idl-license.ocrplatenumberdemo_test_license", true, Predictor.getAlgorithmId());*/
-        AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(activity, "yixing_platenumber_7_B2ECF",
+        AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "yixing_platenumber_7_B2ECF",
                 "yixing_platenumber_7_B2ECF", true, Predictor.getAlgorithmId());
         if (ret != AndroidLicenser.ErrorCode.SUCCESS) {
             Log.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
@@ -46,21 +51,24 @@ public class PredictorWrapper {
         return true;
     }
 
-    public static boolean initModel(Activity activity) {
+    public static boolean initModel(Context context) {
         try {
             // 进行模型初始化
-            int ret = Predictor.getInstance().initModelFromAssets(activity, "ocrplatenumber_models", 2);
+            int ret = Predictor.getInstance().initModelFromAssets(context, "ocrplatenumber_models", 2);
             if (ret != 0) {
                 Log.d(TAG, "initModel error : " + ret);
-                activity.runOnUiThread(() -> {
+                mHandler.post(() -> {
+                    initSuccess = false;
                     if (listener != null) {
-                        listener.initFailed();
+                        listener.initFailed(new Throwable("initModel error : " + ret));
                     }
                 });
+
 //                setTextViewOnUiThread(activity, textView, "模型初始化失败");
                 return false;
             } else {
-                activity.runOnUiThread(() -> {
+                initSuccess = true;
+                mHandler.post(() -> {
                     if (listener != null) {
                         listener.initSuccess();
                     }
@@ -71,9 +79,11 @@ public class PredictorWrapper {
 
         } catch (Exception e) {
 //            setTextViewOnUiThread(activity, textView, "模型初始化失败");
-            activity.runOnUiThread(() -> {
+            LogUtils.tag(TAG).e(e.toString());
+            initSuccess = false;
+            mHandler.post(() -> {
                 if (listener != null) {
-                    listener.initFailed();
+                    listener.initFailed(e);
                 }
             });
             e.printStackTrace();
@@ -108,7 +118,7 @@ public class PredictorWrapper {
 
     public static void asyncTestOneImage(final Activity activity, final Bitmap bitmap) {
         if (activity == null || bitmap == null) {
-            Log.e(TAG, "activity == null || bitmap == null || imageView == null || textView == null");
+            LogUtils.tag(TAG).d("asyncTestOneImage拦截");
             return;
         }
 //        setImageViewOnUiThread(activity, bitmap, imageView);
@@ -180,5 +190,13 @@ public class PredictorWrapper {
 
     public static void setRecogniseListener(RecogniseListener recogniseListener) {
         PredictorWrapper.recogniseListener = recogniseListener;
+    }
+
+    public static boolean isInitSuccess() {
+        return initSuccess;
+    }
+
+    public static void setInitSuccess(boolean initSuccess) {
+        PredictorWrapper.initSuccess = initSuccess;
     }
 }
