@@ -22,10 +22,10 @@
             android:layout_marginStart="@dimen/dp_28"
             android:layout_marginEnd="@dimen/dp_28"
             android:layout_marginBottom="@dimen/dp_30"
-            android:visibility="visible"
             android:background="@drawable/bg_select_primary"
             android:letterSpacing="0.2"
-            android:text="确定" />
+            android:text="确定"
+            android:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/keyboardParent"
@@ -38,8 +38,8 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/dp_20"
-            android:layout_alignParentTop="true">
+            android:layout_alignParentTop="true"
+            android:layout_marginBottom="@dimen/dp_20">
 
             <LinearLayout
                 android:id="@+id/llContentView"
@@ -114,140 +114,147 @@
                     </LinearLayout>
                 </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/dp_15"
-                    android:paddingBottom="@dimen/dp_15">
+                <!-- <LinearLayout
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:focusable="true"
+                     android:focusableInTouchMode="true"
+                     android:orientation="vertical"
+                     android:paddingTop="@dimen/dp_15"
+                     android:paddingBottom="@dimen/dp_15">
 
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:orientation="horizontal">
+                     <LinearLayout
+                         android:layout_width="wrap_content"
+                         android:layout_height="wrap_content"
+                         android:layout_gravity="center_horizontal"
+                         android:orientation="horizontal">
 
-                        <EditText
-                            android:id="@+id/etPlantName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:text="苏"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantName"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:text="苏"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantLetter"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:text="B"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantLetter"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:text="B"
+                             android:textSize="@dimen/sp_14" />
 
-                        <!--<ImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:src="@drawable/shape_circle_black" />-->
+                         &lt;!&ndash;<ImageView
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_gravity="center_vertical"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:src="@drawable/shape_circle_black" />&ndash;&gt;
 
-                        <EditText
-                            android:id="@+id/etPlantNumber1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantNumber1"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantNumber2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantNumber2"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantNumber3"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantNumber3"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantNumber4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantNumber4"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantNumber5"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_blue"
-                            android:gravity="center"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14" />
+                         <EditText
+                             android:id="@+id/etPlantNumber5"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_blue"
+                             android:gravity="center"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14" />
 
-                        <EditText
-                            android:id="@+id/etPlantNumber6"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginStart="@dimen/dp_5"
-                            android:background="@drawable/select_rectangle_radius_5_black_gray_f7f5f6"
-                            android:gravity="center"
-                            android:hint="新"
-                            android:maxLength="1"
-                            android:maxLines="1"
-                            android:minWidth="@dimen/input_plant_num_size"
-                            android:minHeight="@dimen/input_plant_num_size"
-                            android:textSize="@dimen/sp_14">
+                         <EditText
+                             android:id="@+id/etPlantNumber6"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_gravity="center_vertical"
+                             android:layout_marginStart="@dimen/dp_5"
+                             android:background="@drawable/select_rectangle_radius_5_black_gray_f7f5f6"
+                             android:gravity="center"
+                             android:hint="新"
+                             android:maxLength="1"
+                             android:maxLines="1"
+                             android:minWidth="@dimen/input_plant_num_size"
+                             android:minHeight="@dimen/input_plant_num_size"
+                             android:textSize="@dimen/sp_14">
 
-                        </EditText>
-                    </LinearLayout>
+                         </EditText>
+                     </LinearLayout>
 
-                </LinearLayout>
+                 </LinearLayout>-->
+                <com.tourcoo.smartpark.widget.keyboard.PlantLayout
+                    android:id="@+id/plantInputLayout"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:layout_marginBottom="@dimen/dp_10"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <View
                     android:layout_width="match_parent"

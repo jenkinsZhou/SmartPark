@@ -5,22 +5,24 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.provider.MediaStore
-import android.text.*
-import android.text.style.AbsoluteSizeSpan
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.alibaba.fastjson.JSON
 import com.apkfuns.logutils.LogUtils
 import com.kaopiz.kprogresshud.KProgressHUD
-import com.luck.picture.lib.tools.StringUtils
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
@@ -34,9 +36,10 @@ import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.event.OrcInitEvent
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager
 import com.tourcoo.smartpark.util.StringUtil
-import com.tourcoo.smartpark.widget.keyboard.InputCompleteListener
-import com.tourcoo.smartpark.widget.keyboard.KeyboardUtils
-import com.tourcoo.smartpark.widget.keyboard.KingKeyboard
+import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
+import com.tourcoo.smartpark.widget.kingkeyboard.InputCompleteListener
+import com.tourcoo.smartpark.widget.kingkeyboard.KeyboardUtils
+import com.tourcoo.smartpark.widget.kingkeyboard.KingKeyboard
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_BLUE
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_GREEN
@@ -70,7 +73,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
     private var mEditTexts: MutableList<EditText>? = null
     private var photoAdapter: PhotoAdapter? = null
-    private lateinit var kingKeyboard: KingKeyboard
     private var mOnCompleteListener: InputCompleteListener? = null
     private val mSelectImagePathList = ArrayList<String>()
     private var hud: KProgressHUD? = null
@@ -79,6 +81,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private var imageUri: Uri? = null
     private var compressPath: String? = null
     private var needOrc: Boolean = false
+    private var keyboardView: PlateKeyboardView? = null
 
     //后台返回的图片地址
     private val serviceImageUrlList = ArrayList<String>()
@@ -98,46 +101,50 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         }
         llTakePhoto.setOnClickListener(this)
         tvConfirmRecord.setOnClickListener(this)
-        initKeyboard()
+        keyboardView = PlateKeyboardView(mContext)
+      /*  keyboardView?.setOnKeyboardFinishListener {
+        }*/
+//        initKeyboard()
         initPhotoAdapter()
         takePhoto.text = "车辆拍照"
         if (!PredictorWrapper.isInitSuccess()) {
             showLoading("正在初始化组件...")
         }
+        test()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
         titleBar?.setTitleMainText("确认登记")
     }
 
-    private fun initKeyboard() {
-        mEditTexts = ArrayList()
-        kingKeyboard = KingKeyboard(this, keyboardParent)
-        //然后将EditText注册到KingKeyboard即可
-        kingKeyboard.register(etPlantName, KingKeyboard.KeyboardType.LICENSE_PLATE)
-        kingKeyboard.register(etPlantLetter, KingKeyboard.KeyboardType.LICENSE_PLATE)
-        kingKeyboard.register(etPlantNumber1, KingKeyboard.KeyboardType.LICENSE_PLATE)
-        kingKeyboard.register(etPlantNumber2, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-        kingKeyboard.register(etPlantNumber3, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-        kingKeyboard.register(etPlantNumber4, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-        kingKeyboard.register(etPlantNumber5, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-        kingKeyboard.register(etPlantNumber6, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-        kingKeyboard.setKeyboardCustom(R.xml.keyboard_custom)
-        setupEditText(etPlantName)
-        setupEditText(etPlantLetter)
-        setupEditText(etPlantNumber1)
-        setupEditText(etPlantNumber2)
-        setupEditText(etPlantNumber3)
-        setupEditText(etPlantNumber4)
-        setupEditText(etPlantNumber5)
-        etPlantNumber1.requestFocus()
-        //设置"用户名"提示文字的大小
-        val s = SpannableString("新能源")
-        val textSize = AbsoluteSizeSpan(9, true)
-        s.setSpan(textSize, 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        etPlantNumber6.hint = s
-        kingKeyboard.setVibrationEffectEnabled(true)
-    }
+//    private fun initKeyboard() {
+//        mEditTexts = ArrayList()
+//        kingKeyboard = KingKeyboard(this, keyboardParent)
+//        //然后将EditText注册到KingKeyboard即可
+//        kingKeyboard.register(etPlantName, KingKeyboard.KeyboardType.LICENSE_PLATE)
+//        kingKeyboard.register(etPlantLetter, KingKeyboard.KeyboardType.LICENSE_PLATE)
+//        kingKeyboard.register(etPlantNumber1, KingKeyboard.KeyboardType.LICENSE_PLATE)
+//        kingKeyboard.register(etPlantNumber2, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
+//        kingKeyboard.register(etPlantNumber3, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
+//        kingKeyboard.register(etPlantNumber4, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
+//        kingKeyboard.register(etPlantNumber5, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
+//        kingKeyboard.register(etPlantNumber6, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
+//        kingKeyboard.setKeyboardCustom(R.xml.keyboard_custom)
+//        setupEditText(etPlantName)
+//        setupEditText(etPlantLetter)
+//        setupEditText(etPlantNumber1)
+//        setupEditText(etPlantNumber2)
+//        setupEditText(etPlantNumber3)
+//        setupEditText(etPlantNumber4)
+//        setupEditText(etPlantNumber5)
+//        etPlantNumber1.requestFocus()
+//        //设置"用户名"提示文字的大小
+//        val s = SpannableString("新能源")
+//        val textSize = AbsoluteSizeSpan(9, true)
+//        s.setSpan(textSize, 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+//        etPlantNumber6.hint = s
+//        kingKeyboard.setVibrationEffectEnabled(true)
+//    }
 
     private fun setupEditText(editText: EditText) {
         mEditTexts!!.add(editText)
@@ -193,15 +200,15 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.llContentView -> {
-                kingKeyboard.hideKeyboard()
-            }
+
             R.id.llTakePhoto -> {
                 needOrc = true
                 takePhoto()
             }
             R.id.tvConfirmRecord -> {
-                doUpload()
+            }
+            R.id.plantInputLayout -> {
+                keyboardView?.showKeyboard(plantInputLayout)
             }
             else -> {
             }
@@ -499,33 +506,21 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         if (result == null) {
             return
         }
-        when (result.type) {
-            PLANT_TYPE_GREEN -> {
-                //绿牌
-                fillGreenPlant(result.plate_number)
-            }
-            PLANT_TYPE_BLUE -> {
-                //蓝牌
-                fillBluePlant(result.plate_number)
-            }
-            else -> {
-            }
-        }
-        kingKeyboard.hideKeyboard()
+        plantInputLayout?.text = result.plate_number
     }
 
     private fun fillBluePlant(number: String) {
         if (number.length < 7) {
             return
         }
-        etPlantName.setText(number.subSequence(0, 1))
-        etPlantLetter.setText(number.subSequence(1, 2))
-        etPlantNumber1.setText(number.subSequence(2, 3))
-        etPlantNumber2.setText(number.subSequence(3, 4))
-        etPlantNumber3.setText(number.subSequence(4, 5))
-        etPlantNumber4.setText(number.subSequence(5, 6))
-        etPlantNumber5.setText(number.subSequence(6, 7))
-        etPlantNumber6.setText("")
+        /*  etPlantName.setText(number.subSequence(0, 1))
+          etPlantLetter.setText(number.subSequence(1, 2))
+          etPlantNumber1.setText(number.subSequence(2, 3))
+          etPlantNumber2.setText(number.subSequence(3, 4))
+          etPlantNumber3.setText(number.subSequence(4, 5))
+          etPlantNumber4.setText(number.subSequence(5, 6))
+          etPlantNumber5.setText(number.subSequence(6, 7))
+          etPlantNumber6.setText("")*/
     }
 
     private fun fillGreenPlant(number: String) {
@@ -533,7 +528,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
             return
         }
         fillBluePlant(number)
-        etPlantNumber6.setText(number.subSequence(7, 8))
+//        etPlantNumber6.setText(number.subSequence(7, 8))
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -578,7 +573,16 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
                         ToastUtil.showFailed("图片压缩失败：原因:" + e.toString())
                     }
                 }).launch()
+    }
 
+    private fun test() {
+//设置字体大小
+        plantInputLayout.setTextSize(16f)
+//设置字体颜色
+        plantInputLayout.setTextColor(ContextCompat.getColor(mContext, R.color.colorGraySmallText))
+        plantInputLayout.setOnClickListener(this)
+        //获取输入的内容
+        plantInputLayout.text
 
     }
 }

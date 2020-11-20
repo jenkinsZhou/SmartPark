@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:background="@drawable/king_keyboard_view_bg">
-    <com.tourcoo.smartpark.widget.keyboard.KingKeyboardView
+    <com.tourcoo.smartpark.widget.kingkeyboard.KingKeyboardView
         android:id="@+id/keyboardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

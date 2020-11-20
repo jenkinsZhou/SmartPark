@@ -1,9 +1,8 @@
-package com.tourcoo.smartpark.widget.keyboard;
+package com.tourcoo.smartpark.widget.kingkeyboard;
 
 import android.content.Context;
 import android.os.Build;
 import android.text.InputFilter;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 

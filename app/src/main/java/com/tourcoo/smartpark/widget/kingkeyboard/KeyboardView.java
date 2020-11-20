@@ -1,4 +1,4 @@
-package com.tourcoo.smartpark.widget.keyboard;
+package com.tourcoo.smartpark.widget.kingkeyboard;
 
 /*
  * Copyright (C) 2008-2009 Google Inc.

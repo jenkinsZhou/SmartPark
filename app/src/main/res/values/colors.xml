@@ -72,8 +72,12 @@
 
 
     <color name="commonBg">@color/grayF5F5F5</color>
-    <color name="colorKeyboardGray">@color/grayF5F5F5</color>
-
+    <color name="colorKeyboardGray">#CCCCCC</color>
+    <color name="colorKeyboardBlue">#629BFF</color>
+    <color name="colorMainBlue">#7CAFFF</color>
+    <color name="colorCodeGray">#8B99AE</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorKeyboardBg">#CCD0D7</color>
     <color name="king_keyboard_key_text_color">#CCCCCC</color>
 
     <color name="king_keyboard_key_special_text_color">#ff333333</color>
