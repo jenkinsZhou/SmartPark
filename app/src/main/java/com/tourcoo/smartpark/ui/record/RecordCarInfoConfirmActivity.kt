@@ -1,11 +1,12 @@
 package com.tourcoo.smartpark.ui.record
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -17,6 +18,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -39,10 +41,7 @@ import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.tourcoo.smartpark.widget.kingkeyboard.InputCompleteListener
 import com.tourcoo.smartpark.widget.kingkeyboard.KeyboardUtils
-import com.tourcoo.smartpark.widget.kingkeyboard.KingKeyboard
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper
-import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_BLUE
-import com.tourcoo.smartpark.widget.orc.PredictorWrapper.PLANT_TYPE_GREEN
 import com.tourcoo.smartpark.widget.orc.RecogniseListener
 import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
 import kotlinx.android.synthetic.main.activity_record_confirm.*
@@ -102,8 +101,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         llTakePhoto.setOnClickListener(this)
         tvConfirmRecord.setOnClickListener(this)
         keyboardView = PlateKeyboardView(mContext)
-      /*  keyboardView?.setOnKeyboardFinishListener {
-        }*/
+        /*  keyboardView?.setOnKeyboardFinishListener {
+          }*/
 //        initKeyboard()
         initPhotoAdapter()
         takePhoto.text = "车辆拍照"
@@ -401,14 +400,26 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun takePhoto() {
         // 跳转到系统的拍照界面
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ){
+            if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED||ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED ){
+                requestPermission()
+                return
+            }else{
+                takePhoto()
+            }
+        }
         val intentToTakePhoto = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         // 指定照片存储位置为sd卡本目录下
         // 这里设置为固定名字 这样就只会只有一张temp图 如果要所有中间图片都保存可以通过时间或者加其他东西设置图片的名称
-        val mTempPhotoPath = mContext.getExternalFilesDir(null).toString() + File.separator + "SmartPark" + File.separator + "photo.jpeg"
+        val mTempPhotoPath = mContext.getExternalFilesDir(null).toString() + File.separator + "Pictures" + File.pathSeparator + "photo.jpeg"
         //判断版本是否在7.0以上
         imageUri = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             //通过FileProvider创建一个content类型的Uri
-            FileProvider.getUriForFile(mContext, mContext.packageName + ".SmartParkFileProvider", File(mTempPhotoPath))
+            FileProvider.getUriForFile(mContext, "com.tourcoo.smartpark.SmartParkFileProvider", File(mTempPhotoPath))
         } else {
             Uri.fromFile(File(mTempPhotoPath))
         }
@@ -513,14 +524,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         if (number.length < 7) {
             return
         }
-        /*  etPlantName.setText(number.subSequence(0, 1))
-          etPlantLetter.setText(number.subSequence(1, 2))
-          etPlantNumber1.setText(number.subSequence(2, 3))
-          etPlantNumber2.setText(number.subSequence(3, 4))
-          etPlantNumber3.setText(number.subSequence(4, 5))
-          etPlantNumber4.setText(number.subSequence(5, 6))
-          etPlantNumber5.setText(number.subSequence(6, 7))
-          etPlantNumber6.setText("")*/
+
     }
 
     private fun fillGreenPlant(number: String) {
@@ -583,6 +587,47 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         plantInputLayout.setOnClickListener(this)
         //获取输入的内容
         plantInputLayout.text
+    }
 
+    private fun requestPermission() {
+        // Here, thisActivity is the current activity
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.CAMERA)) {
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                ActivityCompat.requestPermissions(this, arrayOf<String>(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        1002)
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this, arrayOf<String>(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        1003)
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            1003 -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size>=2 && (grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED )) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+                    ToastUtil.showSuccess("权限通过")
+                    takePhoto()
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+//                    showWaringDialog()
+                    ToastUtil.showFailed("权限未通过")
+                }
+                return
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@
         tools:targetApi="o">
         <provider
             android:name=".SmartParkFileProvider"
-            android:authorities="${applicationId}.SmartParkFileProvider"
+            android:authorities="com.tourcoo.smartpark.SmartParkFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
