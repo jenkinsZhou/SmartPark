@@ -55,7 +55,7 @@ public class StringUtil {
             return false;
         }
         String str = carNumber.charAt(carNumber.length() - 1) + "";
-        boolean checkLast = (!str.equalsIgnoreCase("I"))&& (!str.equalsIgnoreCase("O")) &&isLetter(str)|| isNumeric(str)  ;
+        boolean checkLast = (!str.equalsIgnoreCase("I")) && (!str.equalsIgnoreCase("O")) && isLetter(str) || isNumeric(str);
         return isChineseChar(carNumber.charAt(0)) && isLetter(carNumber.charAt(1) + "") && checkLast;
     }
 
@@ -68,10 +68,11 @@ public class StringUtil {
         }
     }
 
-    public static boolean isNumeric(String str){
+    public static boolean isNumeric(String str) {
         Pattern pattern = Pattern.compile("[0-9]*");
         return pattern.matcher(str).matches();
     }
+
     /**
      * 判断是否是字母
      *
@@ -93,4 +94,13 @@ public class StringUtil {
         }
         return value;
     }
+
+    public static long parseToLong(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            return -1L;
+        }
+    }
+
 }

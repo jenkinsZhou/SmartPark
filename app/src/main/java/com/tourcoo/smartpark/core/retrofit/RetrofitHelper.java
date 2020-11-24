@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.core.utils.SSLUtil;
+import com.tourcoo.smartpark.ui.account.AccountHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,7 +67,7 @@ public class RetrofitHelper {
     /**
      * 日志tag
      */
-    private String mLogTag = "FastRetrofit";
+    private String mLogTag = "RetrofitHelper";
     /**
      * 日志拦截器
      */
@@ -85,6 +86,9 @@ public class RetrofitHelper {
             Request.Builder request = chain.request().newBuilder();
             //避免某些服务器配置攻击,请求返回403 forbidden 问题
             addHeader("User-Agent", "Mozilla/5.0 (Android)");
+            String token = AccountHelper.getInstance().getAccessToken();
+            LogUtils.tag(mLogTag).d("token="+token);
+            addHeader("Authorization", token);
             if (mHeaderMap.size() > 0) {
                 for (Map.Entry<String, Object> entry : mHeaderMap.entrySet()) {
                     request.addHeader(entry.getKey(), String.valueOf(entry.getValue()));

@@ -11,7 +11,7 @@ import androidx.annotation.LayoutRes;
  * @date 2020年10月26日11:33
  * @Email: 971613168@qq.com
  */
-public interface IBaseView {
+public interface IBasicView {
     /**
      * Activity或Fragment 布局xml
      *
@@ -40,5 +40,14 @@ public interface IBaseView {
      */
     default void loadData() {
 
+    }
+
+    /**
+     * 加载框是否可以取消
+     *
+     * @return boolean
+     */
+    default boolean loadingCancelable() {
+        return false;
     }
 }

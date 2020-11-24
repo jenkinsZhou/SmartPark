@@ -15,7 +15,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.tourcoo.smartpark.core.CommonConstant;
 import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.UiManager;
-import com.tourcoo.smartpark.core.control.IBaseView;
+import com.tourcoo.smartpark.core.control.IBasicView;
 import com.tourcoo.smartpark.core.control.IRefreshLoadView;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
@@ -29,7 +29,7 @@ import com.trello.rxlifecycle3.components.support.RxFragment;
  * @date 2020年10月29日16:17
  * @Email: 971613168@qq.com
  */
-public abstract class BaseFragment extends RxFragment implements IBaseView {
+public abstract class BaseFragment extends RxFragment implements IBasicView {
     protected String TAG = getClass().getSimpleName();
     protected Activity mContext;
     protected View mContentView;

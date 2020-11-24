@@ -12,14 +12,14 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.tourcoo.smartpark.core.CommonConstant;
 import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.UiManager;
-import com.tourcoo.smartpark.core.control.IBaseView;
+import com.tourcoo.smartpark.core.control.IBasicView;
 import com.tourcoo.smartpark.core.control.IRefreshLoadView;
 import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.utils.StackUtil;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
-import com.tourcoo.smartpark.core.widget.dialog.loading.LoadingDialogWrapper;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
@@ -30,7 +30,7 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
  * @date 2020年10月26日16:21
  * @Email: 971613168@qq.com
  */
-public abstract class BaseActivity extends RxAppCompatActivity implements IBaseView {
+public abstract class BaseActivity extends RxAppCompatActivity implements IBasicView {
     protected String TAG = getClass().getSimpleName();
     protected Activity mContext;
     protected View mContentView;
@@ -40,7 +40,7 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
     protected boolean mIsFirstBack = true;
     protected long mDelayBack = 2000;
     private QuitAppControl mQuitAppControl;
-    private IosLoadingDialog loadingDialog;
+    protected IosLoadingDialog baseLoadingDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,7 +66,8 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
         mIsViewLoaded = true;
         beforeInitView(savedInstanceState);
         initView(savedInstanceState);
-        loadingDialog = new IosLoadingDialog(mContext, "加载中...");
+        baseLoadingDialog = new IosLoadingDialog(mContext, "加载中...");
+        baseLoadingDialog.setCancelable(loadingCancelable());
     }
 
 
@@ -147,23 +148,23 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBaseV
     }
 
     protected void showLoading(String msg) {
-        if (loadingDialog != null && !loadingDialog.isShowing()) {
+        if (baseLoadingDialog != null && !baseLoadingDialog.isShowing()) {
             if (!TextUtils.isEmpty(msg)) {
-                loadingDialog.setLoadingText(msg);
+                baseLoadingDialog.setLoadingText(msg);
             }
-            loadingDialog.show();
+            baseLoadingDialog.show();
         }
     }
 
     protected void showLoading() {
-        if (loadingDialog != null && !loadingDialog.isShowing()) {
-            loadingDialog.show();
+        if (baseLoadingDialog != null && !baseLoadingDialog.isShowing()) {
+            baseLoadingDialog.show();
         }
     }
 
     protected void closeLoading() {
-        if (loadingDialog != null) {
-            loadingDialog.dismiss();
+        if (baseLoadingDialog != null && baseLoadingDialog.isShowing()) {
+            baseLoadingDialog.dismiss();
         }
     }
 }

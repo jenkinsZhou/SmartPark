@@ -29,7 +29,7 @@ import java.util.concurrent.TimeoutException;
 import io.reactivex.annotations.NonNull;
 import retrofit2.HttpException;
 
-import static com.tourcoo.smartpark.core.control.RequestConstant.FIRST_PAGE;
+import static com.tourcoo.smartpark.core.control.RequestConfig.FIRST_PAGE;
 
 /**
  * @author :JenkinsZhou

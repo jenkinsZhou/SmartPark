@@ -2,6 +2,10 @@ package com.tourcoo.smartpark.core.retrofit.repository;
 
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
+import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.account.ParkingInfo;
+import com.tourcoo.smartpark.bean.account.TokenInfo;
+import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.core.retrofit.ApiService;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.retrofit.RetryWhen;
@@ -47,13 +51,30 @@ public class ApiRepository extends BaseRepository {
     }
 
 
-
     public Observable<BaseResult<AppUpdateBean>> getAppVersionInfo() {
         return ThreadTransformer.switchSchedulers(getApiService().getAppVersion().retryWhen(new RetryWhen()));
     }
 
 
- /*   public Observable<BaseResult<List<String>>> upload() {
-        return ThreadTransformer.switchSchedulers(getApiService().uploadFiles().retryWhen(new RetryWhen()));
-    }*/
+    public Observable<BaseResult<TokenInfo>> requestLogin(String account, String pass, int parkingId) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("number", account);
+        params.put("password", pass);
+        params.put("parkingId", parkingId);
+        return ThreadTransformer.switchSchedulers(getApiService().requestLogin(params).retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<List<ParkingInfo>>> requestParkingList(String account) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("number", account);
+        return ThreadTransformer.switchSchedulers(getApiService().requestParkingList(params).retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<UserInfo>> requestUserInfo() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));
+    }
+    public Observable<BaseResult<List<ParkSpaceInfo>>> requestParkSpaceList() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestParkSpaceList().retryWhen(new RetryWhen()));
+    }
+
 }

@@ -2,24 +2,21 @@ package com.tourcoo.smartpark.core.retrofit;
 
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
+import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.account.ParkingInfo;
+import com.tourcoo.smartpark.bean.account.TokenInfo;
+import com.tourcoo.smartpark.bean.account.UserInfo;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
-import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
-import retrofit2.http.Streaming;
 
 /**
  * @author :JenkinsZhou
@@ -35,7 +32,7 @@ public interface ApiService {
      *
      * @return
      */
-    @GET("handheld/version")
+    @GET("/handheld/version")
     Observable<BaseResult<AppUpdateBean>> getAppVersion();
 
     /**
@@ -44,26 +41,37 @@ public interface ApiService {
      * @param file
      * @return
      */
-    @POST("file/upload")
+    @POST("/file/upload")
     Call<BaseResult<List<String>>> uploadFiles(@Body RequestBody file);
 
-    /**
-     * 单个文件上传
-     *
-     * @param file
-     * @return
-     */
-    @Multipart
-    @POST("file/upload")
-    Call<BaseResult<List<String>>> uploadFile(@Part MultipartBody.Part file);
 
     /**
-     * 多个文件上传
+     * 登录
      *
-     * @param files
+     * @param map
      * @return
      */
-    @Multipart
-    @POST("file/upload")
-    Call<BaseResult<List<String>>> uploadFiles(@Part List<MultipartBody.Part> files);
+    @POST("/handheld/login/login")
+    Observable<BaseResult<TokenInfo>> requestLogin(@Body Map<String, Object> map);
+
+    /**
+     * 获取当前收费员管辖的停车场列表
+     * @param map
+     * @return
+     */
+    @GET("/handheld/parking/memberlist")
+    Observable<BaseResult<List<ParkingInfo>>> requestParkingList(@QueryMap Map<String, Object> map);
+
+
+    @GET("/handheld/member/info")
+    Observable<BaseResult<UserInfo>> requestUserInfo();
+
+    /**
+     * 获取当前登录停车场车位列表
+     * @return
+     */
+    @GET("/handheld/parking/spacelist")
+    Observable<BaseResult<List<ParkSpaceInfo>>> requestParkSpaceList();
+
+
 }

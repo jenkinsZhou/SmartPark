@@ -1,30 +1,28 @@
 package com.tourcoo;
 
 import android.app.Application;
+import android.content.Context;
 
+
+import androidx.multidex.MultiDex;
 
 import com.apkfuns.log2file.LogFileEngineFactory;
 import com.apkfuns.logutils.LogUtils;
 import com.simple.spiderman.SpiderMan;
-import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
 import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
-import com.tourcoo.smartpark.core.control.RequestConstant;
-import com.tourcoo.smartpark.core.manager.GlideManager;
+import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.event.EventConstant;
 import com.tourcoo.smartpark.event.OrcInitEvent;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
-import com.tourcoo.smartpark.ui.HomeActivity;
 import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
 
 import org.greenrobot.eventbus.EventBus;
-
-import leakcanary.LeakCanary;
 
 /**
  * @author :JenkinsZhou
@@ -94,7 +92,7 @@ public class SmartParkApplication extends Application {
         //初始化Retrofit配置
         RetrofitHelper.getInstance()
                 //配置全局网络请求BaseUrl
-                .setBaseUrl(RequestConstant.BASE_URL)
+                .setBaseUrl(RequestConfig.BASE_URL)
                 //信任所有证书--也可设置setCertificates(单/双向验证)
                 .setCertificates()
                 //设置统一请求头
@@ -133,5 +131,11 @@ public class SmartParkApplication extends Application {
             // 初始化模型
             PredictorWrapper.initModel(this);
         });
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

@@ -13,7 +13,7 @@ import com.tourcoo.smartpark.core.control.IRefreshLoadView;
 import com.tourcoo.smartpark.core.delegate.RefreshLoadDelegate;
 import com.tourcoo.smartpark.core.delegate.TitleDelegate;
 
-import static com.tourcoo.smartpark.core.control.RequestConstant.FIRST_PAGE;
+import static com.tourcoo.smartpark.core.control.RequestConfig.FIRST_PAGE;
 
 /**
  * @author :JenkinsZhou

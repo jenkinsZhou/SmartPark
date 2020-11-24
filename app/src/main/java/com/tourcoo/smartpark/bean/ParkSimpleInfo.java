@@ -7,7 +7,7 @@ package com.tourcoo.smartpark.bean;
  * @date 2020年11月04日16:04
  * @Email: 971613168@qq.com
  */
-public class ParkInfo {
+public class ParkSimpleInfo {
     private String plantNum;
     private String parkingNum;
     private int carType;

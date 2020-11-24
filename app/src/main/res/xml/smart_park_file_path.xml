@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!--对应文件夹名需与file_string一一对应app开发者可以通过自定义file_string及file_path达到符合自己的规则-->
-    <paths>
-        <external-path name="smart_park" path="Android/data/com.tourcoo.smartpark/files/Pictures"/>
-    </paths>
-</resources>
+<paths>
+    <!--path：需要临时授权访问的路径（.代表所有路径）-->
+    <external-path name="path_files" path="."/>
+</paths>

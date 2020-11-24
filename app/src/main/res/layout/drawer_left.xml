@@ -107,6 +107,8 @@
             android:orientation="horizontal">
 
             <TextView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/tvSignIn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -120,6 +122,8 @@
                 android:textSize="@dimen/sp_13" />
 
             <TextView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/tvSignOut"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -154,6 +158,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvTotalCarCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -189,6 +194,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvTheoreticalIncome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -224,6 +230,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvActualIncome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"

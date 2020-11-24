@@ -8,14 +8,12 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <application
         android:name="com.tourcoo.SmartParkApplication"
         android:allowBackup="true"
@@ -33,7 +31,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/smart_park_file_path"/>
+                android:resource="@xml/smart_park_file_path" />
         </provider>
         <meta-data
             android:name="android.max_aspect"
@@ -47,18 +45,20 @@
             android:name="notch.config"
             android:value="portrait|landscape" />
 
-        <activity android:name=".ui.HomeActivity">
+        <activity
+            android:name=".ui.HomeActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.account.LoginActivity" />
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
         <activity android:name=".ui.pay.ExitPayFeeActivity" />
         <activity android:name=".ui.record.RecordCarInfoConfirmActivity" />
         <activity android:name=".ui.report.FeeDailyReportActivity" />
+        <activity android:name=".ui.account.login.LoginActivity" />
 
     </application>
 

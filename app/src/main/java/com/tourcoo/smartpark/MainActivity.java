@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.tourcoo.smartpark.core.base.activity.BaseActivity;
 import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
-import com.tourcoo.smartpark.ui.account.LoginActivity;
+import com.tourcoo.smartpark.ui.account.login.LoginActivity;
 
 public class MainActivity extends BaseActivity implements QuitAppControl {
 private TextView tvHello;
@@ -29,9 +29,6 @@ private TextView tvHello1;
             @Override
             public void onClick(View v) {
                 ToastUtil.showNormal("正常的吐司");
-                Intent intent = new Intent();
-                intent.setClass(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
             }
         });
         tvHello1.setOnClickListener(new View.OnClickListener() {

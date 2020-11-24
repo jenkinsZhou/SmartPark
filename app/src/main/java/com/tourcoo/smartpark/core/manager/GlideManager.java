@@ -51,7 +51,7 @@ public class GlideManager {
     private static Drawable sRoundPlaceholderDrawable;
     @ColorInt
     private static int mPlaceholderColor = Color.LTGRAY;
-    private static float mPlaceholderRoundRadius = SizeUtil.dp2px(5);
+    private static float mPlaceholderRoundRadius = 10f;
 
     private static void setDrawable(GradientDrawable gd, float radius) {
         gd.setColor(mPlaceholderColor);

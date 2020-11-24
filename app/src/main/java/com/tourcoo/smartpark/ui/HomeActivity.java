@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -20,22 +19,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
+import com.tourcoo.smartpark.bean.BaseResult;
+import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.account.ParkingInfo;
+import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.core.CommonUtil;
+import com.tourcoo.smartpark.core.control.RequestConfig;
+import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver;
+import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
-import com.tourcoo.smartpark.bean.ParkInfo;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
-import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
+import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
-import com.tourcoo.smartpark.ui.account.LoginActivity;
+import com.tourcoo.smartpark.ui.account.login.LoginActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
-import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
-import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
+import com.tourcoo.smartpark.util.StringUtil;
+import com.trello.rxlifecycle3.android.ActivityEvent;
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -46,7 +51,7 @@ import java.util.List;
  * @date 2020年10月30日11:22
  * @Email: 971613168@qq.com
  */
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
+public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener {
     private Toolbar homeToolBar;
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
@@ -56,23 +61,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private Handler mHandler = new Handler();
     private TextView tvCarRecord;
     private IosLoadingDialog loadingDialog;
+    private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_activity);
+        setImmersionBar(true);
         loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
         initView();
-        initTestData();
-        setImmersionBar(true);
+        initSpaceRecyclerView();
+        requestParkSpaceList();
     }
 
     private void initView() {
         homeToolBar = findViewById(R.id.homeToolBar);
         ivMenu = findViewById(R.id.ivMenu);
         drawerLayout = findViewById(R.id.drawerLayout);
+        tvUserName = findViewById(R.id.tvUserName);
+        tvUserWorkTime = findViewById(R.id.tvUserWorkTime);
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
         tvCarRecord = findViewById(R.id.tvCarRecord);
+        tvUserLocation = findViewById(R.id.tvUserLocation);
+        tvTotalCarCount = findViewById(R.id.tvTotalCarCount);
+        tvActualIncome = findViewById(R.id.tvActualIncome);
+        tvTheoreticalIncome = findViewById(R.id.tvTheoreticalIncome);
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
         findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
@@ -149,15 +162,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void initTestData() {
+    private void initSpaceRecyclerView() {
         parkingRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this, R.color.whiteF5F5F5), false));
         homeGridParkAdapter = new HomeGridParkAdapter();
-        List<ParkInfo> parkInfoList = new ArrayList<>();
-        ParkInfo parkInfo;
+        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);
+       /* List<ParkSimpleInfo> parkInfoList = new ArrayList<>();
+        ParkSimpleInfo parkInfo;
         int size = 10;
         for (int i = 0; i < size; i++) {
-            parkInfo = new ParkInfo();
+            parkInfo = new ParkSimpleInfo();
             parkInfo.setParkingNum("A02568" + i);
             parkInfo.setPlantNum("皖A·761M" + i);
             if (i % 2 != 0) {
@@ -169,7 +183,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         homeGridParkAdapter.setNewData(parkInfoList);
-        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);
+        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);*/
     }
 
     /**
@@ -202,10 +216,59 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     protected void closeLoading() {
         if (loadingDialog != null) {
             loadingDialog.dismiss();
         }
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        showUserInfo(AccountHelper.getInstance().getUserInfo());
+    }
+
+
+    private void showUserInfo(UserInfo userInfo) {
+        if (userInfo == null) {
+            return;
+        }
+        String info = StringUtil.getNotNullValueLine(userInfo.getName()) + "/" + StringUtil.getNotNullValueLine(userInfo.getNumber());
+        tvUserName.setText(info);
+        tvUserLocation.setText(getNotNullStr(userInfo.getParking()));
+        tvUserWorkTime.setText(getNotNullStr(userInfo.getDate()));
+        tvTotalCarCount.setText(getNotNullStr(userInfo.getCarNum() + ""));
+        tvTheoreticalIncome.setText(getNotNullStr(userInfo.getTheoreticalIncome() + ""));
+        tvActualIncome.setText(getNotNullStr(userInfo.getActualIncome() + ""));
+    }
+
+
+    private String getNotNullStr(String value) {
+        return StringUtil.getNotNullValueLine(value);
+    }
+
+
+    private void requestParkSpaceList() {
+        ApiRepository.getInstance().requestParkSpaceList().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<List<ParkSpaceInfo>>>("正在获取车位列表...") {
+            @Override
+            public void onRequestSuccess(BaseResult<List<ParkSpaceInfo>> entity) {
+                if (entity == null) {
+                    return;
+                }
+                if (entity.getCode() == RequestConfig.REQUEST_SUCCESS_CODE) {
+                    loadSpaceData(entity.getData());
+                } else {
+                    ToastUtil.showFailed(entity.getErrMsg());
+                }
+            }
+        });
+    }
+
+    private void loadSpaceData(List<ParkSpaceInfo> parkSpaceInfoList) {
+        if (parkSpaceInfoList == null) {
+            return;
+        }
+        homeGridParkAdapter.setNewData(parkSpaceInfoList);
+    }
+
 }

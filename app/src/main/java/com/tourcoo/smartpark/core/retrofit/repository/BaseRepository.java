@@ -11,7 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
-import static com.tourcoo.smartpark.core.control.RequestConstant.REQUEST_SUCCESS;
+import static com.tourcoo.smartpark.core.control.RequestConfig.REQUEST_SUCCESS;
 
 /**
  * @author :JenkinsZhou

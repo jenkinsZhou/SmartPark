@@ -7,16 +7,16 @@ package com.tourcoo.smartpark.core.control;
  * @date 2020年10月28日11:22
  * @Email: 971613168@qq.com
  */
-public class RequestConstant {
+public class RequestConfig {
     /**
      * 第一页（有的为0有的为1）
      */
     public static final int FIRST_PAGE = 0;
 
     public static final int REQUEST_SUCCESS = 200;
-
+    public static final int REQUEST_SUCCESS_CODE = 1;
 //    public static final String BASE_URL = "http://192.168.0.201:8007/";
-public static final String BASE_URL = "http://192.168.0.200:8007/";
+public static final String BASE_URL = "http://192.168.0.211:8007";
 //192.168.0.200:8007
 
 }

@@ -8,14 +8,10 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.provider.MediaStore
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import androidx.core.app.ActivityCompat
@@ -33,14 +29,15 @@ import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.FileUtil
+import com.tourcoo.smartpark.core.utils.FileUtil.getExternalFilesDir
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.event.OrcInitEvent
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager
 import com.tourcoo.smartpark.util.StringUtil
+import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.tourcoo.smartpark.widget.kingkeyboard.InputCompleteListener
-import com.tourcoo.smartpark.widget.kingkeyboard.KeyboardUtils
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper
 import com.tourcoo.smartpark.widget.orc.RecogniseListener
 import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
@@ -51,6 +48,8 @@ import okhttp3.RequestBody
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.EasyPermissions
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -68,7 +67,7 @@ import java.net.SocketException
  * @date 2020年11月13日11:09
  * @Email: 971613168@qq.com
  */
-class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
+class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, EasyPermissions.PermissionCallbacks {
 
     private var mEditTexts: MutableList<EditText>? = null
     private var photoAdapter: PhotoAdapter? = null
@@ -82,11 +81,20 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private var needOrc: Boolean = false
     private var keyboardView: PlateKeyboardView? = null
 
+
     //后台返回的图片地址
     private val serviceImageUrlList = ArrayList<String>()
 
+    //权限参数
+    private val needPermissions = arrayOfNulls<String>(3)
+
     companion object {
         const val REQUEST_CODE_TAKE_PHOTO = 1001
+
+        /**
+         * 随便赋值的一个唯一标识码
+         */
+        const val REQUEST_PERMISSION_STORAGE = 100
     }
 
     override fun getContentLayout(): Int {
@@ -94,115 +102,39 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     override fun initView(savedInstanceState: Bundle?) {
-//        llContentView.setOnClickListener(this)
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
         }
         llTakePhoto.setOnClickListener(this)
         tvConfirmRecord.setOnClickListener(this)
+        needPermissions[0] = Manifest.permission.READ_EXTERNAL_STORAGE
+        needPermissions[1] = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        needPermissions[2] = Manifest.permission.CAMERA
         keyboardView = PlateKeyboardView(mContext)
-        /*  keyboardView?.setOnKeyboardFinishListener {
-          }*/
-//        initKeyboard()
         initPhotoAdapter()
         takePhoto.text = "车辆拍照"
         if (!PredictorWrapper.isInitSuccess()) {
             showLoading("正在初始化组件...")
         }
-        test()
+        initInputLayout()
+        checkPermission()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
         titleBar?.setTitleMainText("确认登记")
     }
 
-//    private fun initKeyboard() {
-//        mEditTexts = ArrayList()
-//        kingKeyboard = KingKeyboard(this, keyboardParent)
-//        //然后将EditText注册到KingKeyboard即可
-//        kingKeyboard.register(etPlantName, KingKeyboard.KeyboardType.LICENSE_PLATE)
-//        kingKeyboard.register(etPlantLetter, KingKeyboard.KeyboardType.LICENSE_PLATE)
-//        kingKeyboard.register(etPlantNumber1, KingKeyboard.KeyboardType.LICENSE_PLATE)
-//        kingKeyboard.register(etPlantNumber2, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-//        kingKeyboard.register(etPlantNumber3, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-//        kingKeyboard.register(etPlantNumber4, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-//        kingKeyboard.register(etPlantNumber5, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-//        kingKeyboard.register(etPlantNumber6, KingKeyboard.KeyboardType.LICENSE_PLATE_MODE_CHANGE)
-//        kingKeyboard.setKeyboardCustom(R.xml.keyboard_custom)
-//        setupEditText(etPlantName)
-//        setupEditText(etPlantLetter)
-//        setupEditText(etPlantNumber1)
-//        setupEditText(etPlantNumber2)
-//        setupEditText(etPlantNumber3)
-//        setupEditText(etPlantNumber4)
-//        setupEditText(etPlantNumber5)
-//        etPlantNumber1.requestFocus()
-//        //设置"用户名"提示文字的大小
-//        val s = SpannableString("新能源")
-//        val textSize = AbsoluteSizeSpan(9, true)
-//        s.setSpan(textSize, 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-//        etPlantNumber6.hint = s
-//        kingKeyboard.setVibrationEffectEnabled(true)
-//    }
-
-    private fun setupEditText(editText: EditText) {
-        mEditTexts!!.add(editText)
-        editText.addTextChangedListener(InnerTextWatcher(editText))
-    }
-
-    private inner class InnerTextWatcher(var innerEditText: EditText) : TextWatcher {
-        var maxLength: Int = KeyboardUtils.getMaxLength(innerEditText)
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-        override fun afterTextChanged(s: Editable) {
-            val count = s.length
-            if (maxLength == 0) {
-                return
-            }
-            if (count >= maxLength) {
-                focusNext(innerEditText)
-            } else if (count == 0) {
-                focusLast(innerEditText)
-            }
-        }
-
-    }
-
-
-    fun focusNext(et: EditText?) {
-        val index = mEditTexts!!.indexOf(et)
-        if (index < mEditTexts!!.size - 1) {
-            val nextEt = mEditTexts!![index + 1]
-            nextEt.requestFocus()
-            nextEt.setSelection(nextEt.text.toString().length)
-        } else {
-            if (mOnCompleteListener != null) {
-                val editable = Editable.Factory.getInstance().newEditable("")
-                for (editText in mEditTexts!!) {
-                    editable.append(editText.text)
-                }
-                mOnCompleteListener!!.onComplete(editable, editable.toString())
-            }
-            et!!.setSelection(et.text.toString().length)
-        }
-    }
-
-
-    private fun focusLast(et: EditText?) {
-        val index = mEditTexts!!.indexOf(et)
-        if (index != 0) {
-            val lastEt = mEditTexts!![index - 1]
-            lastEt.requestFocus()
-            lastEt.setSelection(lastEt.text.toString().length)
-        }
-    }
-
     override fun onClick(v: View?) {
         when (v?.id) {
 
             R.id.llTakePhoto -> {
-                needOrc = true
-                takePhoto()
+                if (EasyPermissions.hasPermissions(this, *needPermissions)) {
+                    needOrc = true
+                    takePhoto()
+                } else {
+                    checkPermission()
+                }
+
             }
             R.id.tvConfirmRecord -> {
             }
@@ -356,30 +288,26 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private fun updateProgress(progress: Int) {
         LogUtils.i("进度：$progress")
         hud?.setProgress(progress)
+        if(progress>=100){
+            hud?.dismiss()
+        }
     }
 
     private fun initProgressDialog() {
-        hud = KProgressHUD.create(mContext)
-                .setStyle(KProgressHUD.Style.PIE_DETERMINATE)
+        hud = KProgressHUD.create(mContext,KProgressHUD.Style.PIE_DETERMINATE)
                 .setCancellable(false)
-                .setAutoDismiss(false)
+                .setAutoDismiss(true)
                 .setMaxProgress(100)
-        hud!!.setProgress(0)
     }
 
 
     private fun showHudProgressDialog() {
-        if (hud != null) {
-            hud!!.setProgress(0)
-        } else {
-            initProgressDialog()
-        }
+        initProgressDialog()
         hud!!.show()
     }
 
     private fun closeHudProgressDialog() {
-        if (hud != null && hud!!.isShowing) {
-            hud!!.setProgress(0)
+        if (hud != null) {
             hud!!.dismiss()
         }
         hud = null
@@ -399,23 +327,11 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     private fun takePhoto() {
-        // 跳转到系统的拍照界面
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ){
-            if (ContextCompat.checkSelfPermission(this,
-                            Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED||ContextCompat.checkSelfPermission(this,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED ){
-                requestPermission()
-                return
-            }else{
-                takePhoto()
-            }
-        }
         val intentToTakePhoto = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
         // 指定照片存储位置为sd卡本目录下
         // 这里设置为固定名字 这样就只会只有一张temp图 如果要所有中间图片都保存可以通过时间或者加其他东西设置图片的名称
-        val mTempPhotoPath = mContext.getExternalFilesDir(null).toString() + File.separator + "Pictures" + File.pathSeparator + "photo.jpeg"
+        val mTempPhotoPath = mContext.getExternalFilesDir(null)!!.absolutePath + File.separator + "Pictures" + File.pathSeparator + "photo.jpeg"
         //判断版本是否在7.0以上
         imageUri = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             //通过FileProvider创建一个content类型的Uri
@@ -423,8 +339,13 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         } else {
             Uri.fromFile(File(mTempPhotoPath))
         }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //添加这一句表示对目标应用临时授权该Uri所代表的文件
+            intentToTakePhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
         //下面这句指定调用相机拍照后的照片存储的路径
         intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+
         startActivityForResult(intentToTakePhoto, REQUEST_CODE_TAKE_PHOTO)
 
     }
@@ -435,7 +356,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
             REQUEST_CODE_TAKE_PHOTO -> {
                 if (imageUri != null && resultCode == Activity.RESULT_OK) {
                     mSelectImagePathList.clear()
-                    val currentImagePath = FileUtil.getFilePathByUri(imageUri)
+                    val currentImagePath = FileUtil.getPath(imageUri)
                     scanFile(mContext, currentImagePath)
                     LogUtils.i("获取的路径:$currentImagePath")
                     mSelectImagePathList.add(currentImagePath)
@@ -485,15 +406,15 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
     private fun doRecognisePlant(photoPath: String) {
         if (!PredictorWrapper.isInitSuccess()) {
             //todo 目前先拦截
-            ToastUtil.showNormalDebug("当前sdk未初始化")
+            ToastUtil.showNormalDebug("当前车牌识别sdk未初始化")
             return
         }
         try {
             PredictorWrapper.setRecogniseListener(object : RecogniseListener {
                 override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
                     LogUtils.tag("识别成功").i(result)
-                    closeHudProgressDialog()
                     handleReconCallback(result)
+                    closeHudProgressDialog()
                 }
 
                 override fun recogniseFailed() {
@@ -579,7 +500,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
                 }).launch()
     }
 
-    private fun test() {
+    private fun initInputLayout() {
 //设置字体大小
         plantInputLayout.setTextSize(16f)
 //设置字体颜色
@@ -589,45 +510,95 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener {
         plantInputLayout.text
     }
 
-    private fun requestPermission() {
-        // Here, thisActivity is the current activity
 
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.CAMERA)) {
-                // Show an expanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-                ActivityCompat.requestPermissions(this, arrayOf<String>(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        1002)
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this, arrayOf<String>(Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        1003)
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
+    /*  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+          super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+          when (requestCode) {
+              1003 -> {
+                  // If request is cancelled, the result arrays are empty.
+                  if (grantResults.size >= 2 && (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
+                      // permission was granted, yay! Do the
+                      // contacts-related task you need to do.
+                      ToastUtil.showSuccess("权限通过")
+                      takePhoto()
+                  } else {
+                      // permission denied, boo! Disable the
+                      // functionality that depends on this permission.
+  //                    showWaringDialog()
+                      ToastUtil.showFailed("权限未通过")
+                  }
+                  return
+              }
+          }
+      }*/
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // Forward results to EasyPermissions
+        //将结果传入EasyPermissions中
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            1003 -> {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.size>=2 && (grantResults[0] == PackageManager.PERMISSION_GRANTED&&grantResults[1]==PackageManager.PERMISSION_GRANTED )) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                    ToastUtil.showSuccess("权限通过")
-                    takePhoto()
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-//                    showWaringDialog()
-                    ToastUtil.showFailed("权限未通过")
-                }
-                return
-            }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String?>) {
+        takePhoto()
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String?>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            //这个方法有个前提是，用户点击了“不再询问”后，才判断权限没有被获取到
+            mHandler.postDelayed(Runnable { showSetting() }, 500)
+        } else if (!EasyPermissions.hasPermissions(this, *needPermissions)) {
+            //这里响应的是除了AppSettingsDialog这个弹出框，剩下的两个弹出框被拒绝或者取消的效果
+            exitApp()
         }
+    }
+
+    private fun showSetting() {
+        IosAlertDialog(mContext)
+                .init()
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+                .setTitle("权限申请")
+                .setMsg("应用需要您授予相关权限 请前往授权管理页面授权")
+                .setPositiveButton("前往授权", View.OnClickListener { skipDetailSettingIntent() })
+                .setNegativeButton("退出应用", View.OnClickListener { exitApp() }).show()
+    }
+
+
+    private fun exitApp() {
+        ToastUtil.showNormal("您未授予相关权限")
+        finish()
+    }
+
+    private fun skipDetailSettingIntent() {
+        val intent = Intent()
+        //        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (Build.VERSION.SDK_INT >= 9) {
+            intent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
+            intent.data = Uri.fromParts("package", packageName, null)
+        } else if (Build.VERSION.SDK_INT <= 8) {
+            intent.action = Intent.ACTION_VIEW
+            intent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails")
+            intent.putExtra("com.android.settings.ApplicationPkgName", packageName)
+        }
+        try {
+            startActivityForResult(intent, REQUEST_PERMISSION_STORAGE)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * 检查权限
+     */
+    @AfterPermissionGranted(REQUEST_PERMISSION_STORAGE)
+    private fun checkPermission() {
+        mHandler.postDelayed({
+            if (!EasyPermissions.hasPermissions(this, *needPermissions)) {
+                EasyPermissions.requestPermissions(this, "需要获取相关权限", REQUEST_PERMISSION_STORAGE, *needPermissions)
+            }
+        }, 300)
     }
 }
