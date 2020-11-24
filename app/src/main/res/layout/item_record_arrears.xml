@@ -2,48 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/ic_bg_item_common_small"
     android:orientation="horizontal"
+    android:paddingTop="@dimen/dp_12"
     android:paddingBottom="@dimen/dp_12">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/bg_left_radius_15_right_30_white"
+        android:layout_weight="0.7"
         android:orientation="vertical">
 
-        <TextView
-            style="@style/textBlackStyle14"
+        <LinearLayout
+            android:layout_marginStart="@dimen/dp_20"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:text="A01001"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_gravity="center_horizontal"
+                style="@style/textBlackStyle14"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:text="A01001"
+                android:textStyle="bold" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/dp_10"
-            android:layout_marginBottom="@dimen/dp_11"
-            android:src="@mipmap/ic_car_gray_small" />
+            <ImageView
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:layout_marginBottom="@dimen/dp_11"
+                android:src="@mipmap/ic_car_gray_small" />
 
-        <TextView
-            android:id="@+id/tvPlantNum"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginStart="@dimen/dp_10"
-            android:layout_marginEnd="@dimen/dp_10"
-            android:background="@drawable/bg_radius_30_primary"
-            android:paddingStart="@dimen/dp_11"
-            android:paddingTop="@dimen/dp_3_5"
-            android:paddingEnd="@dimen/dp_11"
-            android:paddingBottom="@dimen/dp_3_5"
-            android:text="苏B·A3456"
-            android:textColor="@color/white"
-            android:textSize="@dimen/sp_12"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvPlantNum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:minWidth="@dimen/dp_80"
+                android:background="@drawable/bg_radius_30_primary"
+                android:paddingStart="@dimen/dp_11"
+                android:paddingTop="@dimen/dp_3_5"
+                android:paddingEnd="@dimen/dp_11"
+                android:paddingBottom="@dimen/dp_3_5"
+                android:text="苏B·A3456"
+                android:textColor="@color/white"
+                android:textSize="@dimen/sp_12"
+                android:textStyle="bold" />
+        </LinearLayout>
+
 
     </LinearLayout>
 
@@ -56,9 +63,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1.6"
-        android:background="@drawable/bg_left_radius_30_right_15_white"
         android:orientation="vertical"
-        android:paddingStart="@dimen/dp_10">
+        android:paddingStart="@dimen/dp_20">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -105,7 +111,6 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-
                 android:layout_weight="1"
                 android:drawableStart="@mipmap/ic_alarm_small_yello"
                 android:drawablePadding="@dimen/dp_5"
@@ -122,98 +127,4 @@
         </LinearLayout>
 
     </LinearLayout>
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            style="@style/textBlackStyle14"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:gravity="center"
-            android:text="A01001"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1.5"
-            android:orientation="horizontal">
-
-            &lt;!&ndash; <ImageView
-                 android:layout_gravity="center_vertical"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:src="@mipmap/ic_money_small_yellow" />&ndash;&gt;
-
-            <TextView
-                style="@style/textBlackStyle14"
-                android:drawableStart="@mipmap/ic_money_small_yellow"
-                android:drawablePadding="@dimen/dp_5"
-                android:text=" 应收费用"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="［元］"
-                android:textColor="#A2A2A2"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginEnd="@dimen/dp_15"
-            android:text="15.00"
-            android:textColor="#FF4A5C"
-            android:textSize="@dimen/sp_15"
-            android:textStyle="bold" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="0dp"
-            android:paddingTop="@dimen/dp_10"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="0.5"
-            android:src="@mipmap/ic_car_gray_small" />
-
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="bottom"
-            android:orientation="horizontal">
-
-
-            <TextView
-                android:drawableStart="@mipmap/ic_money_small_yellow"
-                android:drawablePadding="@dimen/dp_5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" 宜兴停车场 火车站地下停车场"
-                android:textColor="#A2A2A2"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="［元］"
-                android:textColor="#A2A2A2"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-
-    </LinearLayout>-->
 </LinearLayout>

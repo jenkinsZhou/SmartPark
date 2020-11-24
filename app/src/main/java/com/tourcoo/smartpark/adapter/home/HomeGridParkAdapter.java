@@ -28,14 +28,15 @@ public class HomeGridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseVie
         switch (item.getUsed()) {
             case 0:
                 GlideManager.loadImgAuto(R.mipmap.ic_parking_gray,imageView);
+                helper.setVisible(R.id.tvPlantNum,false);
                 break;
             default:
                 GlideManager.loadImgAuto(R.mipmap.ic_car_gray_small,imageView);
-//                GlideManager.loadImg(R.mipmap.ic_parking_gray,helper.getView(R.id.ivParkingStatus));
-//                GlideManager.loadImg(ContextCompat.getDrawable(mContext,R.mipmap.ic_car_gray_small),helper.getView(R.id.ivParkingStatus));
+                helper.setVisible(R.id.tvPlantNum,true);
+                helper.setText(R.id.tvPlantNum,item.getCarNumber());
                 break;
         }
         helper.setText(R.id.tvParkingNum,item.getParkingNumber());
-        helper.setText(R.id.tvPlantNum,item.getCarNumber());
+
     }
 }
