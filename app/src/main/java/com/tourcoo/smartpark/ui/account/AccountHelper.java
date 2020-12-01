@@ -46,7 +46,9 @@ public class AccountHelper {
     }
 
     public boolean isNeedResetPass() {
-        this.needResetPass = SPUtils.getInstance().getBoolean(PREF_NEED_RESET_PASS);
+        if (userInfo != null) {
+            return userInfo.isNeedResetPass();
+        }
         return needResetPass;
     }
 

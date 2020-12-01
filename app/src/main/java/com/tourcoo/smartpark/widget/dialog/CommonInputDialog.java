@@ -71,6 +71,8 @@ public class CommonInputDialog {
         // 定义Dialog布局和参数
         dialog = new Dialog(mContext, R.style.AlertDialogStyle);
         dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
         Window window = dialog.getWindow();
         if (window != null) {
             WindowManager m = window.getWindowManager();
@@ -144,5 +146,11 @@ public class CommonInputDialog {
         }
     }
 
+    public  String getInputString(){
+        if(etInput != null){
+            return etInput.getText().toString();
+        }
+        return "";
+    }
 
 }

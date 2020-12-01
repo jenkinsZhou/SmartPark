@@ -70,11 +70,31 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestParkingList(params).retryWhen(new RetryWhen()));
     }
 
+    /**
+     * 获取用户信息
+     * @return
+     */
     public Observable<BaseResult<UserInfo>> requestUserInfo() {
         return ThreadTransformer.switchSchedulers(getApiService().requestUserInfo().retryWhen(new RetryWhen()));
     }
+
+    /**
+     * 获取车位列表
+     * @return
+     */
     public Observable<BaseResult<List<ParkSpaceInfo>>> requestParkSpaceList() {
         return ThreadTransformer.switchSchedulers(getApiService().requestParkSpaceList().retryWhen(new RetryWhen()));
+    }
+
+    /**
+     * 重置密码
+     * @param newPass
+     * @return
+     */
+    public Observable<BaseResult<Object>> requestUpdatePass(String newPass) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("password", newPass);
+        return ThreadTransformer.switchSchedulers(getApiService().requestUpdatePass(params).retryWhen(new RetryWhen()));
     }
 
 }

@@ -11,7 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
-import static com.tourcoo.smartpark.core.control.RequestConfig.REQUEST_SUCCESS;
+import static com.tourcoo.smartpark.core.control.RequestConfig.RESPONSE_CODE_SUCCESS;
 
 /**
  * @author :JenkinsZhou
@@ -31,7 +31,7 @@ public class BaseRepository {
         return ThreadTransformer.switchSchedulers(
                 observable.retryWhen(new RetryWhen())
                         .flatMap((Function<BaseResult<T>, ObservableSource<T>>) result -> {
-                            if (result.getCode() == REQUEST_SUCCESS) {
+                            if (result.getCode() == RESPONSE_CODE_SUCCESS) {
                                 return result.getData() != null ? Observable.just(result.getData())
                                         : Observable.error(new DataNullException());
                             } else {

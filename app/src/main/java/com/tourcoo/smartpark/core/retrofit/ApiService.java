@@ -16,6 +16,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.QueryMap;
 
 /**
@@ -72,6 +73,9 @@ public interface ApiService {
      */
     @GET("/handheld/parking/spacelist")
     Observable<BaseResult<List<ParkSpaceInfo>>> requestParkSpaceList();
+
+    @PUT("/handheld/member/updatepassword")
+    Observable<BaseResult<Object>> requestUpdatePass(@Body Map<String, Object> map);
 
 
 }

@@ -13,6 +13,7 @@ import com.tourcoo.smartpark.bean.account.UserInfo
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.mvp.BaseMvpTitleActivity
 import com.tourcoo.smartpark.core.utils.SizeUtil
+import com.tourcoo.smartpark.core.utils.StackUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.HomeActivity
@@ -90,6 +91,7 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
             return
         }
         AccountHelper.getInstance().userInfo = userInfo
+        AccountHelper.getInstance().isNeedResetPass = userInfo.isNeedResetPass
         skipHome()
     }
 

@@ -36,7 +36,7 @@ public class HomeGridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseVie
                 helper.setText(R.id.tvPlantNum,item.getCarNumber());
                 break;
         }
-        helper.setText(R.id.tvParkingNum,item.getParkingNumber());
+        helper.setText(R.id.tvParkingNum,item.getNumber());
 
     }
 }

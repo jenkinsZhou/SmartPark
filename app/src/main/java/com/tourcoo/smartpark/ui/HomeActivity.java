@@ -1,10 +1,14 @@
 package com.tourcoo.smartpark.ui;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
@@ -26,8 +31,10 @@ import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver;
+import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
+import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
@@ -37,6 +44,7 @@ import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
 import com.tourcoo.smartpark.util.StringUtil;
+import com.tourcoo.smartpark.widget.dialog.CommonInputDialog;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
@@ -51,7 +59,7 @@ import java.util.List;
  * @date 2020年10月30日11:22
  * @Email: 971613168@qq.com
  */
-public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener {
+public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks {
     private Toolbar homeToolBar;
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
@@ -61,17 +69,20 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private Handler mHandler = new Handler();
     private TextView tvCarRecord;
     private IosLoadingDialog loadingDialog;
+    private Context mContext;
     private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_activity);
-        setImmersionBar(true);
+        mContext = this;
         loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
         initView();
         initSpaceRecyclerView();
+        requestUserInfo();
         requestParkSpaceList();
+        setImmersionBar(true);
     }
 
     private void initView() {
@@ -167,23 +178,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this, R.color.whiteF5F5F5), false));
         homeGridParkAdapter = new HomeGridParkAdapter();
         homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);
-       /* List<ParkSimpleInfo> parkInfoList = new ArrayList<>();
-        ParkSimpleInfo parkInfo;
-        int size = 10;
-        for (int i = 0; i < size; i++) {
-            parkInfo = new ParkSimpleInfo();
-            parkInfo.setParkingNum("A02568" + i);
-            parkInfo.setPlantNum("皖A·761M" + i);
-            if (i % 2 != 0) {
-                parkInfo.setStatus(1);
-            } else {
-                parkInfo.setStatus(0);
-            }
-            parkInfoList.add(parkInfo);
-
-        }
-        homeGridParkAdapter.setNewData(parkInfoList);
-        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);*/
     }
 
     /**
@@ -240,6 +234,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvTotalCarCount.setText(getNotNullStr(userInfo.getCarNum() + ""));
         tvTheoreticalIncome.setText(getNotNullStr(userInfo.getTheoreticalIncome() + ""));
         tvActualIncome.setText(getNotNullStr(userInfo.getActualIncome() + ""));
+        AccountHelper.getInstance().setUserInfo(userInfo);
+        showResetPassByCondition();
     }
 
 
@@ -255,7 +251,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 if (entity == null) {
                     return;
                 }
-                if (entity.getCode() == RequestConfig.REQUEST_SUCCESS_CODE) {
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS) {
                     loadSpaceData(entity.getData());
                 } else {
                     ToastUtil.showFailed(entity.getErrMsg());
@@ -271,4 +267,101 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         homeGridParkAdapter.setNewData(parkSpaceInfoList);
     }
 
+    @Override
+    public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+        LogUtils.i("HomeActivity已被创建");
+        StackUtil.getInstance().push(activity);
+    }
+
+    @Override
+    public void onActivityStarted(@NonNull Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityResumed(@NonNull Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityPaused(@NonNull Activity activity) {
+
+    }
+
+    @Override
+    public void onActivityStopped(@NonNull Activity activity) {
+
+    }
+
+    @Override
+    public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+
+    }
+
+    @Override
+    public void onActivityDestroyed(@NonNull Activity activity) {
+        LogUtils.d("HomeActivity已被销毁");
+        StackUtil.getInstance().pop(activity, false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        closeLoading();
+        super.onDestroy();
+    }
+
+    private void requestUserInfo() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<UserInfo>>() {
+            @Override
+            public void onRequestSuccess(BaseResult<UserInfo> entity) {
+                closeLoading();
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
+                    showUserInfo(entity.getData());
+                }
+            }
+        });
+    }
+
+    private void showResetPassDialog() {
+        CommonInputDialog dialog = new CommonInputDialog(mContext);
+        dialog.create();
+        dialog.setPositiveButtonClick("确定", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (TextUtils.isEmpty(dialog.getInputString())) {
+                    ToastUtil.showNormal("请先输入密码");
+                    return;
+                }
+                requestResetNewPass(dialog.getInputString());
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+
+    private void requestResetNewPass(String newPass) {
+        ApiRepository.getInstance().requestUpdatePass(newPass).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<Object>>() {
+            @Override
+            public void onRequestSuccess(BaseResult<Object> entity) {
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS) {
+                    ToastUtil.showSuccess(entity.getErrMsg());
+                } else {
+                    ToastUtil.showNormal(entity.getErrMsg());
+                    showResetPassDialog();
+                }
+            }
+        });
+    }
+
+    private void showResetPassByCondition() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (AccountHelper.getInstance().isNeedResetPass()) {
+                    showResetPassDialog();
+                }
+            }
+        }, 300);
+    }
 }

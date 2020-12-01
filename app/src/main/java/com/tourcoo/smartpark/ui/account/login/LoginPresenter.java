@@ -43,7 +43,7 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
                 if (entity == null) {
                     return;
                 }
-                if (entity.getCode() == RequestConfig.REQUEST_SUCCESS_CODE) {
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS) {
                     getView().showParkingList(entity.getData());
                 } else {
                     ToastUtil.showNormal(entity.getErrMsg());
@@ -63,7 +63,7 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
                 if (entity == null) {
                     return;
                 }
-                if (entity.getCode() == RequestConfig.REQUEST_SUCCESS_CODE && entity.getData() != null) {
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
                     getView().loginSuccess(entity.getData());
                 } else {
                     ToastUtil.showNormal(entity.getErrMsg());
@@ -83,7 +83,7 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
                 if (entity == null) {
                     return;
                 }
-                if (entity.getCode() == RequestConfig.REQUEST_SUCCESS_CODE && entity.getData() != null) {
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
                     getView().showUserInfo(entity.getData());
                 } else {
                     getView().closeLoadingDialog();

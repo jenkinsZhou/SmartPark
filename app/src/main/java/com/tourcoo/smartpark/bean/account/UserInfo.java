@@ -28,6 +28,7 @@ public class UserInfo {
     private int carNum;
     private int actualIncome;
     private int theoreticalIncome;
+    private boolean needResetPass;
 
     public String getName() {
         return name;
@@ -91,5 +92,13 @@ public class UserInfo {
 
     public void setTheoreticalIncome(int theoreticalIncome) {
         this.theoreticalIncome = theoreticalIncome;
+    }
+
+    public boolean isNeedResetPass() {
+        return needResetPass;
+    }
+
+    public void setNeedResetPass(boolean needResetPass) {
+        this.needResetPass = needResetPass;
     }
 }
