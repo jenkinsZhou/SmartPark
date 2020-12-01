@@ -196,5 +196,11 @@ public class PredictorWrapper {
         return initSuccess;
     }
 
-
+    public static void release() {
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        mHandler = null;
+        recogniseListener = null;
+    }
 }

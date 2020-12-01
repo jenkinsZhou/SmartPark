@@ -97,4 +97,15 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestUpdatePass(params).retryWhen(new RetryWhen()));
     }
 
+
+
+    public Observable<BaseResult<Object>> requestAddParkingSpace(int parkingSpaceId,String plantNum,int carType,String[] photos) {
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("parkingSpaceId", parkingSpaceId);
+        params.put("number", plantNum);
+        params.put("type", carType);
+        params.put("photos", photos);
+        return ThreadTransformer.switchSchedulers(getApiService().requestAddParkingSpace(params).retryWhen(new RetryWhen()));
+    }
+
 }

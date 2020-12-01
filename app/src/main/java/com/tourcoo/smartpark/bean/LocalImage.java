@@ -8,21 +8,18 @@ package com.tourcoo.smartpark.bean;
  * @Email: 971613168@qq.com
  */
 public class LocalImage {
-    private String imagePath;
+    private String localImagePath;
     //传给后台的图片url
-    private String serviceImageUrl ;
+    private String serviceImageUrl;
     /**
      * 是否是拍照识别的图片
      */
     private boolean recognize = false;
 
-    public String getImagePath() {
-        return imagePath;
-    }
+    private int position = -1;
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
+
+
 
     public boolean isRecognize() {
         return recognize;
@@ -32,8 +29,8 @@ public class LocalImage {
         this.recognize = recognize;
     }
 
-    public LocalImage(String imagePath, boolean recognize) {
-        this.imagePath = imagePath;
+    public LocalImage(String localImagePath, boolean recognize) {
+        this.localImagePath = localImagePath;
         this.recognize = recognize;
     }
 
@@ -46,5 +43,21 @@ public class LocalImage {
 
     public void setServiceImageUrl(String serviceImageUrl) {
         this.serviceImageUrl = serviceImageUrl;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public String getLocalImagePath() {
+        return localImagePath;
+    }
+
+    public void setLocalImagePath(String localImagePath) {
+        this.localImagePath = localImagePath;
     }
 }

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.apkfuns.logutils.LogUtils;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
@@ -71,6 +72,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private IosLoadingDialog loadingDialog;
     private Context mContext;
     private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome;
+    public static final String EXTRA_SPACE_INFO = "EXTRA_SPACE_INFO";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
         initView();
         initSpaceRecyclerView();
+        initAdapterClick();
         requestUserInfo();
         requestParkSpaceList();
         setImmersionBar(true);
@@ -150,9 +153,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 startActivity(intent);
                 break;
             case R.id.tvCarRecord:
-                Intent intent1 = new Intent();
-                intent1.setClass(HomeActivity.this, EditPassActivity.class);
-                startActivity(intent1);
+                skipSignSpace(null);
                 break;
             case R.id.tvPayExit:
                 Intent intent2 = new Intent();
@@ -363,5 +364,24 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
             }
         }, 300);
+    }
+
+    private void initAdapterClick() {
+        homeGridParkAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (homeGridParkAdapter.getData().size() < position) {
+                    return;
+                }
+                skipSignSpace(homeGridParkAdapter.getData().get(position));
+            }
+        });
+    }
+
+    private void skipSignSpace(ParkSpaceInfo parkSpaceInfo) {
+        Intent intent = new Intent();
+        intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
+        intent.putExtra(EXTRA_SPACE_INFO, parkSpaceInfo);
+        startActivity(intent);
     }
 }

@@ -1,5 +1,8 @@
 package com.tourcoo.smartpark.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * @author :JenkinsZhou
  * @description : 停车位信息
@@ -7,7 +10,7 @@ package com.tourcoo.smartpark.bean;
  * @date 2020年11月24日17:40
  * @Email: 971613168@qq.com
  */
-public class ParkSpaceInfo {
+public class ParkSpaceInfo implements Parcelable {
 
     /**
      * id : 2010
@@ -82,4 +85,46 @@ public class ParkSpaceInfo {
     public void setSpaceNumber(String spaceNumber) {
         this.spaceNumber = spaceNumber;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.number);
+        dest.writeInt(this.used);
+        dest.writeString(this.parkingNumber);
+        dest.writeString(this.carNumber);
+        dest.writeInt(this.type);
+        dest.writeString(this.spaceNumber);
+    }
+
+    public ParkSpaceInfo() {
+    }
+
+    protected ParkSpaceInfo(Parcel in) {
+        this.id = in.readInt();
+        this.number = in.readString();
+        this.used = in.readInt();
+        this.parkingNumber = in.readString();
+        this.carNumber = in.readString();
+        this.type = in.readInt();
+        this.spaceNumber = in.readString();
+    }
+
+    public static final Parcelable.Creator<ParkSpaceInfo> CREATOR = new Parcelable.Creator<ParkSpaceInfo>() {
+        @Override
+        public ParkSpaceInfo createFromParcel(Parcel source) {
+            return new ParkSpaceInfo(source);
+        }
+
+        @Override
+        public ParkSpaceInfo[] newArray(int size) {
+            return new ParkSpaceInfo[size];
+        }
+    };
 }

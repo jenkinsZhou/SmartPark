@@ -4,17 +4,17 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.provider.MediaStore
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.EditText
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,16 +24,19 @@ import com.kaopiz.kprogresshud.KProgressHUD
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
+import com.tourcoo.smartpark.bean.ParkSpaceInfo
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
+import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
+import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository.*
 import com.tourcoo.smartpark.core.utils.FileUtil
-import com.tourcoo.smartpark.core.utils.FileUtil.getExternalFilesDir
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.event.OrcInitEvent
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager
+import com.tourcoo.smartpark.ui.HomeActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
@@ -41,6 +44,7 @@ import com.tourcoo.smartpark.widget.kingkeyboard.InputCompleteListener
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper
 import com.tourcoo.smartpark.widget.orc.RecogniseListener
 import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
+import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_record_confirm.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -68,10 +72,8 @@ import java.net.SocketException
  * @Email: 971613168@qq.com
  */
 class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, EasyPermissions.PermissionCallbacks {
-
-    private var mEditTexts: MutableList<EditText>? = null
+    private var parkInfo: ParkSpaceInfo? = null
     private var photoAdapter: PhotoAdapter? = null
-    private var mOnCompleteListener: InputCompleteListener? = null
     private val mSelectImagePathList = ArrayList<String>()
     private var hud: KProgressHUD? = null
     private var message: Message? = null
@@ -80,7 +82,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private var compressPath: String? = null
     private var needOrc: Boolean = false
     private var keyboardView: PlateKeyboardView? = null
-
+    private var carType = -1
 
     //后台返回的图片地址
     private val serviceImageUrlList = ArrayList<String>()
@@ -105,6 +107,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this)
         }
+        parkInfo = intent?.getParcelableExtra(HomeActivity.EXTRA_SPACE_INFO)
+        showParkInfo()
         llTakePhoto.setOnClickListener(this)
         tvConfirmRecord.setOnClickListener(this)
         needPermissions[0] = Manifest.permission.READ_EXTERNAL_STORAGE
@@ -160,9 +164,9 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                 LogUtils.tag(TAG).e("删除被拦截")
                 return@setOnItemDeleteClickListener
             }
-            val deletePath = photoAdapter!!.list[position].imagePath
+            val deletePath = photoAdapter!!.list[position].serviceImageUrl
             val success = serviceImageUrlList.remove(deletePath)
-            LogUtils.tag(TAG).d("数据删除状态:$success，删除的路径--->$deletePath")
+            LogUtils.tag(TAG).d("数据删除状态:$success，删除的路径--->$deletePath--剩余长度:" + serviceImageUrlList.size)
         }
         photoRecyclerView.adapter = photoAdapter
 
@@ -248,7 +252,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
         })
         showHudProgressDialog()
-        ApiRepository.getInstance().apiService.uploadFiles(uploadProgressBody).enqueue(object : Callback<BaseResult<List<String>?>?> {
+        getInstance().apiService.uploadFiles(uploadProgressBody).enqueue(object : Callback<BaseResult<List<String>?>?> {
             override fun onResponse(call: Call<BaseResult<List<String>?>?>, response: Response<BaseResult<List<String>?>?>) {
                 closeHudProgressDialog()
                 //图片上传成功回调
@@ -288,13 +292,13 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private fun updateProgress(progress: Int) {
         LogUtils.i("进度：$progress")
         hud?.setProgress(progress)
-        if(progress>=100){
+        if (progress >= 100) {
             hud?.dismiss()
         }
     }
 
     private fun initProgressDialog() {
-        hud = KProgressHUD.create(mContext,KProgressHUD.Style.PIE_DETERMINATE)
+        hud = KProgressHUD.create(mContext, KProgressHUD.Style.PIE_DETERMINATE)
                 .setCancellable(false)
                 .setAutoDismiss(true)
                 .setMaxProgress(100)
@@ -399,6 +403,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         val success = FileUtil.deleteFolder(path)
         LogUtils.i("是否删除了图片数据:$success" + "文件路径:" + path)
         EventBus.getDefault().unregister(this)
+        PredictorWrapper.release()
         super.onDestroy()
     }
 
@@ -453,7 +458,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             return
         }
         fillBluePlant(number)
-//        etPlantNumber6.setText(number.subSequence(7, 8))
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -467,6 +471,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
     private fun addDataToRecyclerView(imagePath: String?, imageUrl: String?, isOrc: Boolean) {
         val localImage = LocalImage(StringUtil.getNotNullValue(imagePath), isOrc)
+        //将后台返回的图片地址赋值给本地实体
         localImage.serviceImageUrl = imageUrl
         photoAdapter?.addData(localImage)
     }
@@ -601,4 +606,31 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
         }, 300)
     }
+
+    private fun showParkInfo() {
+        if (parkInfo == null) {
+            tvParkNumber.text = ""
+            return
+        }
+        tvParkNumber.text = StringUtil.getNotNullValue(parkInfo!!.number)
+    }
+
+    private fun requestAddParkingSpace() {
+        getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, StringUtil.listParseArray(serviceImageUrlList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
+            override fun onRequestSuccess(entity: BaseResult<Any>?) {
+            }
+
+        })
+    }
+
+
+    private fun doSignParkSpace() {
+        if (photoAdapter!!.orcPhotoIndex < 0) {
+            //说明没有拍照识别 直接登记
+        }else{
+            //说明有拍照识别的照片 需要先上传
+            doUpload()
+        }
+    }
+
 }

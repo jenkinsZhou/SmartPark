@@ -3,6 +3,7 @@ package com.tourcoo.smartpark.util;
 import android.text.TextUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -103,4 +104,10 @@ public class StringUtil {
         }
     }
 
+    public static String[] listParseArray(List<String> values) {
+        if (values == null) {
+            return new String[]{};
+        }
+        return (String[]) values.toArray();
+    }
 }

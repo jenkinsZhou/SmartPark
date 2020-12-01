@@ -141,8 +141,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                 @Override
                 public void onClick(View view) {
                     int index = viewHolder.getAdapterPosition();
-                    if(mOnItemDeleteClickListener!= null){
-                        mOnItemDeleteClickListener.onItemDelete(index,view);
+                    if (mOnItemDeleteClickListener != null) {
+                        mOnItemDeleteClickListener.onItemDelete(index, view);
                     }
                     // 这里有时会返回-1造成数据下标越界,具体可参考getAdapterPosition()源码，
                     // 通过源码分析应该是bindViewHolder()暂未绘制完成导致，知道原因的也可联系我~感谢
@@ -153,7 +153,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
                     }
                 }
             });
-            String imagePath = list.get(position).getImagePath();
+            String imagePath = list.get(position).getLocalImagePath();
             GlideManager.loadRoundImg(imagePath, viewHolder.ivLocalPhoto);
             //itemView 的点击事件
             if (mItemClickListener != null) {
@@ -171,7 +171,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     protected OnItemClickListener mItemClickListener;
 
     private OnItemDeleteClickListener mOnItemDeleteClickListener;
-
 
 
     public void setOnItemDeleteClickListener(OnItemDeleteClickListener mOnItemDeleteClickListener) {
@@ -207,7 +206,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
             //没有拍照识别的照片
             if (localImage.isRecognize()) {
                 //这里直接追加到第一张图
-               list.add(0,localImage);
+                list.add(0, localImage);
             } else {
                 //如果当前图片不是识别照片 则直接添加
                 list.add(localImage);
@@ -217,7 +216,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     }
 
 
-    private boolean hasOrcPhoto() {
+    public boolean hasOrcPhoto() {
         for (LocalImage localImage : list) {
             if (localImage == null) {
                 continue;
@@ -229,5 +228,20 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         return false;
     }
 
+    /**
+     * 获取orc照片的位置
+     * @return
+     */
+    public int getOrcPhotoIndex() {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) == null) {
+                continue;
+            }
+            if (list.get(i).isRecognize()) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
 }

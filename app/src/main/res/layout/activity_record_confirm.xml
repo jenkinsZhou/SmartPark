@@ -62,6 +62,7 @@
                             android:background="@drawable/bg_radius_10_gray_f0f5ff"
                             android:orientation="horizontal"
                             android:paddingStart="@dimen/dp_10"
+                            android:minWidth="@dimen/dp_85"
                             android:paddingTop="@dimen/dp_5"
                             android:paddingEnd="@dimen/dp_5"
                             android:paddingBottom="@dimen/dp_5">
@@ -72,7 +73,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
                                 android:layout_marginStart="@dimen/dp_5"
-                                android:text="A01001"
+                                android:hint="请选择车位"
+                                android:letterSpacing="0.2"
                                 android:textColor="#629BFF"
                                 android:textSize="@dimen/sp_12" />
 

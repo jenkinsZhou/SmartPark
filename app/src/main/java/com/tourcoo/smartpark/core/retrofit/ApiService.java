@@ -77,5 +77,12 @@ public interface ApiService {
     @PUT("/handheld/member/updatepassword")
     Observable<BaseResult<Object>> requestUpdatePass(@Body Map<String, Object> map);
 
+    /**
+     * 车辆登记车位
+     * @return
+     */
+    @POST("/handheld/parking/addparking")
+    Observable<BaseResult<Object>> requestAddParkingSpace(@Body Map<String, Object> map);
+
 
 }
