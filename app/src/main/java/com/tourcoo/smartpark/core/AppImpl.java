@@ -118,7 +118,7 @@ public class AppImpl implements DefaultRefreshHeaderCreator, LoadMoreFoot, Recyc
     @Nullable
     @Override
     public LoadingDialogWrapper createLoadingDialog(@Nullable Activity activity) {
-        return new LoadingDialogWrapper(activity, new IosLoadingDialog(activity,"加载中..."));
+        return new LoadingDialogWrapper(activity, new IosLoadingDialog(activity,""));
     }
 
     @Override

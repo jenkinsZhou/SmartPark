@@ -17,8 +17,8 @@ import com.tourcoo.smartpark.core.manager.GlideManager;
  * @date 2020年11月04日16:04
  * @Email: 971613168@qq.com
  */
-public class HomeGridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseViewHolder> {
-    public HomeGridParkAdapter() {
+public class GridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseViewHolder> {
+    public GridParkAdapter() {
         super(R.layout.item_car_info_grid_layout);
     }
 

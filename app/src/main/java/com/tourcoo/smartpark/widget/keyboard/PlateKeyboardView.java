@@ -36,6 +36,7 @@ public class PlateKeyboardView implements View.OnClickListener {
     private boolean isNumber = false;    // 是否数字键盘
     private boolean isSymbol = false;   // 是否是中文
     private View headerView;
+    private TextView finishTextView;
     private String[] provinceShort = new String[]{"京", "津", "冀", "鲁", "晋", "蒙", "辽", "吉", "黑", "沪", "苏", "浙", "皖", "闽", "赣", "豫", "鄂", "湘", "粤", "桂", "渝", "川",
             "贵", "云", "藏", "陕", "甘", "青", "琼", "新", "港", "澳", "台", "宁"};
     private TextView[] tvList;
@@ -44,8 +45,16 @@ public class PlateKeyboardView implements View.OnClickListener {
     private int currentEditTextPosition = 0;//默认当前光标在第一个TextView
     private OnKeyboardFinishListener onKeyboardFinishListener;
     private PlantLayout inputLayout;
+
     public void setOnKeyboardFinishListener(OnKeyboardFinishListener onKeyboardFinishListener) {
         this.onKeyboardFinishListener = onKeyboardFinishListener;
+    }
+
+    public void setOnKeyboardFinishListener(OnKeyboardFinishListener onKeyboardFinishListener, String finishText) {
+        this.onKeyboardFinishListener = onKeyboardFinishListener;
+        if (finishTextView != null && finishText != null) {
+            finishTextView.setText(finishText);
+        }
     }
 
     public void setEditText(EditText text) {
@@ -100,7 +109,7 @@ public class PlateKeyboardView implements View.OnClickListener {
         @Override
         public void onKey(int primaryCode, int[] keyCodes) {
             try {
-                if (mEditText == null && tvList == null){
+                if (mEditText == null && tvList == null) {
                     return;
                 }
                 if (isTvList) {
@@ -373,26 +382,37 @@ public class PlateKeyboardView implements View.OnClickListener {
         }
 
     }
+
     /**
      * 显示键盘
      *
      * @param editText
      */
     public void showKeyboard(EditText editText) {
+        showKeyboard(editText, -1);
+    }
+
+    public void showKeyboard(EditText editText, int inputType) {
         try {
             isTvList = false;
             this.mEditText = editText;
-            int inputText = mEditText.getInputType();
+            int inputText;
+            if (inputType < 0) {
+                inputText = mEditText.getInputType();
+            } else {
+                inputText = inputType;
+            }
             headerView.setVisibility(View.VISIBLE);
             switch (inputText) {
                 case InputType.TYPE_CLASS_NUMBER:
                     showNumberView();
                     break;
                 case InputType.TYPE_CLASS_PHONE:
-                    showNumberView();
+                case InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS:
+                    showLetterView2();
                     break;
                 case InputType.TYPE_NUMBER_FLAG_DECIMAL:
-                    showNumberView();
+                    showLetterView();
                     break;
                 default:
                     showSymbolView();
@@ -451,7 +471,8 @@ public class PlateKeyboardView implements View.OnClickListener {
         if (popWindow == null) {
             parentView = LayoutInflater.from(mContext).inflate(R.layout.keyboard_key_board_popu, null);
             popWindow = new Dialog(mContext, R.style.keyboard_popupAnimation);
-            parentView.findViewById(R.id.keyboard_finish).setOnClickListener(this);
+            finishTextView = parentView.findViewById(R.id.keyboard_finish);
+            finishTextView.setOnClickListener(this);
             parentView.findViewById(R.id.keyboard_back_hide).setOnClickListener(this);
         }
         popWindow.setContentView(parentView);

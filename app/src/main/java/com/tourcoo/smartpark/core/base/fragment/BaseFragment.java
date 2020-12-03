@@ -218,7 +218,7 @@ public abstract class BaseFragment extends RxFragment implements IBasicView {
     private void lazyLoadData() {
         if (mIsFirstShow && mIsViewLoaded) {
             mIsFirstShow = false;
-            loadData();
+            onVisibleLoadData();
         }
     }
 }

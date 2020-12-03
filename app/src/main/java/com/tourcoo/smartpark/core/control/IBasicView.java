@@ -36,9 +36,9 @@ public interface IBasicView {
     }
 
     /**
-     * 需要加载数据时重写此方法
+     * 需要加载数据时重写此方法(用户可见时加载（用于懒加载）)
      */
-    default void loadData() {
+    default void onVisibleLoadData() {
 
     }
 
@@ -49,5 +49,9 @@ public interface IBasicView {
      */
     default boolean loadingCancelable() {
         return false;
+    }
+
+    default void loadData(){
+
     }
 }

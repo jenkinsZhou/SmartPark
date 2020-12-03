@@ -41,7 +41,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     //下拉刷新库注意刷新头SmartRefreshHeader版本最好对应尤其头版本不要低于SmartRefreshLayout版本
-    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-andx-14'
+    implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0'
     //retrofit+rxjava 网络请求及数据解析相关
     implementation 'io.reactivex.rxjava2:rxjava:2.2.6'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
@@ -90,6 +90,8 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation files('libs/commons-lang3-3.11.jar')
     implementation 'com.github.YangsBryant:BSearchEdit:1.0.8'
+    //RXText
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
 
 }
 repositories {

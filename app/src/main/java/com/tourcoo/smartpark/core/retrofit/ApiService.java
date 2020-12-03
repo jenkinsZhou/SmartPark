@@ -6,6 +6,7 @@ import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.settle.SettleDetail;
 
 import java.util.List;
 import java.util.Map;
@@ -84,5 +85,21 @@ public interface ApiService {
     @POST("/handheld/parking/addparking")
     Observable<BaseResult<Object>> requestAddParkingSpace(@Body Map<String, Object> map);
 
+    /**
+     * 获取待收取停车费的车位列表
+     * @param map
+     * @return
+     */
+    @GET("/handheld/parking/settlementlist")
+    Observable<BaseResult<List<ParkSpaceInfo>>> requestSpaceSettleList(@QueryMap Map<String, Object> map);
+
+
+    /**
+     * 获取某停车位的具体收费信息
+     * @param map
+     * @return
+     */
+    @GET("/handheld/parking/settlementinfo")
+    Observable<BaseResult<SettleDetail>> requestSpaceSettleDetail(@QueryMap Map<String, Object> map);
 
 }

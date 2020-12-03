@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.tourcoo.smartpark.core.utils.DrawableUtil;
@@ -394,5 +395,13 @@ public class CommonUtil {
             ClipboardManager clipboardManager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             clipboardManager.setPrimaryClip(ClipData.newPlainText("content", str));
         }
+    }
+
+
+    public static Drawable getDrawable(int drawableId) {
+        if (getApplication() != null) {
+            return ContextCompat.getDrawable(getApplication(), drawableId);
+        }
+        return null;
     }
 }

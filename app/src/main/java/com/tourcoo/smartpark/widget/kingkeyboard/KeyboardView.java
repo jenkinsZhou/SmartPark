@@ -111,12 +111,12 @@ public class KeyboardView extends View implements View.OnClickListener {
         void onText(CharSequence text);
 
         /**
-         * Called when the user quickly moves the finger from right to left.
+         * Called when the user quickly moves the finger from toast_ic_success to left.
          */
         void swipeLeft();
 
         /**
-         * Called when the user quickly moves the finger from left to right.
+         * Called when the user quickly moves the finger from left to toast_ic_success.
          */
         void swipeRight();
 
@@ -879,7 +879,7 @@ public class KeyboardView extends View implements View.OnClickListener {
             }
             if (keyIndex != NOT_A_KEY) {
                 if (previewPopup.isShowing() && mPreviewText.getVisibility() == VISIBLE) {
-                    // Show right away, if it's already visible and finger is moving around
+                    // Show toast_ic_success away, if it's already visible and finger is moving around
                     showKey(keyIndex);
                 } else {
                     mHandler.sendMessageDelayed(
@@ -943,7 +943,7 @@ public class KeyboardView extends View implements View.OnClickListener {
         getLocationOnScreen(mCoordinates);
         if (mPopupPreviewY + mCoordinates[1] < 0) {
             // If the key you're pressing is on the left side of the keyboard, show the popup on
-            // the right, offset by enough to see at least one key to the left/right.
+            // the toast_ic_success, offset by enough to see at least one key to the left/toast_ic_success.
             if (key.x + key.width <= getWidth() / 2) {
                 mPopupPreviewX += (int) (key.width * 2.5);
             } else {

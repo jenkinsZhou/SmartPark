@@ -71,6 +71,12 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBasic
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadData();
+    }
+
     private void beforeLazyLoadData() {
         //确保视图加载及视图绑定完成避免刷新UI抛出异常
         if (mIsViewLoaded) {
@@ -90,7 +96,7 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBasic
     protected void lazyLoadData() {
         if (mIsFirstShow) {
             mIsFirstShow = false;
-            loadData();
+            onVisibleLoadData();
         }
     }
 
@@ -166,5 +172,20 @@ public abstract class BaseActivity extends RxAppCompatActivity implements IBasic
         if (baseLoadingDialog != null && baseLoadingDialog.isShowing()) {
             baseLoadingDialog.dismiss();
         }
+    }
+
+
+    protected void setViewVisible(View view, boolean visible) {
+        if (view == null) {
+            return;
+        }
+        view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    protected void setViewGone(View view, boolean visible) {
+        if (view == null) {
+            return;
+        }
+        view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 }

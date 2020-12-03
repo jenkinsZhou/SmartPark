@@ -343,7 +343,7 @@ public class NavigationViewHelper {
             mPaddingBottom = mBottomView.getPaddingBottom();
         }
         mBottomView.setTag(TAG_NAVIGATION_PADDING_BOTTOM, mPaddingBottom);
-        log("left:" + mPaddingLeft + ";top:" + mPaddingTop + ";right:" + mPaddingRight + ";bottom:" + mPaddingBottom);
+        log("left:" + mPaddingLeft + ";top:" + mPaddingTop + ";toast_ic_success:" + mPaddingRight + ";bottom:" + mPaddingBottom);
         return this;
     }
 

@@ -122,7 +122,7 @@ public class Keyboard {
 
     /**
      * Total width of the keyboard, including left side gaps and keys, but not any gaps on the
-     * right side.
+     * toast_ic_success side.
      */
     private int mTotalWidth;
 
@@ -579,7 +579,7 @@ public class Keyboard {
 
     /**
      * <p>Creates a blank keyboard from the given resource file and populates it with the specified
-     * characters in left-to-right, top-to-bottom fashion, using the specified number of columns.
+     * characters in left-to-toast_ic_success, top-to-bottom fashion, using the specified number of columns.
      * </p>
      * <p>If the specified number of columns is -1, then the keyboard will fit as many keys as
      * possible in each row.</p>

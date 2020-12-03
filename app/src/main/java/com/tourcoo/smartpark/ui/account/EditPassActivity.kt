@@ -2,13 +2,10 @@ package com.tourcoo.smartpark.ui.account
 
 import android.content.Intent
 import android.os.Bundle
-import com.gyf.immersionbar.ImmersionBar
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
-import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.pay.ExitPayFeeActivity
-import com.tourcoo.smartpark.ui.pay.PayResultActivity
+import com.tourcoo.smartpark.ui.pay.ExitPayFeeDetailActivity
 import kotlinx.android.synthetic.main.activity_edit_pass.*
 
 /**
@@ -26,7 +23,7 @@ class EditPassActivity : BaseTitleActivity() {
     override fun initView(savedInstanceState: Bundle?) {
         tvConfirm.setOnClickListener {
             val intent = Intent()
-            intent.setClass(this@EditPassActivity, ExitPayFeeActivity::class.java)
+            intent.setClass(this@EditPassActivity, ExitPayFeeDetailActivity::class.java)
             startActivity(intent)
         }
     }

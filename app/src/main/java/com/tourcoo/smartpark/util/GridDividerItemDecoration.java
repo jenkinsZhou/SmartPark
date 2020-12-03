@@ -65,7 +65,7 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
             if (itemPosition % spanCount == spanCount - 1) {
                 right = mDividerWidth;
             } else {
-//                right = eachWidth - left;
+//                toast_ic_success = eachWidth - left;
                 right = eachWidth;
             }
         }
@@ -82,7 +82,7 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
 
 
         bottom = mDividerWidth;
-        Log.d("zzz", "itemPosition:" + itemPosition + " |left:" + left + " right:" + right + " bottom:" + bottom + " eachWidth:" + eachWidth + " d1:" + dl);
+        Log.d("zzz", "itemPosition:" + itemPosition + " |left:" + left + " toast_ic_success:" + right + " bottom:" + bottom + " eachWidth:" + eachWidth + " d1:" + dl);
         if (isLastRow) {
             bottom = 0;
         }

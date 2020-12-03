@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,10 +27,9 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.tourcoo.smartpark.R;
-import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
+import com.tourcoo.smartpark.adapter.home.GridParkAdapter;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.bean.ParkSpaceInfo;
-import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.control.RequestConfig;
@@ -45,6 +43,7 @@ import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.account.login.LoginActivity;
+import com.tourcoo.smartpark.ui.pay.ExitPayFeeEnterActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
@@ -70,7 +69,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private DrawerLayout drawerLayout;
     private boolean drawerOpenStatus = false;
     private RecyclerView parkingRecyclerView;
-    private HomeGridParkAdapter homeGridParkAdapter;
+    private GridParkAdapter gridParkAdapter;
     private Handler mHandler = new Handler();
     private TextView tvCarRecord;
     private IosLoadingDialog loadingDialog;
@@ -165,9 +164,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 skipSignSpace(null);
                 break;
             case R.id.tvPayExit:
-                Intent intent2 = new Intent();
-                intent2.setClass(HomeActivity.this, RecordCarInfoConfirmActivity.class);
-                startActivity(intent2);
+                skipExitPayEnter();
                 break;
             case R.id.tvHomeReportFee:
                 Intent intent3 = new Intent();
@@ -186,8 +183,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void initSpaceRecyclerView() {
         parkingRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         parkingRecyclerView.addItemDecoration(new GridDividerItemDecoration(SizeUtil.dp2px(7f), ContextCompat.getColor(this, R.color.whiteF5F5F5), false));
-        homeGridParkAdapter = new HomeGridParkAdapter();
-        homeGridParkAdapter.bindToRecyclerView(parkingRecyclerView);
+        gridParkAdapter = new GridParkAdapter();
+        gridParkAdapter.bindToRecyclerView(parkingRecyclerView);
     }
 
     /**
@@ -282,7 +279,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         if (parkSpaceInfoList == null) {
             return;
         }
-        homeGridParkAdapter.setNewData(parkSpaceInfoList);
+        gridParkAdapter.setNewData(parkSpaceInfoList);
     }
 
     @Override
@@ -384,13 +381,13 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void initAdapterClick() {
-        homeGridParkAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+        gridParkAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                if (homeGridParkAdapter.getData().size() < position) {
+                if (gridParkAdapter.getData().size() < position) {
                     return;
                 }
-                skipSignSpace(homeGridParkAdapter.getData().get(position));
+                skipSignSpace(gridParkAdapter.getData().get(position));
             }
         });
     }
@@ -420,5 +417,14 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     public void onRefresh(@NonNull RefreshLayout refreshLayout) {
         requestParkSpaceList("");
+    }
+
+    /**
+     * 离场收费入口
+     */
+    private void skipExitPayEnter(){
+        Intent intent = new Intent();
+        intent.setClass(HomeActivity.this, ExitPayFeeEnterActivity.class);
+        startActivity(intent);
     }
 }
