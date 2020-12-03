@@ -318,6 +318,9 @@ public final class ToastUtil {
      * @param content
      */
     public static void showSuccess(CharSequence content) {
+        if (content == null || content.length() == 0) {
+            return;
+        }
         showCustomLayout(R.layout.toast_view_layout_success, content);
     }
 
@@ -337,6 +340,9 @@ public final class ToastUtil {
      * @param content
      */
     public static void showFailed(CharSequence content) {
+        if (content == null || content.length() == 0) {
+            return;
+        }
         showCustomLayout(R.layout.toast_view_layout_failed, content);
     }
 

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -77,14 +78,18 @@ public class LoadingDialogWrapper {
         if (mDialog instanceof ProgressDialog) {
             ((ProgressDialog) mDialog).setMessage(msg);
         } else if (mDialog instanceof IosLoadingDialog) {
-           if(!TextUtils.isEmpty(msg)){
-               ((IosLoadingDialog) mDialog).setLoadingText(msg);
-           }
+            ((IosLoadingDialog) mDialog).setLoadingText(msg);
         } else {
             if (mDialog.getWindow() != null) {
                 TextView textView = FindViewUtil.getTargetView(mDialog.getWindow().getDecorView(), TextView.class);
                 if (textView != null) {
-                    textView.setText(msg);
+                    if (TextUtils.isEmpty(msg)) {
+                        textView.setVisibility(View.GONE);
+                    } else {
+                        textView.setText(msg);
+                        textView.setVisibility(View.VISIBLE);
+                    }
+
                 } else {
                     Log.e("LoadingDialogWrapper", "textView为null");
                 }

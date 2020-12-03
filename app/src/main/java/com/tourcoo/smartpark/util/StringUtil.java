@@ -108,6 +108,6 @@ public class StringUtil {
         if (values == null) {
             return new String[]{};
         }
-        return (String[]) values.toArray();
+        return values.toArray(new String[0]);
     }
 }

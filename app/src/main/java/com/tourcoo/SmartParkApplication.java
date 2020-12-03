@@ -2,6 +2,7 @@ package com.tourcoo;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 
 import androidx.multidex.MultiDex;
@@ -15,6 +16,7 @@ import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
+import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.event.EventConstant;
 import com.tourcoo.smartpark.event.OrcInitEvent;
@@ -23,6 +25,10 @@ import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * @author :JenkinsZhou
@@ -38,9 +44,12 @@ public class SmartParkApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-        SpiderMan.init(context);
+//        SpiderMan.init(context);
         initLog();
         initConfig();
+        // 以下用来捕获程序崩溃异常
+        // 程序崩溃时触发线程
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         intiPlantOrcSdk();
 
     }
@@ -138,4 +147,26 @@ public class SmartParkApplication extends Application {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
+
+    public Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+            //下面为调试用的代码，发布时可注释
+            Writer info = new StringWriter();
+            PrintWriter printWriter = new PrintWriter(info);
+            ex.printStackTrace(printWriter);
+            Throwable cause = ex.getCause();
+            LogUtils.e("SmartParkApplication", "SmartParkApplication崩溃原因:" + ex.toString());
+            while (cause != null) {
+                cause.printStackTrace(printWriter);
+                cause = cause.getCause();
+            }
+            printWriter.flush();
+            printWriter.close();
+            String result = info.toString();
+            StackUtil.getInstance().exit();
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+    };
 }

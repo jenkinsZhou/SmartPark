@@ -25,7 +25,9 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.bean.ParkSpaceInfo
+import com.tourcoo.smartpark.constant.CarConstant.CAR_TYPE_NORMAL
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
+import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
@@ -74,7 +76,7 @@ import java.net.SocketException
 class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, EasyPermissions.PermissionCallbacks {
     private var parkInfo: ParkSpaceInfo? = null
     private var photoAdapter: PhotoAdapter? = null
-    private val mSelectImagePathList = ArrayList<String>()
+    private val mSelectLocalImagePathList = ArrayList<String>()
     private var hud: KProgressHUD? = null
     private var message: Message? = null
     private val mHandler = MyHandler(this)
@@ -82,7 +84,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private var compressPath: String? = null
     private var needOrc: Boolean = false
     private var keyboardView: PlateKeyboardView? = null
-    private var carType = -1
+    private var carType = CAR_TYPE_NORMAL
+    private var isOrcPhoto = false
 
     //后台返回的图片地址
     private val serviceImageUrlList = ArrayList<String>()
@@ -97,6 +100,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
          * 随便赋值的一个唯一标识码
          */
         const val REQUEST_PERMISSION_STORAGE = 100
+        const val MIN_LENGTH_PLANT_NUM = 7
     }
 
     override fun getContentLayout(): Int {
@@ -141,6 +145,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
             }
             R.id.tvConfirmRecord -> {
+                doSignParkSpace()
             }
             R.id.plantInputLayout -> {
                 keyboardView?.showKeyboard(plantInputLayout)
@@ -256,7 +261,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             override fun onResponse(call: Call<BaseResult<List<String>?>?>, response: Response<BaseResult<List<String>?>?>) {
                 closeHudProgressDialog()
                 //图片上传成功回调
-                handleUploadSuccess(response)
+                handleUploadSuccess(response, isOrcPhoto)
             }
 
             override fun onFailure(call: Call<BaseResult<List<String>?>?>, t: Throwable) {
@@ -270,11 +275,11 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     }
 
     private fun doUpload() {
-        if (mSelectImagePathList.isEmpty()) {
+        if (mSelectLocalImagePathList.isEmpty()) {
             ToastUtil.showNormal("请先拍摄照片")
             return
         }
-        compressImagesAndUpload(parseFileList(mSelectImagePathList))
+        compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
     }
 
     private class MyHandler(dataActivity: RecordCarInfoConfirmActivity) : Handler() {
@@ -317,13 +322,19 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         hud = null
     }
 
-    private fun handleUploadSuccess(response: Response<BaseResult<List<String>?>?>) {
+    private fun handleUploadSuccess(response: Response<BaseResult<List<String>?>?>, isOrcPhoto: Boolean) {
         if (response.isSuccessful && response.body() != null) {
             val resp: BaseResult<List<String>?>? = response.body()
             if (resp != null && resp.data != null && resp.data!!.isNotEmpty()) {
                 val serviceImageUrl = StringUtil.getNotNullValue(resp.data!![0])
-                serviceImageUrlList.add(serviceImageUrl)
-                addDataToRecyclerView(compressPath, serviceImageUrl, needOrc)
+                if (isOrcPhoto) {
+                    //这里直接上传
+                    requestAddParkingSpace(getUrlImageList(serviceImageUrl))
+                } else {
+                    serviceImageUrlList.add(serviceImageUrl)
+                    addDataToRecyclerView(compressPath, serviceImageUrl, needOrc)
+                }
+
             }
         } else {
             ToastUtil.showNormal("服务器异常，请稍后重试")
@@ -359,13 +370,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         when (requestCode) {
             REQUEST_CODE_TAKE_PHOTO -> {
                 if (imageUri != null && resultCode == Activity.RESULT_OK) {
-                    mSelectImagePathList.clear()
+                    mSelectLocalImagePathList.clear()
                     val currentImagePath = FileUtil.getPath(imageUri)
                     scanFile(mContext, currentImagePath)
                     LogUtils.i("获取的路径:$currentImagePath")
-                    mSelectImagePathList.add(currentImagePath)
+                    mSelectLocalImagePathList.add(currentImagePath)
                     if (needOrc) {
                         //这里先不上传 先识别 然后直接将图片添加到recyclerview里面
+                        doRecognisePlant(currentImagePath)
                         compressImagesAndAddToDataToRecyclerview(File(currentImagePath))
                     } else {
                         //这里如果不是拍照识别车牌的话 就先上传
@@ -395,6 +407,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private val onAddPicClickListener = PhotoAdapter.onAddPicClickListener {
         // 进入相册 以下是例子：不需要的api可以不写
         needOrc = false
+        isOrcPhoto =false
         takePhoto()
     }
 
@@ -414,32 +427,35 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             ToastUtil.showNormalDebug("当前车牌识别sdk未初始化")
             return
         }
-        try {
-            PredictorWrapper.setRecogniseListener(object : RecogniseListener {
-                override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
-                    LogUtils.tag("识别成功").i(result)
-                    handleReconCallback(result)
-                    closeHudProgressDialog()
-                }
+        ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
+            try {
+                PredictorWrapper.setRecogniseListener(object : RecogniseListener {
+                    override fun recogniseSuccess(result: com.baidu.vis.ocrplatenumber.Response?) {
+                        LogUtils.tag("识别成功").i(result)
+                        handleReconSuccessCallback(result)
+                        closeHudProgressDialog()
+                    }
 
-                override fun recogniseFailed() {
-                    closeHudProgressDialog()
+                    override fun recogniseFailed() {
+                        closeHudProgressDialog()
 //                ToastUtil.showFailed("识别失败")
-                }
+                    }
 
-            })
-            ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
-                val bitmap: Bitmap = BitmapFactory.decodeFile(photoPath)
-                PredictorWrapper.syncTestOneImage(mContext, bitmap)
-            })
-        } catch (e: Exception) {
-            ToastUtil.showFailedDebug("车牌识别失败:$e")
-            e.printStackTrace()
-        }
+                })
+                ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
+                    val bitmap: Bitmap = BitmapFactory.decodeFile(photoPath)
+                    PredictorWrapper.syncTestOneImage(mContext, bitmap)
+                })
+            } catch (e: Exception) {
+                ToastUtil.showFailedDebug("车牌识别失败:$e")
+                e.printStackTrace()
+            }
+        })
+
 
     }
 
-    private fun handleReconCallback(result: com.baidu.vis.ocrplatenumber.Response?) {
+    private fun handleReconSuccessCallback(result: com.baidu.vis.ocrplatenumber.Response?) {
         if (result == null) {
             return
         }
@@ -477,32 +493,34 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     }
 
     private fun compressImagesAndAddToDataToRecyclerview(file: File) {
-        Luban.with(this)
-                .load(file)
-                .ignoreBy(100)
-                .setTargetDir(getPath())
-                .filter { path -> !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif")) }
-                .setCompressListener(object : OnCompressListener {
-                    override fun onStart() {
-                        showLoading("正在处理图片数据...")
-                    }
-
-                    override fun onSuccess(file: File?) {
-                        closeLoading()
-                        if (file == null) {
-                            ToastUtil.showFailed("压缩失败")
-                            return
+        ThreadPoolManager.getThreadPoolProxy().execute(Runnable {
+            Luban.with(this)
+                    .load(file)
+                    .ignoreBy(100)
+                    .setTargetDir(getPath())
+                    .filter { path -> !(TextUtils.isEmpty(path) || path.toLowerCase().endsWith(".gif")) }
+                    .setCompressListener(object : OnCompressListener {
+                        override fun onStart() {
+                            showLoading("正在处理图片数据...")
                         }
-                        doRecognisePlant(file.path)
-                        //这里不做上传 直接显示到列表中
-                        addDataToRecyclerView(file.path, null, true)
-                    }
 
-                    override fun onError(e: Throwable?) {
-                        closeLoading()
-                        ToastUtil.showFailed("图片压缩失败：原因:" + e.toString())
-                    }
-                }).launch()
+                        override fun onSuccess(file: File?) {
+                            closeLoading()
+                            if (file == null) {
+                                ToastUtil.showFailed("压缩失败")
+                                return
+                            }
+                            //这里不做上传 直接显示到列表中
+                            addDataToRecyclerView(file.path, null, true)
+                        }
+
+                        override fun onError(e: Throwable?) {
+                            closeLoading()
+                            ToastUtil.showFailed("图片压缩失败：原因:" + e.toString())
+                        }
+                    }).launch()
+        })
+
     }
 
     private fun initInputLayout() {
@@ -516,26 +534,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     }
 
 
-    /*  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-          super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-          when (requestCode) {
-              1003 -> {
-                  // If request is cancelled, the result arrays are empty.
-                  if (grantResults.size >= 2 && (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
-                      // permission was granted, yay! Do the
-                      // contacts-related task you need to do.
-                      ToastUtil.showSuccess("权限通过")
-                      takePhoto()
-                  } else {
-                      // permission denied, boo! Disable the
-                      // functionality that depends on this permission.
-  //                    showWaringDialog()
-                      ToastUtil.showFailed("权限未通过")
-                  }
-                  return
-              }
-          }
-      }*/
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
@@ -615,9 +613,26 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         tvParkNumber.text = StringUtil.getNotNullValue(parkInfo!!.number)
     }
 
-    private fun requestAddParkingSpace() {
-        getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, StringUtil.listParseArray(serviceImageUrlList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
+    /**
+     * 来车登记（车辆入库）
+     */
+    private fun requestAddParkingSpace(imageUrlList: ArrayList<String>) {
+        val imageArray = StringUtil.listParseArray(imageUrlList)
+        if (imageArray.isEmpty()) {
+            ToastUtil.showNormal("请至少上传一张图片")
+            return
+        }
+        getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, imageArray).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
             override fun onRequestSuccess(entity: BaseResult<Any>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+                    ToastUtil.showSuccess(entity.errMsg)
+                    handleSignSuccessCallback()
+                } else {
+                    ToastUtil.showNormal(entity.errMsg)
+                }
             }
 
         })
@@ -625,12 +640,47 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
 
     private fun doSignParkSpace() {
-        if (photoAdapter!!.orcPhotoIndex < 0) {
+        val orcPhotoPosition = photoAdapter!!.orcPhotoIndex
+        if (orcPhotoPosition < 0) {
             //说明没有拍照识别 直接登记
-        }else{
+            isOrcPhoto = false
+            ToastUtil.showNormal("直接上传")
+        } else {
             //说明有拍照识别的照片 需要先上传
-            doUpload()
+            isOrcPhoto = true
+            if (parkInfo == null || parkInfo!!.id < 0) {
+                ToastUtil.showNormal("未获取到车位信息")
+                return
+            }
+            if (carType < 0) {
+                ToastUtil.showNormal("未获取到车辆类型")
+                return
+            }
+            val plantNum = plantInputLayout.text
+            if (TextUtils.isEmpty(plantNum) || plantNum.length < MIN_LENGTH_PLANT_NUM) {
+                ToastUtil.showNormal("请输入正确的车牌号")
+                return
+            }
+            compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
         }
     }
 
+
+    private fun getUrlImageList(orcImageUrl: String?): ArrayList<String> {
+        val imageList = ArrayList<String>()
+        if (!TextUtils.isEmpty(orcImageUrl)) {
+            imageList.add(orcImageUrl!!)
+        }
+        for (localImage in photoAdapter!!.list) {
+            if (!TextUtils.isEmpty(localImage.serviceImageUrl)) {
+                imageList.add(localImage.serviceImageUrl)
+            }
+        }
+        return imageList
+    }
+
+    private fun handleSignSuccessCallback(){
+        setResult(RESULT_OK)
+        finish()
+    }
 }

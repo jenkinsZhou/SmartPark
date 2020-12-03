@@ -237,7 +237,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
             if (list.get(i) == null) {
                 continue;
             }
-            if (list.get(i).isRecognize()) {
+            if (list.get(i).isRecognize()&&list.get(i).getLocalImagePath() !=null) {
                 return i;
             }
         }

@@ -49,19 +49,22 @@ public class IosLoadingDialog extends Dialog {
         if (TextUtils.isEmpty(loadingText)) {
             tvLoadingText.setVisibility(View.GONE);
         } else {
+            tvLoadingText.setVisibility(View.VISIBLE);
             tvLoadingText.setText(loadingText);
         }
     }
 
 
     public IosLoadingDialog setLoadingText(String loadingText) {
-        if (TextUtils.isEmpty(loadingText)) {
-            return this;
-        }
         this.loadingText = loadingText;
         if (tvLoadingText == null) {
             return this;
         }
+        if (TextUtils.isEmpty(loadingText)) {
+            tvLoadingText.setVisibility(View.GONE);
+            return this;
+        }
+        tvLoadingText.setVisibility(View.VISIBLE);
         tvLoadingText.setText(loadingText);
         View view = getCurrentFocus();
         if (view != null) {
@@ -71,13 +74,15 @@ public class IosLoadingDialog extends Dialog {
     }
 
     public IosLoadingDialog setLoadingText(CharSequence loadingText) {
-        if (TextUtils.isEmpty(loadingText)) {
-            return this;
-        }
         this.loadingText = loadingText;
         if (tvLoadingText == null) {
             return this;
         }
+        if (TextUtils.isEmpty(loadingText)) {
+            tvLoadingText.setVisibility(View.GONE);
+            return this;
+        }
+        tvLoadingText.setVisibility(View.VISIBLE);
         tvLoadingText.setText(loadingText);
         View view = getCurrentFocus();
         if (view != null) {

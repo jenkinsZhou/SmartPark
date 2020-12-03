@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -92,9 +91,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/dp_15"
                     android:layout_weight="1"
+                    android:background="@drawable/bg_select_primary_blue"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="@drawable/bg_select_primary_blue"
                     android:gravity="center"
                     android:letterSpacing="0.18"
                     android:paddingTop="@dimen/dp_11"
@@ -105,14 +104,24 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/parkingRecyclerView"
+            <com.scwang.smartrefresh.layout.SmartRefreshLayout
+                android:id="@+id/homeRefreshLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:srlEnableLoadMore="true"
                 android:layout_above="@id/llBottomLayout"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/dp_20"
-                android:layout_marginBottom="@dimen/dp_20" />
+                android:layout_marginBottom="@dimen/dp_20"
+
+                >
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/parkingRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+
         </RelativeLayout>
 
     </LinearLayout>

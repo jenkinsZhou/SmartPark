@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/ivLocalPhoto"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_90"
+        android:layout_height="@dimen/dp_85"
         android:layout_centerHorizontal="true"
         android:src="@mipmap/ic_image_add"
         android:layout_marginTop="@dimen/dp_18"

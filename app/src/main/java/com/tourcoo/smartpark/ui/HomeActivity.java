@@ -23,6 +23,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.gyf.immersionbar.ImmersionBar;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.HomeGridParkAdapter;
 import com.tourcoo.smartpark.bean.BaseResult;
@@ -60,7 +64,7 @@ import java.util.List;
  * @date 2020年10月30日11:22
  * @Email: 971613168@qq.com
  */
-public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks {
+public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener {
     private Toolbar homeToolBar;
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
@@ -73,18 +77,20 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private Context mContext;
     private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome;
     public static final String EXTRA_SPACE_INFO = "EXTRA_SPACE_INFO";
+    public static final int REQUEST_CODE_SIGN = 1002;
+    private SmartRefreshLayout homeRefreshLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_activity);
         mContext = this;
-        loadingDialog = new IosLoadingDialog(HomeActivity.this, "加载中...");
+        loadingDialog = new IosLoadingDialog(HomeActivity.this);
         initView();
         initSpaceRecyclerView();
         initAdapterClick();
         requestUserInfo();
-        requestParkSpaceList();
+        requestParkSpaceList("正在获取车位信息");
         setImmersionBar(true);
     }
 
@@ -100,6 +106,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvTotalCarCount = findViewById(R.id.tvTotalCarCount);
         tvActualIncome = findViewById(R.id.tvActualIncome);
         tvTheoreticalIncome = findViewById(R.id.tvTheoreticalIncome);
+        homeRefreshLayout = findViewById(R.id.homeRefreshLayout);
+        homeRefreshLayout.setRefreshHeader(new ClassicsHeader(mContext));
+        homeRefreshLayout.setOnRefreshListener(this);
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
         findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
@@ -245,18 +254,26 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-    private void requestParkSpaceList() {
-        ApiRepository.getInstance().requestParkSpaceList().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<List<ParkSpaceInfo>>>("正在获取车位列表...") {
+    private void requestParkSpaceList(String message) {
+        ApiRepository.getInstance().requestParkSpaceList().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<List<ParkSpaceInfo>>>(message) {
             @Override
             public void onRequestSuccess(BaseResult<List<ParkSpaceInfo>> entity) {
                 if (entity == null) {
+                    homeRefreshLayout.finishRefresh(false);
                     return;
                 }
+                homeRefreshLayout.finishRefresh(true);
                 if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS) {
                     loadSpaceData(entity.getData());
                 } else {
                     ToastUtil.showFailed(entity.getErrMsg());
                 }
+            }
+
+            @Override
+            public void onRequestError(Throwable throwable) {
+                super.onRequestError(throwable);
+                homeRefreshLayout.finishRefresh(false);
             }
         });
     }
@@ -382,6 +399,26 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         Intent intent = new Intent();
         intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
         intent.putExtra(EXTRA_SPACE_INFO, parkSpaceInfo);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_SIGN);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN:
+                if (resultCode == RESULT_OK) {
+                    //刷新列表
+                    requestParkSpaceList("正在刷新");
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+        requestParkSpaceList("");
     }
 }
