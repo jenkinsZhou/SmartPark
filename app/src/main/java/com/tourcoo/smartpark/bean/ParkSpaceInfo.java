@@ -22,7 +22,7 @@ public class ParkSpaceInfo implements Parcelable {
      * spaceNumber : 0100
      */
 
-    private int id;
+    private long id;
     private long recordId;
     private String number;
     private int used;
@@ -32,11 +32,11 @@ public class ParkSpaceInfo implements Parcelable {
     private String spaceNumber;
 
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -105,7 +105,7 @@ public class ParkSpaceInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.id);
+        dest.writeLong(this.id);
         dest.writeLong(this.recordId);
         dest.writeString(this.number);
         dest.writeInt(this.used);
@@ -119,7 +119,7 @@ public class ParkSpaceInfo implements Parcelable {
     }
 
     protected ParkSpaceInfo(Parcel in) {
-        this.id = in.readInt();
+        this.id = in.readLong();
         this.recordId = in.readLong();
         this.number = in.readString();
         this.used = in.readInt();

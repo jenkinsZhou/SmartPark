@@ -324,6 +324,13 @@ public final class ToastUtil {
         showCustomLayout(R.layout.toast_view_layout_success, content);
     }
 
+    public static void showWarning(CharSequence content) {
+        if (content == null || content.length() == 0) {
+            return;
+        }
+        showCustomLayout(R.layout.toast_view_layout_warning, content);
+    }
+
     public static void showSuccessDebug(CharSequence content) {
         if (AppConfig.DEBUG_BODE) {
             showSuccess(content);

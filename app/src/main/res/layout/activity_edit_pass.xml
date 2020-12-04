@@ -32,6 +32,7 @@
                 android:textSize="@dimen/sp_14" />
 
             <EditText
+                android:id="@+id/etOldPass"
                 style="@style/textBlackLittle15Style"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -74,6 +75,7 @@
                 android:textSize="@dimen/sp_14" />
 
             <EditText
+                android:id="@+id/etNewPass"
                 style="@style/textBlackLittle15Style"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

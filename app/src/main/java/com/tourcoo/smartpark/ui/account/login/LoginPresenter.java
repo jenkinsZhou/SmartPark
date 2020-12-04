@@ -67,7 +67,14 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
                     getView().loginSuccess(entity.getData());
                 } else {
                     ToastUtil.showNormal(entity.getErrMsg());
+                    getView().loginFailed();
                 }
+            }
+
+            @Override
+            public void onRequestError(Throwable throwable) {
+                super.onRequestError(throwable);
+                getView().loginFailed();
             }
         }, account, pass, parkingId);
     }

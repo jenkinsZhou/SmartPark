@@ -85,6 +85,10 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
         presenter.requestUserInfo()
     }
 
+    override fun loginFailed() {
+     closeLoadingDialog()
+    }
+
     override fun showUserInfo(userInfo: UserInfo?) {
         closeLoadingDialog()
         if (userInfo == null) {

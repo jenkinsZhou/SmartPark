@@ -96,6 +96,7 @@ public abstract class BaseMvpTitleActivity<P extends BasePresenter> extends Base
     @Override
     public void showLoadingDialog(String message) {
         if (loadingDialog != null && !loadingDialog.isShowing()) {
+            loadingDialog.setLoadingText(message);
             loadingDialog.show();
         }
     }

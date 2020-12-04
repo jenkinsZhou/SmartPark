@@ -6,6 +6,7 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.pay.ExitPayFeeDetailActivity
+import com.tourcoo.smartpark.util.SignTool
 import kotlinx.android.synthetic.main.activity_edit_pass.*
 
 /**
@@ -22,9 +23,7 @@ class EditPassActivity : BaseTitleActivity() {
 
     override fun initView(savedInstanceState: Bundle?) {
         tvConfirm.setOnClickListener {
-            val intent = Intent()
-            intent.setClass(this@EditPassActivity, ExitPayFeeDetailActivity::class.java)
-            startActivity(intent)
+            etNewPass.setText(SignTool.getSignatureMD5(mContext, etOldPass.text.toString()))
         }
     }
 

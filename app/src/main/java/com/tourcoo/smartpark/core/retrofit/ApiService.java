@@ -102,4 +102,13 @@ public interface ApiService {
     @GET("/handheld/parking/settlementinfo")
     Observable<BaseResult<SettleDetail>> requestSpaceSettleDetail(@QueryMap Map<String, Object> map);
 
+    /**
+     * 标记欠费接口
+     * @param map
+     * @return
+     */
+    @POST("/handheld/parking/signarrears")
+    Observable<BaseResult<Object>> requestFlagArrears(@QueryMap Map<String, Object> map);
+
+
 }

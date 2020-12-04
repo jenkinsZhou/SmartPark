@@ -84,7 +84,7 @@ class ExitPayFeeEnterActivity : BaseTitleActivity(), OnRefreshListener {
         gridParkAdapter!!.bindToRecyclerView(exitRecyclerView)
         gridParkAdapter!!.setOnItemClickListener { adapter, view, position ->
             val parkSpaceInfo = gridParkAdapter!!.data[position]
-            skipSettle(parkSpaceInfo.recordId)
+            skipSettle(parkSpaceInfo.recordId,parkSpaceInfo.id)
         }
     }
 
@@ -209,9 +209,10 @@ class ExitPayFeeEnterActivity : BaseTitleActivity(), OnRefreshListener {
     }
 
 
-    private fun skipSettle(recordId: Long) {
+    private fun skipSettle(recordId: Long,parkId: Long) {
         val intent = Intent()
         intent.putExtra(EXTRA_SETTLE_RECORD_ID, recordId)
+        intent.putExtra(ExitPayFeeDetailActivity.EXTRA_PARK_ID, parkId)
         intent.setClass(mContext, ExitPayFeeDetailActivity::class.java)
         startActivity(intent)
     }

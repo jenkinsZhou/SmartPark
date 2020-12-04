@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.core.retrofit.repository;
 
 import android.text.TextUtils;
 
+import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.bean.ParkSpaceInfo;
@@ -104,7 +105,7 @@ public class ApiRepository extends BaseRepository {
     }
 
 
-    public Observable<BaseResult<Object>> requestAddParkingSpace(int parkingSpaceId, String plantNum, int carType, String[] photos) {
+    public Observable<BaseResult<Object>> requestAddParkingSpace(long parkingSpaceId, String plantNum, int carType, String[] photos) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("parkingSpaceId", parkingSpaceId);
         params.put("number", plantNum);
@@ -130,6 +131,7 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 获取某停车位的具体收费信息
+     *
      * @param recordId ignore
      * @return
      */
@@ -141,7 +143,21 @@ public class ApiRepository extends BaseRepository {
         } else {
             params.put("ignore", 0);
         }
+        LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestSpaceSettleDetail(params).retryWhen(new RetryWhen()));
     }
+
+    /**
+     * 标为欠费
+     * @param parkId
+     * @return
+     */
+    public Observable<BaseResult<Object>> requestFlagArrears(long parkId) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", parkId);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestFlagArrears(params).retryWhen(new RetryWhen()));
+    }
+
 
 }

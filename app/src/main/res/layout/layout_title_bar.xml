@@ -6,7 +6,6 @@
     android:layout_height="@dimen/dp_title_height"
     android:background="@color/white"
     app:title_actionTextColor="@color/colorTitleText"
-    app:title_dividerBackground="@color/colorTitleDivider"
     app:title_titleMainText="@string/app_name"
     app:title_leftTextColor="@color/colorTitleText"
     app:title_rightTextColor="@color/colorTitleText"

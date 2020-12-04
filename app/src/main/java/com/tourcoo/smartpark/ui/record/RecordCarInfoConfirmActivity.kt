@@ -14,12 +14,12 @@ import android.os.Message
 import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.View
-import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.alibaba.fastjson.JSON
 import com.apkfuns.logutils.LogUtils
+import com.baidu.liantian.b.r
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
@@ -125,7 +125,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             showLoading("正在初始化组件...")
         }
         initInputLayout()
-        checkPermission()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -377,7 +376,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                     mSelectLocalImagePathList.add(currentImagePath)
                     if (needOrc) {
                         //这里先不上传 先识别 然后直接将图片添加到recyclerview里面
-                        doRecognisePlant(currentImagePath)
                         compressImagesAndAddToDataToRecyclerview(File(currentImagePath))
                     } else {
                         //这里如果不是拍照识别车牌的话 就先上传
@@ -417,6 +415,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         LogUtils.i("是否删除了图片数据:$success" + "文件路径:" + path)
         EventBus.getDefault().unregister(this)
         PredictorWrapper.release()
+        mHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
@@ -504,14 +503,15 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                             showLoading("正在处理图片数据...")
                         }
 
-                        override fun onSuccess(file: File?) {
+                        override fun onSuccess(compressFile: File?) {
                             closeLoading()
-                            if (file == null) {
+                            if (compressFile == null) {
                                 ToastUtil.showFailed("压缩失败")
                                 return
                             }
+                            doRecognisePlant(compressFile.path)
                             //这里不做上传 直接显示到列表中
-                            addDataToRecyclerView(file.path, null, true)
+                            addDataToRecyclerView(compressFile.path, null, true)
                         }
 
                         override fun onError(e: Throwable?) {

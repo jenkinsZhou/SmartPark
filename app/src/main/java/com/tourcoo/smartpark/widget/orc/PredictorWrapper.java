@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
 import com.baidu.vis.ocrplatenumber.Predictor;
@@ -16,6 +17,7 @@ import com.baidu.vis.ocrplatenumber.Response;
 import com.baidu.vis.ocrplatenumber.SDKExceptions;
 import com.baidu.vis.unified.license.AndroidLicenser;
 import com.baidu.vis.unified.license.BDLicenseLocalInfo;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
 
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,11 +42,12 @@ public class PredictorWrapper {
         // 使用申请的license-key 及 收钱文件进行本地授权
       /*  AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(activity, "ocrplatenumberdemo_test_license",
                 "idl-license.ocrplatenumberdemo_test_license", true, Predictor.getAlgorithmId());*/
-        AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "yixing_platenumber_7_B2ECF",
-                "yixing_platenumber_7_B2ECF", true, Predictor.getAlgorithmId());
+     /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "yixing_platenumber_7_B2ECF",
+                "yixing_platenumber_7_B2ECF", true, Predictor.getAlgorithmId());*/
+        AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "TUKU_TEST",
+                "idl_license_ocr_platenumber", true, Predictor.getAlgorithmId());
         if (ret != AndroidLicenser.ErrorCode.SUCCESS) {
-            Log.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
-//            setTextViewOnUiThread(activity, textView, "鉴权失败");
+            LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
             return false;
         }
 //        setTextViewOnUiThread(activity, textView, "鉴权成功");

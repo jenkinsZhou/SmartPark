@@ -24,6 +24,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    dexOptions {
+        javaMaxHeapSize "Xg"
+        preDexLibraries = false
+    }
+    signingConfigs {
+        debug {
+            keyAlias 'emi'
+            keyPassword 'android'
+            storeFile file('../key/android_key_release.jks')
+            storePassword 'android'
+        }
+        release {
+            keyAlias 'emi'
+            keyPassword 'android'
+            storeFile file('../key/android_key_release.jks')
+            storePassword 'android'
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

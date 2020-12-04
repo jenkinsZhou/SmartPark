@@ -42,6 +42,7 @@ public class LoginContract {
 
      void showParkingList(List<ParkingInfo> parkingInfoList);
      void loginSuccess(TokenInfo tokenInfo);
+        void loginFailed();
      void showUserInfo(UserInfo userInfo);
     }
 
