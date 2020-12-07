@@ -43,7 +43,7 @@ import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.account.login.LoginActivity;
-import com.tourcoo.smartpark.ui.pay.ExitPayFeeEnterActivity;
+import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
@@ -53,6 +53,7 @@ import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -78,6 +79,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public static final String EXTRA_SPACE_INFO = "EXTRA_SPACE_INFO";
     public static final int REQUEST_CODE_SIGN = 1002;
     private SmartRefreshLayout homeRefreshLayout;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

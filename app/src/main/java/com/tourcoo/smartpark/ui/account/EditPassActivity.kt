@@ -1,11 +1,9 @@
 package com.tourcoo.smartpark.ui.account
 
-import android.content.Intent
 import android.os.Bundle
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.pay.ExitPayFeeDetailActivity
 import com.tourcoo.smartpark.util.SignTool
 import kotlinx.android.synthetic.main.activity_edit_pass.*
 

@@ -9,6 +9,7 @@ import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 import com.tourcoo.smartpark.core.retrofit.ApiService;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
@@ -135,7 +136,7 @@ public class ApiRepository extends BaseRepository {
      * @param recordId ignore
      * @return
      */
-    public Observable<BaseResult<SettleDetail>> requestSpaceSettleDetail(long recordId, boolean ignore) {
+    public Observable<BaseResult<SettleDetail>> requestSpaceSettleDetail(long recordId, boolean ignore, String arrearsIds) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", recordId);
         if (ignore) {
@@ -143,12 +144,16 @@ public class ApiRepository extends BaseRepository {
         } else {
             params.put("ignore", 0);
         }
+        if (!TextUtils.isEmpty(arrearsIds)) {
+            params.put("arrearsId", arrearsIds);
+        }
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestSpaceSettleDetail(params).retryWhen(new RetryWhen()));
     }
 
     /**
      * 标为欠费
+     *
      * @param parkId
      * @return
      */
@@ -157,6 +162,25 @@ public class ApiRepository extends BaseRepository {
         params.put("id", parkId);
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestFlagArrears(params).retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<List<ArrearsRecord>>> requestArrearsList(long carId) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("carId", carId);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestArrearsList(params).retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<String>> requestPay(long recordId, int type, String code, String[] arrearsId) {
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("id", recordId);
+        params.put("type", type);
+        if (!TextUtils.isEmpty(code)) {
+            params.put("code", code);
+        }
+        params.put("arrearsId", arrearsId);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestPay(params).retryWhen(new RetryWhen()));
     }
 
 

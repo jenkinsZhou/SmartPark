@@ -1,4 +1,4 @@
-package com.tourcoo.smartpark.ui.pay
+package com.tourcoo.smartpark.ui.fee
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -29,7 +29,7 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.SizeUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.pay.ExitPayFeeDetailActivity.Companion.EXTRA_SETTLE_RECORD_ID
+import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.Companion.EXTRA_SETTLE_RECORD_ID
 import com.tourcoo.smartpark.util.GridDividerItemDecoration
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.trello.rxlifecycle3.android.ActivityEvent

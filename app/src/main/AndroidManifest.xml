@@ -56,15 +56,15 @@
         </activity>
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
-        <activity android:name=".ui.pay.ExitPayFeeDetailActivity" />
+        <activity android:name=".ui.fee.ExitPayFeeDetailActivity" />
         <activity android:name=".ui.record.RecordCarInfoConfirmActivity" />
         <activity android:name=".ui.report.FeeDailyReportActivity" />
         <activity android:name=".ui.account.login.LoginActivity" />
-        <activity android:name=".ui.pay.ExitPayFeeEnterActivity"
+        <activity android:name=".ui.fee.ExitPayFeeEnterActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:configChanges="orientation|keyboardHidden"
             />
-        <activity android:name=".ui.pay.ExitSettleDetailActivity" />
+        <activity android:name=".ui.fee.ArrearsRecordActivity" />
 
     </application>
 

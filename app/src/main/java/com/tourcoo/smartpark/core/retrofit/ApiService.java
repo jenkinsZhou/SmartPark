@@ -6,6 +6,7 @@ import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 
 import java.util.List;
@@ -108,7 +109,18 @@ public interface ApiService {
      * @return
      */
     @POST("/handheld/parking/signarrears")
-    Observable<BaseResult<Object>> requestFlagArrears(@QueryMap Map<String, Object> map);
+    Observable<BaseResult<Object>> requestFlagArrears(@Body Map<String, Object> map);
 
+    /**
+     * 欠费记录列表
+     * @param map
+     * @return
+     */
+    @GET("/handheld/parking/arrearslist")
+    Observable<BaseResult<List<ArrearsRecord>>> requestArrearsList(@QueryMap Map<String, Object> map);
+
+
+    @POST("/handheld/parking/settlement")
+    Observable<BaseResult<String>> requestPay(@Body Map<String, Object> map);
 
 }

@@ -1,16 +1,17 @@
-package com.tourcoo.smartpark.ui.pay
+package com.tourcoo.smartpark.ui.fee
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
+import com.apkfuns.logutils.LogUtils
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
-import com.tourcoo.smartpark.bean.ParkSpaceInfo
+import com.tourcoo.smartpark.bean.fee.ArrearsRecord
 import com.tourcoo.smartpark.bean.settle.SettleDetail
 import com.tourcoo.smartpark.constant.CarConstant
 import com.tourcoo.smartpark.core.CommonUtil
@@ -18,16 +19,15 @@ import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
-import com.tourcoo.smartpark.core.utils.DrawableUtil
-import com.tourcoo.smartpark.core.utils.SizeUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_CASH
 import com.tourcoo.smartpark.util.StringUtil
+import com.tourcoo.smartpark.util.StringUtil.listParseIntArray
 import com.tourcoo.smartpark.widget.dialog.AppUpdateDialog
-import com.tourcoo.smartpark.widget.dialog.CommonInputDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
-import java.util.*
+import org.apache.commons.lang3.StringUtils
 
 
 /**
@@ -44,11 +44,20 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
      * 停车记录id
      */
     private var parkId = -1L
+
+    private var carId = -1L
     private var needIgnore = false
+
+    private var mArrearsIds: String? = null
+    private var mPayType: Int? = null
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
         const val EXTRA_PARK_ID = "EXTRA_PARK_ID"
+        const val EXTRA_CAR_ID = "EXTRA_CAR_ID"
+        const val EXTRA_ARREARS_IDS = "EXTRA_ARREARS_IDS"
+        const val REQUEST_CODE_FEE_RECORD = 1002
+
     }
 
     override fun getContentLayout(): Int {
@@ -58,7 +67,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     override fun initView(savedInstanceState: Bundle?) {
         recordId = intent?.getLongExtra(EXTRA_SETTLE_RECORD_ID, -1L)!!
         parkId = intent?.getLongExtra(EXTRA_PARK_ID, -1L)!!
-        if(recordId<0||parkId<0){
+        if (recordId < 0 || parkId < 0) {
             ToastUtil.showWarning("未获取到正确的停车数据")
             finish()
             return
@@ -76,18 +85,19 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
 
     override fun loadData() {
         super.loadData()
-        requestSettleInfo(false)
+        requestSettleInfo(needIgnore)
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.llPayByCash -> {
-                val dialog: AppUpdateDialog = AppUpdateDialog(mContext).create()
-                dialog.setPositiveButtonClick("立即更新") {
-                    ToastUtil.showWarning("立即更新")
-                    dialog.dismiss()
-                }
-                dialog.show()
+                doPayByCash()
+                /*  val dialog: AppUpdateDialog = AppUpdateDialog(mContext).create()
+                  dialog.setPositiveButtonClick("立即更新") {
+                      ToastUtil.showWarning("立即更新")
+                      dialog.dismiss()
+                  }
+                  dialog.show()*/
             }
             R.id.llPayByCode -> {
                 ToastUtil.showFailed("点击了")
@@ -97,7 +107,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
                 needIgnore = !needIgnore
             }
             R.id.tvFeeHistory -> {
-                ToastUtil.showSuccess("欠费详情")
+                skipArrearsRecord()
             }
 
             else -> {
@@ -137,7 +147,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
 
 
     private fun requestSettleInfo(needIgnore: Boolean) {
-        ApiRepository.getInstance().requestSpaceSettleDetail(recordId, needIgnore).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SettleDetail>>() {
+        ApiRepository.getInstance().requestSpaceSettleDetail(recordId, needIgnore, mArrearsIds).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SettleDetail>>() {
             override fun onRequestSuccess(entity: BaseResult<SettleDetail>?) {
                 handleRequestSuccess(entity, needIgnore)
             }
@@ -158,6 +168,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         }
         settleRefreshLayout.finishRefresh(true)
         if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+            carId = entity.data.carId
             showSettleInfo(entity.data, ignore)
 
         } else {
@@ -190,7 +201,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         if (detail.count > 0) {
             rightLayout.addView(rightTextView)
             rightTextView.setOnClickListener {
-                requestFlagArrears(parkId)
+                requestFlagArrears(recordId)
             }
             setViewGone(rightTextView, true)
         } else {
@@ -210,6 +221,49 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
                 } else {
                     ToastUtil.showFailed(entity.errMsg)
                 }
+            }
+        })
+    }
+
+    private fun skipArrearsRecord() {
+        val intent = Intent()
+        intent.putExtra(EXTRA_CAR_ID, carId)
+        intent.setClass(this@ExitPayFeeDetailActivity, ArrearsRecordActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE_FEE_RECORD)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_CODE_FEE_RECORD -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val arrearsIds = data.getSerializableExtra(EXTRA_ARREARS_IDS) as ArrayList<Long>?
+                    if (arrearsIds != null) {
+                        mArrearsIds = StringUtils.join(arrearsIds, ",")
+                    }
+                }
+            }
+            else -> {
+            }
+        }
+    }
+
+
+    private fun doPayByScan() {
+
+    }
+
+    /**
+     * 现金支付
+     */
+    private fun doPayByCash() {
+        mPayType = PAY_TYPE_CASH
+    }
+
+    private fun requestPay() {
+        ApiRepository.getInstance().requestPay(carId,mPayType!!,"",listParseIntArray()).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<List<ArrearsRecord>>>() {
+            override fun onRequestSuccess(entity: BaseResult<List<ArrearsRecord>>?) {
+//                handleRequestSuccess(entity)
             }
         })
     }

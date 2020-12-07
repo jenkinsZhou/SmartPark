@@ -104,10 +104,17 @@ public class StringUtil {
         }
     }
 
-    public static String[] listParseArray(List<String> values) {
+    public static String[] listParseStringArray(List<String> values) {
         if (values == null) {
             return new String[]{};
         }
         return values.toArray(new String[0]);
+    }
+
+    public static Integer[] listParseIntArray(List<Integer> values) {
+        if (values == null) {
+            return new Integer[]{};
+        }
+        return values.toArray(new Integer[0]);
     }
 }
