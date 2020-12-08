@@ -5,6 +5,8 @@ import com.tourcoo.smartpark.core.retrofit.CommonTransformer;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * @author :JenkinsZhou
@@ -74,4 +76,16 @@ public class RxJavaManager {
         return getDelayObservable(delayTime, delayTime, TimeUnit.MILLISECONDS);
     }
 
+
+    /**
+     * 每隔milliseconds毫秒 执行一次命令
+     *
+     * @param milliseconds
+     * @param observable
+     */
+    public void doEventByInterval(long milliseconds, Observer<Long> observable) {
+        Observable.interval(milliseconds, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observable);
+    }
 }

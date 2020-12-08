@@ -121,6 +121,6 @@ public interface ApiService {
 
 
     @POST("/handheld/parking/settlement")
-    Observable<BaseResult<String>> requestPay(@Body Map<String, Object> map);
+    Observable<BaseResult<Object>> requestPay(@Body Map<String, Object> map);
 
 }

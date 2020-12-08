@@ -65,6 +65,7 @@
             android:configChanges="orientation|keyboardHidden"
             />
         <activity android:name=".ui.fee.ArrearsRecordActivity" />
+        <activity android:name=".ui.pay.ScanCodePayActivity" />
 
     </application>
 

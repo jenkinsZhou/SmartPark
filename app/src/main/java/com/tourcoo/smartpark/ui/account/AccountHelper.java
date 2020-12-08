@@ -1,9 +1,13 @@
 package com.tourcoo.smartpark.ui.account;
 
+import android.content.Intent;
 import android.text.TextUtils;
 
 import com.luck.picture.lib.tools.SPUtils;
+import com.tourcoo.SmartParkApplication;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.core.utils.StackUtil;
+import com.tourcoo.smartpark.ui.account.login.LoginActivity;
 import com.tourcoo.smartpark.util.SpUtil;
 import com.tourcoo.smartpark.util.StringUtil;
 
@@ -63,5 +67,15 @@ public class AccountHelper {
 
     public UserInfo getUserInfo() {
         return userInfo;
+    }
+
+
+    public void logout() {
+        userInfo = null;
+        setAccessToken("");
+        StackUtil.getInstance().popAll();
+        Intent intent = new Intent(SmartParkApplication.getContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        SmartParkApplication.getContext().startActivity(intent);
     }
 }

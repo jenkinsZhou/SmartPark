@@ -1,5 +1,8 @@
 package com.tourcoo.smartpark.bean.settle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author :停车费结算详情实体
  * @description : JenkinsZhou
@@ -25,13 +28,15 @@ public class SettleDetail {
     private double arrears;
     private String carNumber;
     private String number;
-    private int id;
+    private long id;
     private int type;
     private double fee;
     private String createdAt;
     private String leaveAt;
     private double count;
     private long carId;
+    private List<Integer> arrearsId = new ArrayList<>();
+
 
     public double getArrears() {
         return arrears;
@@ -57,11 +62,11 @@ public class SettleDetail {
         this.number = number;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -111,5 +116,13 @@ public class SettleDetail {
 
     public void setCarId(long carId) {
         this.carId = carId;
+    }
+
+    public List<Integer> getArrearsId() {
+        return arrearsId;
+    }
+
+    public void setArrearsId(List<Integer> arrearsId) {
+        this.arrearsId = arrearsId;
     }
 }

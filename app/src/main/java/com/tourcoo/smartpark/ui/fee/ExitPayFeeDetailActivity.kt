@@ -5,29 +5,30 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import com.apkfuns.logutils.LogUtils
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
-import com.tourcoo.smartpark.bean.fee.ArrearsRecord
 import com.tourcoo.smartpark.bean.settle.SettleDetail
 import com.tourcoo.smartpark.constant.CarConstant
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
+import com.tourcoo.smartpark.core.retrofit.BaseObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_CASH
+import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_SCAN
+import com.tourcoo.smartpark.ui.pay.ScanCodePayActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.util.StringUtil.listParseIntArray
-import com.tourcoo.smartpark.widget.dialog.AppUpdateDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
 import org.apache.commons.lang3.StringUtils
+import kotlin.collections.ArrayList
 
 
 /**
@@ -46,18 +47,21 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     private var parkId = -1L
 
     private var carId = -1L
+    private var settleId = -1L
     private var needIgnore = false
 
     private var mArrearsIds: String? = null
     private var mPayType: Int? = null
+    private val arrearsIdList: MutableList<Int> = ArrayList()
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
         const val EXTRA_PARK_ID = "EXTRA_PARK_ID"
         const val EXTRA_CAR_ID = "EXTRA_CAR_ID"
         const val EXTRA_ARREARS_IDS = "EXTRA_ARREARS_IDS"
+        const val EXTRA_SCAN_RESULT = "EXTRA_SCAN_RESULT"
         const val REQUEST_CODE_FEE_RECORD = 1002
-
+        const val REQUEST_CODE_PAY_BY_SCAN = 1003
     }
 
     override fun getContentLayout(): Int {
@@ -100,7 +104,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
                   dialog.show()*/
             }
             R.id.llPayByCode -> {
-                ToastUtil.showFailed("点击了")
+                skipScanCode()
             }
             R.id.tvIgnoreHistoryFee -> {
                 requestSettleInfo(!needIgnore)
@@ -167,8 +171,13 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
             return
         }
         settleRefreshLayout.finishRefresh(true)
-        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
             carId = entity.data.carId
+            settleId = entity.data.id
+            arrearsIdList.clear()
+            if (entity.data.arrearsId != null) {
+                arrearsIdList.addAll(entity.data.arrearsId)
+            }
             showSettleInfo(entity.data, ignore)
 
         } else {
@@ -243,14 +252,25 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
                     }
                 }
             }
+            REQUEST_CODE_PAY_BY_SCAN -> {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val scanCode = StringUtil.getNotNullValue(data.getStringExtra(EXTRA_SCAN_RESULT))
+                    doPayByScan(scanCode)
+                }
+            }
             else -> {
             }
         }
     }
 
 
-    private fun doPayByScan() {
-
+    private fun doPayByScan(scanCode: String?) {
+        mPayType = PAY_TYPE_SCAN
+        if (settleId == -1L) {
+            ToastUtil.showWarning("未获取到结算信息")
+            return
+        }
+        requestPay(scanCode)
     }
 
     /**
@@ -260,11 +280,37 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         mPayType = PAY_TYPE_CASH
     }
 
-    private fun requestPay() {
-        ApiRepository.getInstance().requestPay(carId,mPayType!!,"",listParseIntArray()).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<List<ArrearsRecord>>>() {
-            override fun onRequestSuccess(entity: BaseResult<List<ArrearsRecord>>?) {
-//                handleRequestSuccess(entity)
+    private fun requestPay(scanCode: String?) {
+        showLoading("正在支付...")
+        ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseIntArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<Any>>() {
+            override fun onRequestSuccess(entity: BaseResult<Any>?) {
+                handlePaySuccess(entity)
+            }
+
+            override fun onRequestError(throwable: Throwable?) {
+                super.onRequestError(throwable)
+                closeLoading()
             }
         })
+    }
+
+
+    private fun skipScanCode() {
+        val intent = Intent()
+        intent.setClass(this@ExitPayFeeDetailActivity, ScanCodePayActivity::class.java)
+        startActivityForResult(intent, REQUEST_CODE_PAY_BY_SCAN)
+    }
+
+    private fun handlePaySuccess(entity: BaseResult<Any>?) {
+        closeLoading()
+        if (entity == null) {
+            return
+        }
+        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+            ToastUtil.showSuccess(entity.errMsg)
+            finish()
+        } else {
+            ToastUtil.showFailed(entity.errMsg)
+        }
     }
 }

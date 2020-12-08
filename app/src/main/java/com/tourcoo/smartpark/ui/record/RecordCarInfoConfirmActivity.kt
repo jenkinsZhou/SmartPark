@@ -617,7 +617,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
      * 来车登记（车辆入库）
      */
     private fun requestAddParkingSpace(imageUrlList: ArrayList<String>) {
-        val imageArray = StringUtil.listParseArray(imageUrlList)
+        val imageArray = StringUtil.listParseStringArray(imageUrlList)
         if (imageArray.isEmpty()) {
             ToastUtil.showNormal("请至少上传一张图片")
             return

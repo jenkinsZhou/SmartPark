@@ -112,6 +112,8 @@ dependencies {
     //RXText
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
 
+    implementation project(':zxing')
+
 }
 repositories {
     mavenCentral()

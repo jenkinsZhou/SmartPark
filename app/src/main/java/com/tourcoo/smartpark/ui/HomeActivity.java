@@ -158,9 +158,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvLogout:
-                Intent intent = new Intent();
-                intent.setClass(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
+                AccountHelper.getInstance().logout();
                 break;
             case R.id.tvCarRecord:
                 skipSignSpace(null);
@@ -424,7 +422,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     /**
      * 离场收费入口
      */
-    private void skipExitPayEnter(){
+    private void skipExitPayEnter() {
         Intent intent = new Intent();
         intent.setClass(HomeActivity.this, ExitPayFeeEnterActivity.class);
         startActivity(intent);
