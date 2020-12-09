@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -36,6 +37,7 @@ import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
+import com.tourcoo.smartpark.core.utils.ResourceUtil;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
@@ -48,6 +50,7 @@ import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
 import com.tourcoo.smartpark.util.StringUtil;
+import com.tourcoo.smartpark.widget.dialog.BottomSheetDialog;
 import com.tourcoo.smartpark.widget.dialog.CommonInputDialog;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
@@ -90,8 +93,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         initView();
         initSpaceRecyclerView();
         initAdapterClick();
-        requestUserInfo();
-        requestParkSpaceList("正在获取车位信息");
         setImmersionBar(true);
     }
 
@@ -158,7 +159,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tvLogout:
-                AccountHelper.getInstance().logout();
+                showLogoutDialog();
                 break;
             case R.id.tvCarRecord:
                 skipSignSpace(null);
@@ -234,6 +235,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         if (userInfo == null) {
             return;
         }
+        AccountHelper.getInstance().setUserInfo(userInfo);
         String info = StringUtil.getNotNullValueLine(userInfo.getName()) + "/" + StringUtil.getNotNullValueLine(userInfo.getNumber());
         tvUserName.setText(info);
         tvUserLocation.setText(getNotNullStr(userInfo.getParking()));
@@ -241,7 +243,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvTotalCarCount.setText(getNotNullStr(userInfo.getCarNum() + ""));
         tvTheoreticalIncome.setText(getNotNullStr(userInfo.getTheoreticalIncome() + ""));
         tvActualIncome.setText(getNotNullStr(userInfo.getActualIncome() + ""));
-        AccountHelper.getInstance().setUserInfo(userInfo);
         showResetPassByCondition();
     }
 
@@ -332,6 +333,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 closeLoading();
                 if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
                     showUserInfo(entity.getData());
+                    requestParkSpaceList("正在获取车位信息");
                 }
             }
         });
@@ -426,5 +428,30 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         Intent intent = new Intent();
         intent.setClass(HomeActivity.this, ExitPayFeeEnterActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        requestUserInfo();
+    }
+
+
+    private void showLogoutDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(mContext);
+        BottomSheetDialog.SheetItemTextStyle style = new BottomSheetDialog.SheetItemTextStyle();
+        style.setTextColor(ContextCompat.getColor(mContext, R.color.redFF4A5C));
+        style.setTypeface(Typeface.DEFAULT);
+        BottomSheetDialog.SheetItem item = new BottomSheetDialog.SheetItem("退出登录", style, new BottomSheetDialog.OnSheetItemClickListener() {
+
+            @Override
+            public void onClick(int which) {
+                AccountHelper.getInstance().logout();
+            }
+        });
+
+
+        dialog.addSheetItem(item);
+        dialog.create().setTitle("退出登录后 会返回到登录页").show();
     }
 }

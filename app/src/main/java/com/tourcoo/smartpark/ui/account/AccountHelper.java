@@ -78,4 +78,8 @@ public class AccountHelper {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         SmartParkApplication.getContext().startActivity(intent);
     }
+
+    public boolean isLogin() {
+        return  !TextUtils.isEmpty(getAccessToken());
+    }
 }

@@ -60,6 +60,7 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
         getModel().requestLogin(new BaseObserver<BaseResult<TokenInfo>>() {
             @Override
             public void onRequestSuccess(BaseResult<TokenInfo> entity) {
+               closeLoadingDialog();
                 if (entity == null) {
                     return;
                 }
@@ -74,6 +75,7 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginContract.Logi
             @Override
             public void onRequestError(Throwable throwable) {
                 super.onRequestError(throwable);
+                closeLoadingDialog();
                 getView().loginFailed();
             }
         }, account, pass, parkingId);

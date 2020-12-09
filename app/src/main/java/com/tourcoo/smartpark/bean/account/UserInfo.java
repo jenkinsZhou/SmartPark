@@ -26,8 +26,8 @@ public class UserInfo {
     private String date;
     private String parking;
     private int carNum;
-    private int actualIncome;
-    private int theoreticalIncome;
+    private double actualIncome;
+    private double theoreticalIncome;
     private boolean needResetPass;
 
     public String getName() {
@@ -78,19 +78,19 @@ public class UserInfo {
         this.carNum = carNum;
     }
 
-    public int getActualIncome() {
+    public double getActualIncome() {
         return actualIncome;
     }
 
-    public void setActualIncome(int actualIncome) {
+    public void setActualIncome(double actualIncome) {
         this.actualIncome = actualIncome;
     }
 
-    public int getTheoreticalIncome() {
+    public double getTheoreticalIncome() {
         return theoreticalIncome;
     }
 
-    public void setTheoreticalIncome(int theoreticalIncome) {
+    public void setTheoreticalIncome(double theoreticalIncome) {
         this.theoreticalIncome = theoreticalIncome;
     }
 
