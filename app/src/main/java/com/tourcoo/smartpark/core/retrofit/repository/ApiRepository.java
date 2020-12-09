@@ -5,12 +5,17 @@ import android.text.TextUtils;
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
+import com.tourcoo.smartpark.bean.PageBean;
 import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
+import com.tourcoo.smartpark.bean.fee.FeeRecord;
+import com.tourcoo.smartpark.bean.fee.PayResult;
+import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
+import com.tourcoo.smartpark.bean.system.AppVersion;
 import com.tourcoo.smartpark.core.retrofit.ApiService;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.retrofit.RetryWhen;
@@ -171,7 +176,7 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestArrearsList(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<Object>> requestPay(long recordId, int type, String code, Integer[] arrearsId) {
+    public Observable<BaseResult<PayResult>> requestPay(long recordId, int type, String code, Integer[] arrearsId) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("id", recordId);
         params.put("type", type);
@@ -183,5 +188,37 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestPay(params).retryWhen(new RetryWhen()));
     }
 
+    /**
+     * 用户日报
+     *
+     * @return
+     */
+    public Observable<BaseResult<DailyReport>> requestDailyReport() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestDailyReport().retryWhen(new RetryWhen()));
+    }
+
+    /**
+     * 签到签出
+     *
+     * @return
+     */
+    public Observable<BaseResult<Object>> requestSign() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestSign().retryWhen(new RetryWhen()));
+    }
+
+
+    public Observable<BaseResult<PageBean<FeeRecord>>> requestDailyRecordList(int page) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("page", page);
+        params.put("perPage", 10);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestDailyRecord(params).retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<AppVersion>> requestAppVersion(String versionName) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("versionName", versionName);
+        return ThreadTransformer.switchSchedulers(getApiService().requestAppVersion(params).retryWhen(new RetryWhen()));
+    }
 
 }

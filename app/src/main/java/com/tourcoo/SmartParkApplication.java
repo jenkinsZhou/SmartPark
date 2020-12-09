@@ -44,12 +44,12 @@ public class SmartParkApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-//        SpiderMan.init(context);
+        SpiderMan.init(context);
         initLog();
         initConfig();
         // 以下用来捕获程序崩溃异常
         // 程序崩溃时触发线程
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+//        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         intiPlantOrcSdk();
 
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -10,7 +11,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvTitle"
+            android:id="@+id/tvUpdateTitle"
             style="@style/textBlackStyle14"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dp_143"
@@ -20,21 +21,46 @@
             android:id="@+id/tvContent"
             style="@style/textBlackStyle12"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/dp_16"
+            android:layout_marginTop="@dimen/dp_12"
             android:text="V1.1.2"
             android:textColor="@color/blue629BFF" />
+
+        <TextView
+            android:id="@+id/tvUpdateDesc"
+            style="@style/textBlackStyle12"
+            android:layout_gravity="center_horizontal"
+            android:text="V1.1.2"
+            android:textColor="@color/grayA2A2A2"
+            android:visibility="gone" />
+
+        <com.tourcoo.smartpark.widget.progress.HorizontalProgressView
+            android:id="@+id/hpb"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_30"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:visibility="gone"
+            app:hpv_end_color="@color/green_end"
+            app:hpv_end_progress="100"
+            app:hpv_isTracked="true"
+            app:hpv_progress_duration="2900"
+            app:hpv_progress_textColor="#696969"
+            app:hpv_progress_textVisibility="false"
+            app:hpv_start_color="@color/green_start"
+            app:hpv_track_color="#f4f4f4"
+            app:hpv_track_width="@dimen/dp_8" />
 
         <TextView
             android:id="@+id/tvPositive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_24"
-            android:layout_marginEnd="@dimen/dp_24"
             android:layout_marginTop="@dimen/dp_27"
+            android:layout_marginEnd="@dimen/dp_24"
             android:layout_marginBottom="@dimen/dp_24"
+            android:background="@drawable/bg_select_primary_blue"
             android:clickable="true"
             android:focusable="true"
-            android:background="@drawable/bg_select_primary_blue"
             android:gravity="center"
             android:letterSpacing="0.18"
             android:paddingTop="@dimen/dp_8"

@@ -2,34 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/dp_14"
+    android:layout_marginTop="@dimen/dp_12"
+    android:layout_marginEnd="@dimen/dp_14"
     android:background="@drawable/ic_bg_item_common_small"
     android:orientation="horizontal"
     android:paddingTop="@dimen/dp_12"
     android:paddingBottom="@dimen/dp_12">
-
+    <!--收费记录-->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.7"
+        android:layout_weight="0.82"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_marginStart="@dimen/dp_20"
-            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
             <TextView
-                android:layout_gravity="center_horizontal"
+                android:id="@+id/tvParkNumber"
                 style="@style/textBlackStyle14"
                 android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:gravity="center"
                 android:text="A01001"
                 android:textStyle="bold" />
 
             <ImageView
-                android:layout_gravity="center_horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:layout_marginBottom="@dimen/dp_11"
                 android:src="@mipmap/ic_car_gray_small" />
@@ -39,8 +44,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:background="@drawable/bg_radius_30_gray_a2a2a2"
                 android:minWidth="@dimen/dp_80"
-                android:background="@drawable/bg_radius_30_primary"
                 android:paddingStart="@dimen/dp_11"
                 android:paddingTop="@dimen/dp_3_5"
                 android:paddingEnd="@dimen/dp_11"
@@ -64,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1.6"
         android:orientation="vertical"
-        android:paddingStart="@dimen/dp_20">
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -77,15 +82,16 @@
                 android:layout_weight="1"
                 android:drawableStart="@mipmap/ic_money_small_yellow"
                 android:drawablePadding="@dimen/dp_5"
-                android:text=" 应收费用"
+                android:text="欠缴费用"
+                android:textColor="#E54E3F"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvFeeShould"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="@dimen/dp_15"
-                android:text="15.00"
                 android:textColor="#FF4A5C"
                 android:textSize="@dimen/sp_15"
                 android:textStyle="bold" />
@@ -93,6 +99,7 @@
 
 
         <TextView
+            android:id="@+id/tvParkingName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_18"
@@ -109,6 +116,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvParkingDuration"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -119,11 +127,12 @@
                 android:textStyle="bold" />
 
             <ImageView
+                android:id="@+id/ivParkingType"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="@dimen/dp_15"
-                android:src="@mipmap/ic_ali_pay_small" />
+                android:src="@mipmap/ic_pay_type_ali" />
         </LinearLayout>
 
     </LinearLayout>

@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tourcoo.smartpark.R
-import com.tourcoo.smartpark.adapter.fee.ArrearsRecordAdapter
+import com.tourcoo.smartpark.adapter.fee.ArrearsRecordHistoryAdapter
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
@@ -31,7 +31,7 @@ import java.util.*
 class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     private var carId: Long? = null
     private var selectAll = false
-    private var adapter: ArrearsRecordAdapter? = null
+    private var historyAdapter: ArrearsRecordHistoryAdapter? = null
     private val arrearsIdArray = ArrayList<Long>()
     private val arrearsIds: String? = null
     override fun getContentLayout(): Int {
@@ -62,9 +62,9 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun initRecyclerView() {
         rvArrears.layoutManager = LinearLayoutManager(mContext)
-        adapter = ArrearsRecordAdapter()
-        adapter!!.bindToRecyclerView(rvArrears)
-        adapter!!.setOnItemClickListener { adapter, view, position ->
+        historyAdapter = ArrearsRecordHistoryAdapter()
+        historyAdapter!!.bindToRecyclerView(rvArrears)
+        historyAdapter!!.setOnItemClickListener { adapter, view, position ->
             doSelect(position)
         }
     }
@@ -91,11 +91,11 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     private fun loadRecord(data: List<ArrearsRecord>?) {
-        if (adapter?.emptyView == null) {
+        if (historyAdapter?.emptyView == null) {
             val emptyView = LayoutInflater.from(mContext).inflate(R.layout.status_layout_car_data_empty, null)
-            adapter?.emptyView = emptyView
+            historyAdapter?.emptyView = emptyView
         }
-        adapter?.setNewData(data)
+        historyAdapter?.setNewData(data)
         showBottomLayoutInfo(0)
     }
 
@@ -121,8 +121,8 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     private fun doSelect(position: Int) {
         var currentInfo: ArrearsRecord?
         var selectCount = 0
-        for (i in 0 until adapter!!.data.size) {
-            currentInfo = adapter!!.data[i] as ArrearsRecord
+        for (i in 0 until historyAdapter!!.data.size) {
+            currentInfo = historyAdapter!!.data[i] as ArrearsRecord
             if (position == i) {
                 currentInfo.isSelect = !currentInfo.isSelect
             }
@@ -130,19 +130,19 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
                 selectCount++
             }
         }
-        adapter!!.notifyDataSetChanged()
+        historyAdapter!!.notifyDataSetChanged()
         showBottomLayoutInfo(selectCount)
     }
 
     private fun doSelectAll(select: Boolean) {
         var currentInfo: ArrearsRecord?
-        for (i in 0 until adapter!!.data.size) {
-            currentInfo = adapter!!.data[i] as ArrearsRecord
+        for (i in 0 until historyAdapter!!.data.size) {
+            currentInfo = historyAdapter!!.data[i] as ArrearsRecord
             currentInfo.isSelect = select
         }
-        adapter!!.notifyDataSetChanged()
+        historyAdapter!!.notifyDataSetChanged()
         if (select) {
-            showBottomLayoutInfo(adapter!!.data.size)
+            showBottomLayoutInfo(historyAdapter!!.data.size)
         } else {
             showBottomLayoutInfo(0)
         }
@@ -150,7 +150,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun showBottomLayoutInfo(selectCount: Int) {
         var fee = 0.00
-        for (arrearsRecord in adapter!!.data) {
+        for (arrearsRecord in historyAdapter!!.data) {
             if (arrearsRecord.isSelect) {
                 fee = DoubleUtil.sum(fee, arrearsRecord.fee)
             }
@@ -163,7 +163,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     private fun showSelectState() {
-        val dataSize = adapter!!.data.size
+        val dataSize = historyAdapter!!.data.size
         if (getSelectCount() == dataSize && dataSize > 0) {
             ivSelectAll.setImageResource(R.mipmap.ic_checked_blue_small)
         } else {
@@ -173,7 +173,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun getSelectCount(): Int {
         var count = 0
-        for (datum in adapter!!.data) {
+        for (datum in historyAdapter!!.data) {
             if (datum.isSelect) {
                 count++
             }
@@ -183,7 +183,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun doConfirmSelect() {
         arrearsIdArray.clear()
-        for (arrearsRecord in adapter!!.data) {
+        for (arrearsRecord in historyAdapter!!.data) {
             if (arrearsRecord.isSelect) {
                 arrearsIdArray.add(arrearsRecord.id)
             }

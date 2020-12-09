@@ -107,13 +107,13 @@
             android:orientation="horizontal">
 
             <TextView
-                android:clickable="true"
-                android:focusable="true"
                 android:id="@+id/tvSignIn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_select_primary_green"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:paddingTop="@dimen/dp_6"
                 android:paddingBottom="@dimen/dp_6"
@@ -122,14 +122,14 @@
                 android:textSize="@dimen/sp_13" />
 
             <TextView
-                android:clickable="true"
-                android:focusable="true"
                 android:id="@+id/tvSignOut"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/dp_10"
                 android:layout_weight="1"
                 android:background="@drawable/bg_select_primary_blue"
+                android:clickable="true"
+                android:focusable="true"
                 android:gravity="center"
                 android:paddingTop="@dimen/dp_6"
                 android:paddingBottom="@dimen/dp_6"

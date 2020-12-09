@@ -24,22 +24,22 @@
             android:src="@mipmap/ic_pay_success" />
 
         <TextView
+            android:id="@+id/tvPayStatus"
             style="@style/menuTextStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dp_18"
             android:letterSpacing="0.2"
-            android:text="本次停车费已支付成功"
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvPayResult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dp_18"
             android:layout_marginBottom="@dimen/dp_24"
-            android:text="应收费用20.00元  实收费用20.00元"
             android:textColor="#A2A2A2"
             android:textSize="@dimen/sp_13" />
 
@@ -48,6 +48,7 @@
 
 
     <TextView
+        android:id="@+id/tvConfirm"
         style="@style/buttonMatchWidthBlue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

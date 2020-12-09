@@ -520,4 +520,66 @@
         <attr name="hvp_topOffset" format="dimension"/>
     </declare-styleable>
 
+    <!--HorizontalProgressView-->
+    <declare-styleable name="HorizontalProgressView">
+        <!--起始进度，默认是0-->
+        <attr name="hpv_start_progress" format="integer" />
+        <!--终止进度，默认是60-->
+        <attr name="hpv_end_progress" format="integer" />
+        <!--渐变效果的起始颜色，默认是#FFC288-->
+        <attr name="hpv_start_color" format="color" />
+        <!--渐变效果的终止颜色，默认是#FF8F5D-->
+        <attr name="hpv_end_color" format="color" />
+        <!--是否显示轨迹背景， 默认是false-->
+        <attr name="hpv_isTracked" format="boolean" />
+        <!--进度条的宽度（边界宽度）,默认是16dp-->
+        <attr name="hpv_track_width" format="dimension" />
+        <!--轨迹背景的颜色， 默认是#f3e5dd-->
+        <attr name="hpv_track_color" format="color" />
+        <!--动画时长， 默认是1200ms-->
+        <attr name="hpv_progress_duration" format="integer" />
+        <!--是否显示进度值文本， 默认是true-->
+        <attr name="hpv_progress_textVisibility" format="boolean" />
+        <!--进度值的颜色， 默认是R.attr.colorAccent-->
+        <attr name="hpv_progress_textColor" format="color" />
+        <!--进度值的文本字体大小， 默认是14sp-->
+        <attr name="hpv_progress_textSize" format="dimension" />
+        <!--动画类型， 默认是AccelerateDecelerateInterpolator-->
+        <attr name="hpv_animate_type" format="enum">
+            <!--加速减速插值器-->
+            <enum name="AccelerateDecelerateInterpolator" value="0" />
+            <!--线性插值器-->
+            <enum name="LinearInterpolator" value="1" />
+            <!--加速插值器-->
+            <enum name="AccelerateInterpolator" value="2" />
+            <!--减速插值器-->
+            <enum name="DecelerateInterpolator" value="3" />
+            <enum name="OvershootInterpolator" value="4" />
+        </attr>
+        <!--圆角半径,默认5dp-->
+        <attr name="hpv_corner_radius" format="dimension" />
+        <!--文字距离view的padding，默认5dp-->
+        <attr name="hpv_text_padding_bottom" format="dimension" />
+        <!--设置进度值是否跟随控件动画移动， 默认是true-->
+        <attr name="hpv_text_movedEnable" format="boolean" />
+    </declare-styleable>
+    <attr name="HorizontalProgressViewStyle" format="reference" />
+    <!--HorizontalProgressView-->
+    <style name="HorizontalProgressView">
+        <item name="hpv_start_progress">0</item>
+        <item name="hpv_end_progress">60</item>
+        <item name="hpv_start_color">@color/xui_config_color_light_orange</item>
+        <item name="hpv_end_color">@color/xui_config_color_dark_orange</item>
+        <item name="hpv_isTracked">false</item>
+        <item name="hpv_track_width">@dimen/default_pv_trace_width</item>
+        <item name="hpv_track_color">@color/default_pv_track_color</item>
+        <item name="hpv_progress_duration">1200</item>
+        <item name="hpv_progress_textVisibility">true</item>
+        <item name="hpv_progress_textColor">?attr/colorAccent</item>
+        <item name="hpv_progress_textSize">@dimen/default_pv_progress_text_size</item>
+        <item name="hpv_animate_type">AccelerateDecelerateInterpolator</item>
+        <item name="hpv_corner_radius">@dimen/default_pv_corner_radius</item>
+        <item name="hpv_text_padding_bottom">@dimen/default_pv_corner_radius</item>
+        <item name="hpv_text_movedEnable">true</item>
+    </style>
 </resources>

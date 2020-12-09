@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -32,32 +33,42 @@ import com.tourcoo.smartpark.adapter.home.GridParkAdapter;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.system.AppVersion;
 import com.tourcoo.smartpark.core.CommonUtil;
+import com.tourcoo.smartpark.core.UiManager;
+import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
+import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
+import com.tourcoo.smartpark.core.retrofit.DownloadObserver;
+import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
-import com.tourcoo.smartpark.core.utils.ResourceUtil;
+import com.tourcoo.smartpark.core.utils.FileUtil;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
-import com.tourcoo.smartpark.ui.account.login.LoginActivity;
+import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
+import com.tourcoo.smartpark.ui.report.DailyFeeReportActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
-import com.tourcoo.smartpark.ui.report.FeeDailyReportActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
 import com.tourcoo.smartpark.util.StringUtil;
+import com.tourcoo.smartpark.widget.dialog.AppUpdateDialog;
 import com.tourcoo.smartpark.widget.dialog.BottomSheetDialog;
 import com.tourcoo.smartpark.widget.dialog.CommonInputDialog;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
+
+import static com.tourcoo.smartpark.constant.ParkConstant.PARK_STATUS_USED;
+import static com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
 
 
 /**
@@ -69,6 +80,7 @@ import java.util.List;
  */
 public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener {
     private Toolbar homeToolBar;
+    private String mFilePath = FileUtil.getCacheDir();
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
     private boolean drawerOpenStatus = false;
@@ -82,7 +94,10 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public static final String EXTRA_SPACE_INFO = "EXTRA_SPACE_INFO";
     public static final int REQUEST_CODE_SIGN = 1002;
     private SmartRefreshLayout homeRefreshLayout;
-
+    private boolean firstLoad = true;
+    protected boolean mIsFirstBack = true;
+    protected long mDelayBack = 1000L;
+    private AppUpdateDialog appUpdateDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +126,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         homeRefreshLayout = findViewById(R.id.homeRefreshLayout);
         homeRefreshLayout.setRefreshHeader(new ClassicsHeader(mContext));
         homeRefreshLayout.setOnRefreshListener(this);
+        findViewById(R.id.tvSignIn).setOnClickListener(this);
+        findViewById(R.id.tvSignOut).setOnClickListener(this);
+
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
         findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
@@ -169,11 +187,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.tvHomeReportFee:
                 Intent intent3 = new Intent();
-                intent3.setClass(HomeActivity.this, FeeDailyReportActivity.class);
+                intent3.setClass(HomeActivity.this, DailyFeeReportActivity.class);
                 startActivity(intent3);
                 break;
             case R.id.tvHomeEditPass:
                 CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
+                break;
+            case R.id.tvSignIn:
+            case R.id.tvSignOut:
+                requestSign();
                 break;
             default:
                 break;
@@ -204,7 +226,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             drawerLayout.close();
             return;
         }
-        super.onBackPressed();
+        quitApp();
     }
 
 
@@ -327,13 +349,19 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void requestUserInfo() {
-        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<UserInfo>>() {
+        ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<UserInfo>>() {
             @Override
             public void onRequestSuccess(BaseResult<UserInfo> entity) {
                 closeLoading();
                 if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
                     showUserInfo(entity.getData());
-                    requestParkSpaceList("正在获取车位信息");
+                    if (firstLoad) {
+                        requestParkSpaceList("正在获取车位信息");
+                        firstLoad = false;
+                    } else {
+                        requestParkSpaceList("");
+                    }
+
                 }
             }
         });
@@ -396,8 +424,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void skipSignSpace(ParkSpaceInfo parkSpaceInfo) {
         Intent intent = new Intent();
-        intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
-        intent.putExtra(EXTRA_SPACE_INFO, parkSpaceInfo);
+        if (parkSpaceInfo.getUsed() == PARK_STATUS_USED) {
+            intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
+            intent.putExtra(EXTRA_SETTLE_RECORD_ID, parkSpaceInfo.getRecordId());
+            intent.putExtra(ExitPayFeeDetailActivity.EXTRA_PARK_ID, parkSpaceInfo.getId());
+            intent.setClass(mContext, ExitPayFeeDetailActivity.class);
+        } else {
+            intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
+            intent.putExtra(EXTRA_SPACE_INFO, parkSpaceInfo);
+        }
         startActivityForResult(intent, REQUEST_CODE_SIGN);
     }
 
@@ -434,6 +469,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onResume() {
         super.onResume();
         requestUserInfo();
+        requestAppVersion();
     }
 
 
@@ -453,5 +489,115 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
         dialog.addSheetItem(item);
         dialog.create().setTitle("退出登录后 会返回到登录页").show();
+    }
+
+    private void requestSign() {
+        ApiRepository.getInstance().requestSign().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<Object>>() {
+            @Override
+            public void onRequestSuccess(BaseResult<Object> entity) {
+                if (entity == null) {
+                    return;
+                }
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS) {
+                    ToastUtil.showSuccess(entity.getErrMsg());
+                } else {
+                    ToastUtil.showWarning(entity.getErrMsg());
+                }
+            }
+        });
+    }
+
+    protected void quitApp() {
+        QuitAppControl mQuitAppControl = UiManager.getInstance().getQuitAppControl();
+        mDelayBack = mQuitAppControl != null ? mQuitAppControl.quipApp(mIsFirstBack, this) : mDelayBack;
+        //时延太小或已是第二次提示直接通知执行最终操作
+        if (mDelayBack <= 0 || !mIsFirstBack) {
+            if (mQuitAppControl != null) {
+                mQuitAppControl.quipApp(false, this);
+            } else {
+                StackUtil.getInstance().exit();
+            }
+            return;
+        }
+        //编写逻辑
+        if (mIsFirstBack) {
+            mIsFirstBack = false;
+            RxJavaManager.getInstance().setTimer(mDelayBack)
+                    .compose(this.<Long>bindUntilEvent(ActivityEvent.DESTROY))
+                    .subscribe(new BaseObserver<Long>() {
+                        @Override
+                        public void onRequestSuccess(Long entity) {
+                            mIsFirstBack = true;
+                        }
+                    });
+        }
+    }
+
+
+    private void requestAppVersion() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ApiRepository.getInstance().requestAppVersion(CommonUtil.getVersionName(mContext)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseObserver<BaseResult<AppVersion>>() {
+                    @Override
+                    public void onRequestSuccess(BaseResult<AppVersion> entity) {
+                        if (entity == null) {
+                            return;
+                        }
+                        if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
+                            handleUpdateCallback(entity.getData());
+                        }
+                    }
+                });
+            }
+        }, 300);
+
+    }
+
+
+    private void handleUpdateCallback(AppVersion appVersion) {
+        if (appUpdateDialog != null) {
+            appUpdateDialog.dismiss();
+        }
+        appUpdateDialog = new AppUpdateDialog(mContext).create(false);
+        appUpdateDialog.setTitle("发现新版本").
+                setDesc(StringUtil.getNotNullValueLine(appVersion.getDescription())).
+                setPositiveButtonClick("立即更新", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        downApk(appVersion.getApkPath());
+                    }
+                });
+        appUpdateDialog.show();
+    }
+
+
+    private void downApk(String url) {
+        ToastUtil.showSuccess("执行了");
+        String fileName = "/" + System.currentTimeMillis() + "_" + CommonUtil.getRandom(100000) + ".apk";
+        RetrofitHelper.getInstance().downloadFile(url)
+                .subscribe(new DownloadObserver(mFilePath, fileName) {
+                    @Override
+                    public void onSuccess(File file) {
+                        ToastUtil.showSuccess("下载成功");
+                    }
+
+                    @Override
+                    public void onFail(Throwable e) {
+                        ToastUtil.showFailed("下载失败" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onProgress(float progress, long current, long total) {
+                        LogUtils.i("下载进度:"+progress);
+                        updateDialogProgress(progress);
+                    }
+                });
+    }
+
+    private void updateDialogProgress(float progress) {
+        if (appUpdateDialog != null) {
+            appUpdateDialog.setProgress(progress);
+        }
     }
 }

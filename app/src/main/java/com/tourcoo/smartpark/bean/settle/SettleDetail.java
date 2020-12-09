@@ -1,5 +1,6 @@
 package com.tourcoo.smartpark.bean.settle;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @date 2020年12月03日15:34
  * @Email: 971613168@qq.com
  */
-public class SettleDetail {
+public class SettleDetail implements Serializable {
 
 
     /**
@@ -125,4 +126,8 @@ public class SettleDetail {
     public void setArrearsId(List<Integer> arrearsId) {
         this.arrearsId = arrearsId;
     }
+
+
+
+
 }

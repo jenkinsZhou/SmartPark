@@ -3,6 +3,8 @@ package com.tourcoo.smartpark.widget.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -14,6 +16,8 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.widget.progress.HorizontalProgressView;
+
 
 /**
  * @author :JenkinsZhou
@@ -29,6 +33,10 @@ public class AppUpdateDialog {
     private TextView tvPositive;
     private TextView tvTitle;
     private TextView tvContent;
+    private TextView tvUpdateDesc;
+    private boolean cancelable = true;
+    private HorizontalProgressView hpb;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
 
     public AppUpdateDialog(Context context) {
         this.mContext = context;
@@ -42,25 +50,21 @@ public class AppUpdateDialog {
     }
 
 
-
-
-    public AppUpdateDialog create() {
+    public AppUpdateDialog create(boolean cancelable) {
         // 获取Dialog布局
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_app_update, null);
-        tvTitle = view.findViewById(R.id.tvTitle);
+        tvTitle = view.findViewById(R.id.tvUpdateTitle);
         tvContent = view.findViewById(R.id.tvContent);
+        hpb = view.findViewById(R.id.hpb);
         tvPositive = view.findViewById(R.id.tvPositive);
-      /*  tvUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });*/
+        this.cancelable = cancelable;
         // 设置Dialog最小宽度为屏幕宽度
         view.setMinimumWidth(width);
         // 定义Dialog布局和参数
         dialog = new Dialog(mContext, R.style.AlertDialogStyle);
         dialog.setContentView(view);
+        dialog.setCanceledOnTouchOutside(cancelable);
+        dialog.setCancelable(cancelable);
         Window window = dialog.getWindow();
         if (window != null) {
             WindowManager m = window.getWindowManager();
@@ -131,6 +135,26 @@ public class AppUpdateDialog {
         return this;
     }
 
+    public AppUpdateDialog setTitle(CharSequence charSequence) {
+        if (charSequence != null && tvTitle != null) {
+            tvTitle.setText(charSequence);
+        }
+        return this;
+    }
+
+    public AppUpdateDialog setDesc(CharSequence charSequence) {
+        if (tvUpdateDesc == null) {
+            return this;
+        }
+        if (TextUtils.isEmpty(charSequence)) {
+            tvUpdateDesc.setVisibility(View.GONE);
+        } else {
+            tvUpdateDesc.setText(charSequence);
+            tvUpdateDesc.setVisibility(View.VISIBLE);
+        }
+        return this;
+    }
+
 
     public AppUpdateDialog setPositiveButton(CharSequence charSequence, View.OnClickListener onClickListener) {
         if (charSequence != null && tvPositive != null) {
@@ -149,4 +173,14 @@ public class AppUpdateDialog {
         return this;
     }
 
+    public void setProgress(float progress) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                hpb.setVisibility(View.VISIBLE);
+                hpb.setProgress(progress);
+            }
+        });
+
+    }
 }

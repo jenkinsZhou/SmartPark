@@ -20,8 +20,8 @@ import com.tourcoo.smartpark.util.StringUtil;
  * @date 2020年12月07日10:25
  * @Email: 971613168@qq.com
  */
-public class ArrearsRecordAdapter extends BaseQuickAdapter<ArrearsRecord, BaseViewHolder> {
-    public ArrearsRecordAdapter() {
+public class ArrearsRecordHistoryAdapter extends BaseQuickAdapter<ArrearsRecord, BaseViewHolder> {
+    public ArrearsRecordHistoryAdapter() {
         super(R.layout.item_record_arrears_history);
     }
 

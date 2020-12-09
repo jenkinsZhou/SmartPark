@@ -69,6 +69,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.report.DailyFeeReportActivity" />
+        <activity android:name=".ui.report.FeeRecordActivity" />
     </application>
 
 </manifest>

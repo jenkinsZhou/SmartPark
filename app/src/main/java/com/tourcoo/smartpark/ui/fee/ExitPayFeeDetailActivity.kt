@@ -10,8 +10,9 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
+import com.tourcoo.smartpark.bean.fee.PayResult
 import com.tourcoo.smartpark.bean.settle.SettleDetail
-import com.tourcoo.smartpark.constant.CarConstant
+import com.tourcoo.smartpark.constant.ParkConstant
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
@@ -22,9 +23,11 @@ import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_CASH
 import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_SCAN
+import com.tourcoo.smartpark.ui.pay.PayResultActivity
 import com.tourcoo.smartpark.ui.pay.ScanCodePayActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.util.StringUtil.listParseIntArray
+import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
 import org.apache.commons.lang3.StringUtils
@@ -53,6 +56,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     private var mArrearsIds: String? = null
     private var mPayType: Int? = null
     private val arrearsIdList: MutableList<Int> = ArrayList()
+    private var payResult: PayResult? = null
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
@@ -60,6 +64,8 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         const val EXTRA_CAR_ID = "EXTRA_CAR_ID"
         const val EXTRA_ARREARS_IDS = "EXTRA_ARREARS_IDS"
         const val EXTRA_SCAN_RESULT = "EXTRA_SCAN_RESULT"
+        const val EXTRA_PAY_RESULT = "EXTRA_PAY_RESULT"
+        const val EXTRA_PAY_STATUS = "EXTRA_PAY_STATUS"
         const val REQUEST_CODE_FEE_RECORD = 1002
         const val REQUEST_CODE_PAY_BY_SCAN = 1003
     }
@@ -95,13 +101,8 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.llPayByCash -> {
-                doPayByCash()
-                /*  val dialog: AppUpdateDialog = AppUpdateDialog(mContext).create()
-                  dialog.setPositiveButtonClick("立即更新") {
-                      ToastUtil.showWarning("立即更新")
-                      dialog.dismiss()
-                  }
-                  dialog.show()*/
+                showPayCashConfirm()
+
             }
             R.id.llPayByCode -> {
                 skipScanCode()
@@ -189,13 +190,13 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         tvSpaceNum.text = StringUtil.getNotNullValueLine(detail.number)
         tvPlantNum.text = StringUtil.getNotNullValueLine(detail.carNumber)
         when (detail.type) {
-            CarConstant.CAR_TYPE_NORMAL -> {
+            ParkConstant.CAR_TYPE_NORMAL -> {
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff)
             }
-            CarConstant.CAR_TYPE_YELLOW -> {
+            ParkConstant.CAR_TYPE_YELLOW -> {
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b)
             }
-            CarConstant.CAR_TYPE_GREEN -> {
+            ParkConstant.CAR_TYPE_GREEN -> {
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b)
             }
             else -> {
@@ -210,7 +211,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         if (detail.count > 0) {
             rightLayout.addView(rightTextView)
             rightTextView.setOnClickListener {
-                requestFlagArrears(recordId)
+                showSignConfirm()
             }
             setViewGone(rightTextView, true)
         } else {
@@ -278,12 +279,13 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
      */
     private fun doPayByCash() {
         mPayType = PAY_TYPE_CASH
+        requestPay(null)
     }
 
     private fun requestPay(scanCode: String?) {
         showLoading("正在支付...")
-        ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseIntArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<Any>>() {
-            override fun onRequestSuccess(entity: BaseResult<Any>?) {
+        ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseIntArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<PayResult?>>() {
+            override fun onRequestSuccess(entity: BaseResult<PayResult?>?) {
                 handlePaySuccess(entity)
             }
 
@@ -301,16 +303,54 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         startActivityForResult(intent, REQUEST_CODE_PAY_BY_SCAN)
     }
 
-    private fun handlePaySuccess(entity: BaseResult<Any>?) {
+    private fun handlePaySuccess(entity: BaseResult<PayResult?>?) {
         closeLoading()
         if (entity == null) {
             return
         }
-        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+            payResult = entity.data
             ToastUtil.showSuccess(entity.errMsg)
-            finish()
+            skipPayResult(true)
         } else {
             ToastUtil.showFailed(entity.errMsg)
+            skipPayResult(false)
         }
+    }
+
+
+    private fun showPayCashConfirm() {
+        IosAlertDialog(mContext)
+                .init()
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+                .setTitle("现金支付")
+                .setMsg("确定使用现金支付吗?")
+                .setPositiveButton("立即支付", View.OnClickListener { doPayByCash() })
+                .setNegativeButton("取消", View.OnClickListener {
+                }).show()
+    }
+
+    private fun skipPayResult(success: Boolean) {
+        val intent = Intent()
+        intent.putExtra(EXTRA_PAY_RESULT, payResult)
+        intent.putExtra(EXTRA_PAY_STATUS, success)
+        intent.setClass(this@ExitPayFeeDetailActivity, PayResultActivity::class.java)
+        startActivity(intent)
+    }
+
+    /**
+     * 标为欠费弹窗
+     */
+    private fun showSignConfirm() {
+        IosAlertDialog(mContext)
+                .init()
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+                .setTitle("标为欠费")
+                .setMsg("确定要标为欠费吗?")
+                .setPositiveButton("确定", View.OnClickListener { requestFlagArrears(recordId) })
+                .setNegativeButton("取消", View.OnClickListener {
+                }).show()
     }
 }
