@@ -15,6 +15,7 @@ import com.tourcoo.SmartParkApplication;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.multi_status.EmptyStatusCallback;
 import com.tourcoo.smartpark.core.multi_status.ErrorStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusNetErrorCallback;
 import com.tourcoo.smartpark.core.utils.NetworkUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 
@@ -84,7 +85,6 @@ public class HttpRequestControlImpl implements HttpRequestControl {
         if (smartRefreshLayout != null) {
             if (smartRefreshLayout.getState() == RefreshState.Refreshing || page == FIRST_PAGE) {
                 adapter.setNewData(new ArrayList());
-                LogUtils.i("---->", "----");
             }
             adapter.addData(dataList);
             if (httpDataListener != null) {
@@ -143,9 +143,13 @@ public class HttpRequestControlImpl implements HttpRequestControl {
             ToastUtil.showNormal(reason);
             return;
         }
+        LoadService statusManager = httpRequestControl.getStatusLayoutManager();
+        if (statusManager != null && !NetworkUtil.isConnected(SmartParkApplication.getContext())) {
+            statusManager.showCallback(MultiStatusNetErrorCallback.class);
+            return;
+        }
         SmartRefreshLayout smartRefreshLayout = httpRequestControl.getRefreshLayout();
         BaseQuickAdapter adapter = httpRequestControl.getRecyclerAdapter();
-        LoadService statusManager = httpRequestControl.getStatusLayoutManager();
         int page = httpRequestControl.getCurrentPage();
         if (smartRefreshLayout != null) {
             smartRefreshLayout.finishRefresh(false);
@@ -156,18 +160,17 @@ public class HttpRequestControlImpl implements HttpRequestControl {
                 return;
             }
             if (page == FIRST_PAGE) {
-                //                if (!NetworkUtil.isConnected(App.getContext())) {
-//                    //可自定义网络错误页面展示
-//                    statusLayoutManager.showCustomLayout(R.layout.layout_status_layout_manager_error);
-//                } else {
+                if (!NetworkUtil.isConnected(SmartParkApplication.getContext())) {
+                    statusManager.showCallback(ErrorStatusCallback.class);
+                    return;
+                }
                 statusManager.showCallback(ErrorStatusCallback.class);
-//                }
                 return;
             }
             //可根据不同错误展示不同错误布局
-            statusManager.showCallback(ErrorStatusCallback.class);
+            statusManager.showSuccess();
         } else {
-            ToastUtil.showFailed("适配器为空");
+            ToastUtil.showFailed("未找到对应适配器");
         }
     }
 }

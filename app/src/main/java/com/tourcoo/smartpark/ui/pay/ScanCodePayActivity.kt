@@ -2,16 +2,12 @@ package com.tourcoo.smartpark.ui.pay
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Vibrator
-import android.util.Log
 import cn.bingoogolapple.qrcode.core.QRCodeView
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.fee.ArrearsRecordActivity
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity
-import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.Companion.REQUEST_CODE_PAY_BY_SCAN
 import com.tourcoo.smartpark.util.StringUtil
 import kotlinx.android.synthetic.main.activity_scan_code_layout.*
 

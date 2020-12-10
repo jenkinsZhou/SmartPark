@@ -7,8 +7,9 @@ import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
-import com.tourcoo.smartpark.bean.fee.FeeRecord;
+import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
@@ -123,13 +124,13 @@ public interface ApiService {
     Observable<BaseResult<Object>> requestFlagArrears(@Body Map<String, Object> map);
 
     /**
-     * 欠费记录列表
+     * 欠费记录历史列表
      *
      * @param map
      * @return
      */
     @GET("/handheld/parking/arrearslist")
-    Observable<BaseResult<List<ArrearsRecord>>> requestArrearsList(@QueryMap Map<String, Object> map);
+    Observable<BaseResult<List<ArrearsHistoryRecord>>> requestArrearsHistoryList(@QueryMap Map<String, Object> map);
 
 
     @POST("/handheld/parking/settlement")
@@ -138,8 +139,13 @@ public interface ApiService {
     @GET("/handheld/member/daily")
     Observable<BaseResult<DailyReport>> requestDailyReport();
 
+    /**
+     * 收费列表
+     * @param map
+     * @return
+     */
     @GET("/handheld/member/dailyrecord")
-    Observable<BaseResult<PageBean<FeeRecord>>> requestDailyRecord(@QueryMap Map<String, Object> map);
+    Observable<BaseResult<PageBean<DailyFeeRecord>>> requestDailyRecordList(@QueryMap Map<String, Object> map);
 
     /**
      * 签到签出
@@ -153,4 +159,11 @@ public interface ApiService {
     Observable<BaseResult<AppVersion>> requestAppVersion(@QueryMap Map<String, Object> map);
 
 
+    /**
+     * 欠费列表
+     * @param map
+     * @return
+     */
+    @GET("/handheld/member/arrearslist")
+    Observable<BaseResult<PageBean<ArrearsRecord>>> requestArrearsRecordList(@QueryMap Map<String, Object> map);
 }

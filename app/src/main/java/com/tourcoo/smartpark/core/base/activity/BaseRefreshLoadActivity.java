@@ -1,6 +1,8 @@
 package com.tourcoo.smartpark.core.base.activity;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -8,10 +10,13 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.kingja.loadsir.core.LoadService;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.control.IHttpRequestControl;
 import com.tourcoo.smartpark.core.control.IRefreshLoadView;
 import com.tourcoo.smartpark.core.delegate.RefreshLoadDelegate;
 import com.tourcoo.smartpark.core.delegate.TitleDelegate;
+import com.tourcoo.smartpark.core.multi_status.LoadingStatusCallback;
+import com.tourcoo.smartpark.core.utils.ToastUtil;
 
 import static com.tourcoo.smartpark.core.control.RequestConfig.FIRST_PAGE;
 
@@ -22,7 +27,7 @@ import static com.tourcoo.smartpark.core.control.RequestConfig.FIRST_PAGE;
  * @date 2020年10月29日15:04
  * @Email: 971613168@qq.com
  */
-public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity  implements IRefreshLoadView<T> {
+public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity implements IRefreshLoadView<T> {
 
     protected SmartRefreshLayout mRefreshLayout;
     protected RecyclerView mRecyclerView;
@@ -30,7 +35,6 @@ public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity  impl
     private BaseQuickAdapter mQuickAdapter;
     protected int mDefaultPage = FIRST_PAGE;
     protected int mDefaultPageSize = 10;
-
     protected RefreshLoadDelegate<T> mFastRefreshLoadDelegate;
     private Class<?> mClass;
 
@@ -85,7 +89,7 @@ public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity  impl
 
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
-        mDefaultPage =FIRST_PAGE;
+        mDefaultPage = FIRST_PAGE;
         mFastRefreshLoadDelegate.setLoadMore(isLoadMoreEnable());
         loadPageData(mDefaultPage);
     }
@@ -107,4 +111,29 @@ public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity  impl
         }
         super.onDestroy();
     }
+
+    @Override
+    public void onReload(View v) {
+        TextView tvRefresh = v.findViewById(R.id.tvRefresh);
+        if (tvRefresh != null) {
+            tvRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    doRefresh();
+                }
+            });
+        } else {
+            doRefresh();
+        }
+
+    }
+
+
+    private void doRefresh() {
+        if (mStatusManager != null) {
+            mStatusManager.showCallback(LoadingStatusCallback.class);
+        }
+        loadPageData(mDefaultPage);
+    }
+
 }

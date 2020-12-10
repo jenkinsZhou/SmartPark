@@ -2,52 +2,44 @@ package com.tourcoo.smartpark.bean.fee;
 
 /**
  * @author :JenkinsZhou
- * @description : 欠费记录实体
+ * @description : 欠费记录
  * @company :途酷科技
- * @date 2020年12月07日10:32
+ * @date 2020年12月10日11:46
  * @Email: 971613168@qq.com
  */
 public class ArrearsRecord {
 
+
     /**
-     * createdAt : mollit
-     * fee : -7.382316137723835E7
-     * id : -51871492
-     * parking : nulla Ut laborum laboris culpa
-     * leaveAt : Lorem
-     * duration : et ullamco irure nulla sint
+     * number : anim ut
+     * parking : nisi elit commodo
+     * carNumber : non consequat velit consectetur pariatur
+     * duration : ex minim enim est
+     * type : 41822620
+     * parkingNumber : aute dolor cupidatat esse tempor
+     * id : -23283279
+     * fee : 4.241495018589005E7
+     * leaveAt : laborum dolore esse consectetur id
+     * createdAt : qui proident est Excepteur mollit
      */
 
-    private String createdAt;
-    private double fee;
-    private long id;
+    private String number;
     private String parking;
-    private String leaveAt;
+    private String carNumber;
     private String duration;
-    private boolean select;
+    private int type;
+    private String parkingNumber;
+    private long id;
+    private double fee;
+    private String leaveAt;
+    private String createdAt;
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getNumber() {
+        return number;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public double getFee() {
-        return fee;
-    }
-
-    public void setFee(double fee) {
-        this.fee = fee;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getParking() {
@@ -58,12 +50,12 @@ public class ArrearsRecord {
         this.parking = parking;
     }
 
-    public String getLeaveAt() {
-        return leaveAt;
+    public String getCarNumber() {
+        return carNumber;
     }
 
-    public void setLeaveAt(String leaveAt) {
-        this.leaveAt = leaveAt;
+    public void setCarNumber(String carNumber) {
+        this.carNumber = carNumber;
     }
 
     public String getDuration() {
@@ -74,11 +66,51 @@ public class ArrearsRecord {
         this.duration = duration;
     }
 
-    public boolean isSelect() {
-        return select;
+    public int getType() {
+        return type;
     }
 
-    public void setSelect(boolean select) {
-        this.select = select;
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getParkingNumber() {
+        return parkingNumber;
+    }
+
+    public void setParkingNumber(String parkingNumber) {
+        this.parkingNumber = parkingNumber;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public double getFee() {
+        return fee;
+    }
+
+    public void setFee(double fee) {
+        this.fee = fee;
+    }
+
+    public String getLeaveAt() {
+        return leaveAt;
+    }
+
+    public void setLeaveAt(String leaveAt) {
+        this.leaveAt = leaveAt;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.adapter.fee.ArrearsRecordHistoryAdapter
 import com.tourcoo.smartpark.bean.BaseResult
-import com.tourcoo.smartpark.bean.fee.ArrearsRecord
+import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
@@ -22,13 +22,13 @@ import kotlinx.android.synthetic.main.activity_arrears_record.*
 import java.util.*
 
 /**
- *@description : 欠费记录页面
+ *@description : 缴费记录页面
  *@company :途酷科技
  * @author :JenkinsZhou
  * @date 2020年12月07日10:43
  * @Email: 971613168@qq.com
  */
-class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
+class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     private var carId: Long? = null
     private var selectAll = false
     private var historyAdapter: ArrearsRecordHistoryAdapter? = null
@@ -56,7 +56,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     override fun loadData() {
         super.loadData()
-        requestArrearsList()
+        requestArrearsHistoryList()
         showBottomLayoutInfo(0)
     }
 
@@ -70,16 +70,16 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
 
-    private fun requestArrearsList() {
-        ApiRepository.getInstance().requestArrearsList(carId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<List<ArrearsRecord>>>() {
-            override fun onRequestSuccess(entity: BaseResult<List<ArrearsRecord>>?) {
+    private fun requestArrearsHistoryList() {
+        ApiRepository.getInstance().requestArrearsHistoryList(carId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<List<ArrearsHistoryRecord>>>() {
+            override fun onRequestSuccess(entity: BaseResult<List<ArrearsHistoryRecord>>?) {
                 handleRequestSuccess(entity)
             }
         })
     }
 
 
-    private fun handleRequestSuccess(entity: BaseResult<List<ArrearsRecord>>?) {
+    private fun handleRequestSuccess(entity: BaseResult<List<ArrearsHistoryRecord>>?) {
         if (entity == null) {
             return
         }
@@ -90,7 +90,7 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
         }
     }
 
-    private fun loadRecord(data: List<ArrearsRecord>?) {
+    private fun loadRecord(data: List<ArrearsHistoryRecord>?) {
         if (historyAdapter?.emptyView == null) {
             val emptyView = LayoutInflater.from(mContext).inflate(R.layout.status_layout_car_data_empty, null)
             historyAdapter?.emptyView = emptyView
@@ -119,10 +119,10 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     private fun doSelect(position: Int) {
-        var currentInfo: ArrearsRecord?
+        var currentInfo: ArrearsHistoryRecord?
         var selectCount = 0
         for (i in 0 until historyAdapter!!.data.size) {
-            currentInfo = historyAdapter!!.data[i] as ArrearsRecord
+            currentInfo = historyAdapter!!.data[i] as ArrearsHistoryRecord
             if (position == i) {
                 currentInfo.isSelect = !currentInfo.isSelect
             }
@@ -135,9 +135,9 @@ class ArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     private fun doSelectAll(select: Boolean) {
-        var currentInfo: ArrearsRecord?
+        var currentInfo: ArrearsHistoryRecord?
         for (i in 0 until historyAdapter!!.data.size) {
-            currentInfo = historyAdapter!!.data[i] as ArrearsRecord
+            currentInfo = historyAdapter!!.data[i] as ArrearsHistoryRecord
             currentInfo.isSelect = select
         }
         historyAdapter!!.notifyDataSetChanged()

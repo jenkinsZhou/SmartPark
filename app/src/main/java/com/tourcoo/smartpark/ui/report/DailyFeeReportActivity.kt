@@ -11,7 +11,6 @@ import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.pay.ScanCodePayActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_report_fee_daily.*
@@ -80,7 +79,7 @@ class DailyFeeReportActivity : BaseTitleActivity() {
 
     private fun doSkipReportList() {
         val intent = Intent()
-        intent.setClass(this@DailyFeeReportActivity, FeeRecordActivity::class.java)
+        intent.setClass(this@DailyFeeReportActivity, DailyFeeRecordListActivity::class.java)
         startActivity(intent)
     }
 }

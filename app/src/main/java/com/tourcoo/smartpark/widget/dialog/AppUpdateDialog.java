@@ -13,10 +13,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.widget.progress.HorizontalProgressView;
+import com.tourcoo.smartpark.widget.progress.NumberProgressBar;
 
 
 /**
@@ -34,9 +36,7 @@ public class AppUpdateDialog {
     private TextView tvTitle;
     private TextView tvContent;
     private TextView tvUpdateDesc;
-    private boolean cancelable = true;
-    private HorizontalProgressView hpb;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private NumberProgressBar numberPb ;
 
     public AppUpdateDialog(Context context) {
         this.mContext = context;
@@ -55,9 +55,9 @@ public class AppUpdateDialog {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_app_update, null);
         tvTitle = view.findViewById(R.id.tvUpdateTitle);
         tvContent = view.findViewById(R.id.tvContent);
-        hpb = view.findViewById(R.id.hpb);
+        tvUpdateDesc = view.findViewById(R.id.tvUpdateDesc);
         tvPositive = view.findViewById(R.id.tvPositive);
-        this.cancelable = cancelable;
+        numberPb = view.findViewById(R.id.numberPb);
         // 设置Dialog最小宽度为屏幕宽度
         view.setMinimumWidth(width);
         // 定义Dialog布局和参数
@@ -85,8 +85,8 @@ public class AppUpdateDialog {
             Point size = new Point();
             display.getSize(size);
             int width = size.x;
-            // 宽度设置为屏幕的0.58
-            p.width = (int) (width * 0.58);
+            // 宽度设置为屏幕的0.65
+            p.width = (int) (width * 0.65);
             window.setAttributes(p);
         }
         return this;
@@ -174,13 +174,18 @@ public class AppUpdateDialog {
     }
 
     public void setProgress(float progress) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                hpb.setVisibility(View.VISIBLE);
-                hpb.setProgress(progress);
-            }
-        });
+        if (numberPb != null) {
+            numberPb.setVisibility(View.VISIBLE);
+            numberPb.setProgress((int) progress);
+        }
 
     }
+
+    public boolean isShowing() {
+        if (dialog != null) {
+            return dialog.isShowing();
+        }
+        return false;
+    }
+
 }

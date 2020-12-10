@@ -180,7 +180,7 @@ public class AppImpl implements DefaultRefreshHeaderCreator, LoadMoreFoot, Recyc
      * @return true 拦截操作不进行原始{@link BaseObserver#onError(Throwable)}后续逻辑
      * false 不拦截继续后续逻辑
      * {@link com.tourcoo.smartpark.core.retrofit.DataNullException} 已在{@link BaseObserver#onError} ｝处理如果为该类型Exception可不用管,参考
-     * {@link BaseRepository#transform(Observable)} 处理逻辑
+     * {@link BaseObserver#transform(Observable)} 处理逻辑
      */
     @Override
     public boolean onError(BaseObserver o, Throwable e) {

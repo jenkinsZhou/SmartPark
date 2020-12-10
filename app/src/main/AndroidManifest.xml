@@ -61,7 +61,7 @@
             android:name=".ui.fee.ExitPayFeeEnterActivity"
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
-        <activity android:name=".ui.fee.ArrearsRecordActivity" />
+        <activity android:name=".ui.fee.PayArrearsRecordActivity" />
         <activity android:name=".ui.pay.ScanCodePayActivity" />
         <activity android:name=".ui.SplashActivity">
             <intent-filter>
@@ -70,7 +70,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.report.DailyFeeReportActivity" />
-        <activity android:name=".ui.report.FeeRecordActivity" />
+        <activity android:name=".ui.report.DailyFeeRecordListActivity" />
+        <activity android:name=".ui.record.ArrearsRecordListActivity" />
     </application>
 
 </manifest>

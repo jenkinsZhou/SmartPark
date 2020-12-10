@@ -238,7 +238,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     private fun skipArrearsRecord() {
         val intent = Intent()
         intent.putExtra(EXTRA_CAR_ID, carId)
-        intent.setClass(this@ExitPayFeeDetailActivity, ArrearsRecordActivity::class.java)
+        intent.setClass(this@ExitPayFeeDetailActivity, PayArrearsRecordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_FEE_RECORD)
     }
 

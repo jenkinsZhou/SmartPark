@@ -44,6 +44,7 @@ public class RetrofitHelper {
     private static volatile Retrofit.Builder sRetrofitBuilder;
     private static OkHttpClient.Builder sClientBuilder;
     private static OkHttpClient sClient;
+    private static String TAG = "RetrofitHelper";
     /**
      * 重定向访问Url--通过设置header模式
      */
@@ -87,7 +88,7 @@ public class RetrofitHelper {
             //避免某些服务器配置攻击,请求返回403 forbidden 问题
             addHeader("User-Agent", "Mozilla/5.0 (Android)");
             String token = AccountHelper.getInstance().getAccessToken();
-            LogUtils.tag(mLogTag).d("token="+token);
+            LogUtils.tag(mLogTag).d("token=" + token);
             addHeader("Authorization", token);
             if (mHeaderMap.size() > 0) {
                 for (Map.Entry<String, Object> entry : mHeaderMap.entrySet()) {
@@ -437,7 +438,7 @@ public class RetrofitHelper {
     public RetrofitHelper setLogEnable(boolean enable, String tag, HttpLoggingInterceptor.Level level) {
         tag = TextUtils.isEmpty(tag) ? mLogTag : tag;
         if (TextUtils.isEmpty(tag)) {
-            tag = "FastRetrofit";
+            tag = TAG;
         }
         mLogTag = tag;
         if (enable) {

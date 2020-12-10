@@ -10,8 +10,9 @@ import com.tourcoo.smartpark.bean.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
+import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
-import com.tourcoo.smartpark.bean.fee.FeeRecord;
+import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
@@ -169,11 +170,11 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestFlagArrears(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<List<ArrearsRecord>>> requestArrearsList(long carId) {
+    public Observable<BaseResult<List<ArrearsHistoryRecord>>> requestArrearsHistoryList(long carId) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("carId", carId);
         LogUtils.tag("提交到后台的参数").i(params);
-        return ThreadTransformer.switchSchedulers(getApiService().requestArrearsList(params).retryWhen(new RetryWhen()));
+        return ThreadTransformer.switchSchedulers(getApiService().requestArrearsHistoryList(params).retryWhen(new RetryWhen()));
     }
 
     public Observable<BaseResult<PayResult>> requestPay(long recordId, int type, String code, Integer[] arrearsId) {
@@ -206,19 +207,37 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestSign().retryWhen(new RetryWhen()));
     }
 
-
-    public Observable<BaseResult<PageBean<FeeRecord>>> requestDailyRecordList(int page) {
+    /**
+     * 收费记录
+     * @param page
+     * @return
+     */
+    public Observable<BaseResult<PageBean<DailyFeeRecord>>> requestDailyRecordList(int page) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("page", page);
         params.put("perPage", 10);
         LogUtils.tag("提交到后台的参数").i(params);
-        return ThreadTransformer.switchSchedulers(getApiService().requestDailyRecord(params).retryWhen(new RetryWhen()));
+        return ThreadTransformer.switchSchedulers(getApiService().requestDailyRecordList(params).retryWhen(new RetryWhen()));
     }
 
     public Observable<BaseResult<AppVersion>> requestAppVersion(String versionName) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("versionName", versionName);
         return ThreadTransformer.switchSchedulers(getApiService().requestAppVersion(params).retryWhen(new RetryWhen()));
+    }
+
+
+    /**
+     * 欠费记录列表
+     * @param page
+     * @return
+     */
+    public Observable<BaseResult<PageBean<ArrearsRecord>>> requestArrearsRecordList(int page) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("page", page);
+        params.put("perPage", 10);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestArrearsRecordList(params).retryWhen(new RetryWhen()));
     }
 
 }

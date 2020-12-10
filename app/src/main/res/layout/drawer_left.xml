@@ -292,6 +292,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvHomeArrears"
                 style="@style/menuTextStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

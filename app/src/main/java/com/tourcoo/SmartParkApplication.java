@@ -9,12 +9,17 @@ import androidx.multidex.MultiDex;
 
 import com.apkfuns.log2file.LogFileEngineFactory;
 import com.apkfuns.logutils.LogUtils;
+import com.kingja.loadsir.core.LoadSir;
 import com.simple.spiderman.SpiderMan;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
 import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
+import com.tourcoo.smartpark.core.multi_status.EmptyStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.ErrorStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.LoadingStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusNetErrorCallback;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
@@ -47,6 +52,7 @@ public class SmartParkApplication extends Application {
         SpiderMan.init(context);
         initLog();
         initConfig();
+        initLoadSir();
         // 以下用来捕获程序崩溃异常
         // 程序崩溃时触发线程
 //        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
@@ -112,7 +118,7 @@ public class SmartParkApplication extends Application {
 //                .setLogEnable(BuildConfig.DEBUG, TAG, HttpLoggingInterceptor.Level.BODY)
                 //设置统一超时--也可单独调用read/write/connect超时(可以设置时间单位TimeUnit)
                 //默认20 s
-                .setTimeout(30);
+                .setTimeout(20);
 
     }
 
@@ -169,4 +175,13 @@ public class SmartParkApplication extends Application {
             android.os.Process.killProcess(android.os.Process.myPid());
         }
     };
+
+    private void initLoadSir() {
+        LoadSir.beginBuilder()
+                .addCallback(new ErrorStatusCallback())//添加各种状态页
+                .addCallback(new EmptyStatusCallback())
+                .addCallback(new LoadingStatusCallback())
+                .addCallback(new MultiStatusNetErrorCallback())
+                .commit();
+    }
 }

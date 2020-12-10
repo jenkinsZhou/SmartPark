@@ -33,7 +33,7 @@ public class ResponseInterceptor implements Interceptor {
         Request request = chain.request();
         Response response = chain.proceed(request);
         ResponseBody responseBody = response.body();
-        if (responseBody == null) {
+        if (responseBody == null || !RetrofitHelper.getInstance().isLogEnable()) {
             return response;
         }
         BufferedSource source = responseBody.source();

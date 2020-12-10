@@ -1,16 +1,13 @@
 package com.tourcoo.smartpark.adapter.fee;
 
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.tourcoo.smartpark.R;
-import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
-import com.tourcoo.smartpark.core.manager.GlideManager;
+import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.util.StringUtil;
 
 /**
@@ -20,13 +17,13 @@ import com.tourcoo.smartpark.util.StringUtil;
  * @date 2020年12月07日10:25
  * @Email: 971613168@qq.com
  */
-public class ArrearsRecordHistoryAdapter extends BaseQuickAdapter<ArrearsRecord, BaseViewHolder> {
+public class ArrearsRecordHistoryAdapter extends BaseQuickAdapter<ArrearsHistoryRecord, BaseViewHolder> {
     public ArrearsRecordHistoryAdapter() {
         super(R.layout.item_record_arrears_history);
     }
 
     @Override
-    protected void convert(@NonNull BaseViewHolder helper, ArrearsRecord item) {
+    protected void convert(@NonNull BaseViewHolder helper, ArrearsHistoryRecord item) {
         helper.setText(R.id.tvParkingName, StringUtil.getNotNullValue(item.getParking()));
         helper.setText(R.id.tvCarEnterTime, StringUtil.getNotNullValue(item.getCreatedAt()));
         helper.setText(R.id.tvCarExitTime, StringUtil.getNotNullValue(item.getLeaveAt()));

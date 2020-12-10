@@ -7,7 +7,7 @@ package com.tourcoo.smartpark.bean.fee;
  * @date 2020年12月09日11:19
  * @Email: 971613168@qq.com
  */
-public class FeeRecord {
+public class DailyFeeRecord {
 
 
     /**

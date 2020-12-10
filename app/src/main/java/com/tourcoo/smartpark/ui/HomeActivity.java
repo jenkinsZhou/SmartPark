@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -53,6 +52,7 @@ import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
+import com.tourcoo.smartpark.ui.record.ArrearsRecordListActivity;
 import com.tourcoo.smartpark.ui.report.DailyFeeReportActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
@@ -98,6 +98,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected boolean mIsFirstBack = true;
     protected long mDelayBack = 1000L;
     private AppUpdateDialog appUpdateDialog;
+    private boolean isDownloading = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,6 +133,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
         findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
+        findViewById(R.id.tvHomeArrears).setOnClickListener(this);
+
         findViewById(R.id.tvLogout).setOnClickListener(this);
         findViewById(R.id.tvHomeEditPass).setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
@@ -189,6 +192,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 Intent intent3 = new Intent();
                 intent3.setClass(HomeActivity.this, DailyFeeReportActivity.class);
                 startActivity(intent3);
+                break;
+            case R.id.tvHomeArrears:
+                CommonUtil.startActivity(HomeActivity.this, ArrearsRecordListActivity.class);
                 break;
             case R.id.tvHomeEditPass:
                 CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
@@ -469,7 +475,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onResume() {
         super.onResume();
         requestUserInfo();
-        requestAppVersion();
+//        requestAppVersion();
     }
 
 
@@ -535,6 +541,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void requestAppVersion() {
+        if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
+            return;
+        }
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -556,15 +565,19 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void handleUpdateCallback(AppVersion appVersion) {
-        if (appUpdateDialog != null) {
-            appUpdateDialog.dismiss();
+        if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
+            return;
         }
-        appUpdateDialog = new AppUpdateDialog(mContext).create(false);
+        appUpdateDialog = new AppUpdateDialog(mContext).create(true);
         appUpdateDialog.setTitle("发现新版本").
                 setDesc(StringUtil.getNotNullValueLine(appVersion.getDescription())).
                 setPositiveButtonClick("立即更新", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        if (isDownloading) {
+                            ToastUtil.showWarning("当前正在下载中");
+                            return;
+                        }
                         downApk(appVersion.getApkPath());
                     }
                 });
@@ -573,24 +586,28 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void downApk(String url) {
-        ToastUtil.showSuccess("执行了");
-        String fileName = "/" + System.currentTimeMillis() + "_" + CommonUtil.getRandom(100000) + ".apk";
-        RetrofitHelper.getInstance().downloadFile(url)
+        String fileName = "/" + "SmartPark" + ".apk";
+        isDownloading = true;
+        RetrofitHelper.getInstance().downloadFile(url).compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new DownloadObserver(mFilePath, fileName) {
                     @Override
                     public void onSuccess(File file) {
                         ToastUtil.showSuccess("下载成功");
+                        appUpdateDialog.dismiss();
+                        isDownloading = false;
+                        RetrofitHelper.getInstance().setLogEnable(true);
                     }
 
                     @Override
                     public void onFail(Throwable e) {
                         ToastUtil.showFailed("下载失败" + e.getMessage());
+                        isDownloading = false;
+                        RetrofitHelper.getInstance().setLogEnable(true);
                     }
 
                     @Override
                     public void onProgress(float progress, long current, long total) {
-                        LogUtils.i("下载进度:"+progress);
-                        updateDialogProgress(progress);
+                        updateDialogProgress(progress * 100);
                     }
                 });
     }
