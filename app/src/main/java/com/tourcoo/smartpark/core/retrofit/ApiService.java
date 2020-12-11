@@ -10,6 +10,7 @@ import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
+import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
@@ -166,4 +167,10 @@ public interface ApiService {
      */
     @GET("/handheld/member/arrearslist")
     Observable<BaseResult<PageBean<ArrearsRecord>>> requestArrearsRecordList(@QueryMap Map<String, Object> map);
+
+    /**
+     * 凭条获取接口
+     */
+    @GET("/handheld/parking/certificate")
+    Observable<BaseResult<PayCertificate>> requestPayCertificate(@QueryMap Map<String, Object> map);
 }

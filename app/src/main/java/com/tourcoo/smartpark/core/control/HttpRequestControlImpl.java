@@ -13,8 +13,8 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.constant.RefreshState;
 import com.tourcoo.SmartParkApplication;
 import com.tourcoo.smartpark.R;
-import com.tourcoo.smartpark.core.multi_status.EmptyStatusCallback;
-import com.tourcoo.smartpark.core.multi_status.ErrorStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiEmptyStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusErrorCallback;
 import com.tourcoo.smartpark.core.multi_status.MultiStatusNetErrorCallback;
 import com.tourcoo.smartpark.core.utils.NetworkUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
@@ -66,7 +66,7 @@ public class HttpRequestControlImpl implements HttpRequestControl {
                 //第一页都没有数据
                 adapter.setNewData(new ArrayList());
                 //显示空布局
-                statusLayoutManager.showCallback(EmptyStatusCallback.class);
+                statusLayoutManager.showCallback(MultiEmptyStatusCallback.class);
                 if (httpDataListener != null) {
                     httpDataListener.empty();
                 }
@@ -161,10 +161,10 @@ public class HttpRequestControlImpl implements HttpRequestControl {
             }
             if (page == FIRST_PAGE) {
                 if (!NetworkUtil.isConnected(SmartParkApplication.getContext())) {
-                    statusManager.showCallback(ErrorStatusCallback.class);
+                    statusManager.showCallback(MultiStatusErrorCallback.class);
                     return;
                 }
-                statusManager.showCallback(ErrorStatusCallback.class);
+                statusManager.showCallback(MultiStatusErrorCallback.class);
                 return;
             }
             //可根据不同错误展示不同错误布局

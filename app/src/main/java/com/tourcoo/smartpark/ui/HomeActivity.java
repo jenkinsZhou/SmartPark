@@ -23,6 +23,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.gyf.immersionbar.ImmersionBar;
+import com.kingja.loadsir.callback.Callback;
+import com.kingja.loadsir.core.LoadService;
+import com.kingja.loadsir.core.LoadSir;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -38,12 +41,16 @@ import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
+import com.tourcoo.smartpark.core.multi_status.MultiEmptyStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusErrorCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusNetErrorCallback;
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.retrofit.DownloadObserver;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository;
 import com.tourcoo.smartpark.core.utils.FileUtil;
+import com.tourcoo.smartpark.core.utils.NetworkUtil;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
@@ -78,7 +85,7 @@ import static com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.EXTRA_SETTLE
  * @date 2020年10月30日11:22
  * @Email: 971613168@qq.com
  */
-public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener {
+public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener, Callback.OnReloadListener {
     private Toolbar homeToolBar;
     private String mFilePath = FileUtil.getCacheDir();
     private ImageView ivMenu;
@@ -99,6 +106,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected long mDelayBack = 1000L;
     private AppUpdateDialog appUpdateDialog;
     private boolean isDownloading = false;
+    private LoadService loadService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -107,6 +115,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         mContext = this;
         loadingDialog = new IosLoadingDialog(HomeActivity.this);
         initView();
+        initStatusManager();
         initSpaceRecyclerView();
         initAdapterClick();
         setImmersionBar(true);
@@ -299,6 +308,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             @Override
             public void onRequestError(Throwable throwable) {
                 super.onRequestError(throwable);
+                loadService.showCallback(MultiStatusErrorCallback.class);
                 homeRefreshLayout.finishRefresh(false);
             }
         });
@@ -306,8 +316,10 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void loadSpaceData(List<ParkSpaceInfo> parkSpaceInfoList) {
         if (parkSpaceInfoList == null) {
+            loadService.showCallback(MultiEmptyStatusCallback.class);
             return;
         }
+        loadService.showSuccess();
         gridParkAdapter.setNewData(parkSpaceInfoList);
     }
 
@@ -354,7 +366,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         super.onDestroy();
     }
 
-    private void requestUserInfo() {
+    private void requestUserInfoAndParkList() {
+        if (!NetworkUtil.isConnected(mContext)) {
+            loadService.showCallback(MultiStatusNetErrorCallback.class);
+            return;
+        }
         ApiRepository.getInstance().requestUserInfo().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<UserInfo>>() {
             @Override
             public void onRequestSuccess(BaseResult<UserInfo> entity) {
@@ -369,6 +385,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     }
 
                 }
+            }
+
+            @Override
+            public void onRequestError(Throwable throwable) {
+                super.onRequestError(throwable);
+                loadService.showCallback(MultiStatusErrorCallback.class);
             }
         });
     }
@@ -430,7 +452,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     private void skipSignSpace(ParkSpaceInfo parkSpaceInfo) {
         Intent intent = new Intent();
-        if (parkSpaceInfo.getUsed() == PARK_STATUS_USED) {
+        if (parkSpaceInfo != null && parkSpaceInfo.getUsed() == PARK_STATUS_USED) {
             intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
             intent.putExtra(EXTRA_SETTLE_RECORD_ID, parkSpaceInfo.getRecordId());
             intent.putExtra(ExitPayFeeDetailActivity.EXTRA_PARK_ID, parkSpaceInfo.getId());
@@ -449,7 +471,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             case REQUEST_CODE_SIGN:
                 if (resultCode == RESULT_OK) {
                     //刷新列表
-                    requestParkSpaceList("正在刷新");
+                    requestUserInfoAndParkList();
                 }
                 break;
             default:
@@ -459,7 +481,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     @Override
     public void onRefresh(@NonNull RefreshLayout refreshLayout) {
-        requestParkSpaceList("");
+        requestUserInfoAndParkList();
     }
 
     /**
@@ -474,8 +496,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        requestUserInfo();
-//        requestAppVersion();
+        requestUserInfoAndParkList();
+        requestAppVersion();
     }
 
 
@@ -565,6 +587,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void handleUpdateCallback(AppVersion appVersion) {
+        if (appVersion == null || !appVersion.isForce()) {
+            return;
+        }
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
             return;
         }
@@ -586,7 +611,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void downApk(String url) {
-        String fileName = "/" + "SmartPark" + ".apk";
+        String fileName = "/" + "smart_park_" + CommonUtil.getRandom(100) + ".apk";
         isDownloading = true;
         RetrofitHelper.getInstance().downloadFile(url).compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new DownloadObserver(mFilePath, fileName) {
@@ -616,5 +641,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         if (appUpdateDialog != null) {
             appUpdateDialog.setProgress(progress);
         }
+    }
+
+    private void initStatusManager() {
+        //这里实例化多状态管理类
+        loadService = LoadSir.getDefault().register(homeRefreshLayout, this);
+    }
+
+    @Override
+    public void onReload(View v) {
+        requestUserInfoAndParkList();
     }
 }

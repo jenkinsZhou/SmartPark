@@ -2,7 +2,6 @@ package com.tourcoo;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 
 import androidx.multidex.MultiDex;
@@ -16,9 +15,9 @@ import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
-import com.tourcoo.smartpark.core.multi_status.EmptyStatusCallback;
-import com.tourcoo.smartpark.core.multi_status.ErrorStatusCallback;
-import com.tourcoo.smartpark.core.multi_status.LoadingStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiEmptyStatusCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusErrorCallback;
+import com.tourcoo.smartpark.core.multi_status.MultiStatusLoadingCallback;
 import com.tourcoo.smartpark.core.multi_status.MultiStatusNetErrorCallback;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.utils.StackUtil;
@@ -178,9 +177,9 @@ public class SmartParkApplication extends Application {
 
     private void initLoadSir() {
         LoadSir.beginBuilder()
-                .addCallback(new ErrorStatusCallback())//添加各种状态页
-                .addCallback(new EmptyStatusCallback())
-                .addCallback(new LoadingStatusCallback())
+                .addCallback(new MultiStatusErrorCallback())//添加各种状态页
+                .addCallback(new MultiEmptyStatusCallback())
+                .addCallback(new MultiStatusLoadingCallback())
                 .addCallback(new MultiStatusNetErrorCallback())
                 .commit();
     }

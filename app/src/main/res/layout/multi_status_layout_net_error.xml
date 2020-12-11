@@ -39,6 +39,8 @@
         style="@style/buttonMatchWidthBlue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusable="false"
+        android:clickable="false"
         android:layout_marginStart="@dimen/dp_28"
         android:layout_marginEnd="@dimen/dp_28"
         android:layout_marginBottom="@dimen/dp_28"
