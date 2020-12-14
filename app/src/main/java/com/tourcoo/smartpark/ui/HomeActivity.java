@@ -381,7 +381,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                         requestParkSpaceList("正在获取车位信息");
                         firstLoad = false;
                     } else {
-                        requestParkSpaceList("");
+                        requestParkSpaceList("刷新中...");
                     }
 
                 }

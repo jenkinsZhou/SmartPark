@@ -24,6 +24,7 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.bean.ParkSpaceInfo
+import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_GREEN
 import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_NORMAL
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
@@ -98,6 +99,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
          */
         const val REQUEST_PERMISSION_STORAGE = 100
         const val MIN_LENGTH_PLANT_NUM = 7
+
+        const val LENGTH_CAR_TYPE_GREEN = 8
     }
 
     override fun getContentLayout(): Int {
@@ -657,6 +660,9 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             if (TextUtils.isEmpty(plantNum) || plantNum.length < MIN_LENGTH_PLANT_NUM) {
                 ToastUtil.showNormal("请输入正确的车牌号")
                 return
+            }
+            if(plantNum.length ==LENGTH_CAR_TYPE_GREEN ){
+                carType = CAR_TYPE_GREEN
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
         }

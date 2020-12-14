@@ -101,8 +101,10 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.llPayByCash -> {
-                showPayCashConfirm()
+//                showPayCashConfirm()
+                payResult = PayResult()
 
+                skipPayResult(true)
             }
             R.id.llPayByCode -> {
                 skipScanCode()
@@ -335,6 +337,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         val intent = Intent()
         intent.putExtra(EXTRA_PAY_RESULT, payResult)
         intent.putExtra(EXTRA_PAY_STATUS, success)
+        intent.putExtra(EXTRA_PARK_ID, parkId)
         intent.setClass(this@ExitPayFeeDetailActivity, PayResultActivity::class.java)
         startActivity(intent)
     }

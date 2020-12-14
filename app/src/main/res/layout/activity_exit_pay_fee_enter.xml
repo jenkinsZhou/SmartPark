@@ -46,11 +46,12 @@
 
             <ImageView
                 android:id="@+id/ivDeleteSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/dp_20"
+                android:layout_height="@dimen/dp_20"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="@dimen/dp_8"
-                android:padding="@dimen/dp_10"
+                android:padding="@dimen/dp_5"
+                android:scaleType="fitXY"
                 android:src="@mipmap/ic_delete_gray_small" />
         </LinearLayout>
     </LinearLayout>

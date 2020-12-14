@@ -18,7 +18,7 @@ public class RequestConfig {
     public static final int REQUEST_CODE_TOKEN_INVALID = 401;
 
 //    public static final String BASE_URL = "http://192.168.0.201:8007/";
-public static final String BASE_URL = "http://192.168.0.211:8007";
+public static final String BASE_URL = "http://192.168.0.238:8007";
 //192.168.0.200:8007
 
 }
