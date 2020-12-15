@@ -53,7 +53,7 @@
         </activity>
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
-        <activity android:name=".ui.fee.ExitPayFeeDetailActivity" />
+        <activity android:name=".ui.fee.SettleFeeDetailActivity" />
         <activity android:name=".ui.record.RecordCarInfoConfirmActivity" />
         <activity android:name=".ui.account.login.LoginActivity" />
         <activity
@@ -71,6 +71,7 @@
         <activity android:name=".ui.report.DailyFeeReportActivity" />
         <activity android:name=".ui.report.DailyFeeRecordListActivity" />
         <activity android:name=".ui.record.ArrearsRecordListActivity" />
+        <activity android:name=".ui.record.WaitSettleListActivity" />
     </application>
 
 </manifest>

@@ -244,7 +244,7 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestArrearsRecordList(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<PayCertificate>> requestPayCertificate(int recordId) {
+    public Observable<BaseResult<PayCertificate>> requestPayCertificate(long recordId) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("id", recordId);
         LogUtils.tag("提交到后台的参数").i(params);

@@ -7,7 +7,7 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
 import com.tourcoo.smartpark.util.StringUtil
 import kotlinx.android.synthetic.main.activity_scan_code_layout.*
 
@@ -84,7 +84,7 @@ class ScanCodePayActivity : BaseTitleActivity(), QRCodeView.Delegate {
 
     private fun handleScanSuccessCallback(result: String?) {
         val intent = Intent()
-        intent.putExtra(ExitPayFeeDetailActivity.EXTRA_SCAN_RESULT, StringUtil.getNotNullValue(result))
+        intent.putExtra(SettleFeeDetailActivity.EXTRA_SCAN_RESULT, StringUtil.getNotNullValue(result))
         setResult(RESULT_OK, intent)
         finish()
     }

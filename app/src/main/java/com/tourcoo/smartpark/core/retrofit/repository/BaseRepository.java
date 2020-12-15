@@ -31,6 +31,9 @@ public class BaseRepository {
         return ThreadTransformer.switchSchedulers(
                 observable.retryWhen(new RetryWhen())
                         .flatMap((Function<BaseResult<T>, ObservableSource<T>>) result -> {
+                            if (result == null) {
+                                return Observable.error(new DataNullException());
+                            }
                             if (result.getCode() == RESPONSE_CODE_SUCCESS) {
                                 return result.getData() != null ? Observable.just(result.getData())
                                         : Observable.error(new DataNullException());

@@ -27,7 +27,7 @@ class ArrearsRecordListActivity : BaseRefreshLoadActivity<ArrearsRecord>() {
 
     private var adapter: ArrearsRecordAdapter? = null
     override fun getContentLayout(): Int {
-        return R.layout.activity_report_fee_list
+        return R.layout.activity_report_fee_common
     }
 
     override fun initView(savedInstanceState: Bundle?) {

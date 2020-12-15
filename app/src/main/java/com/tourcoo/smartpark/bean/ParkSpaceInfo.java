@@ -30,7 +30,24 @@ public class ParkSpaceInfo implements Parcelable {
     private String carNumber;
     private int type;
     private String spaceNumber;
+    private String createdAt;
+    private String parking;
 
+    public String getParking() {
+        return parking;
+    }
+
+    public void setParking(String parking) {
+        this.parking = parking;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public long getId() {
         return id;
@@ -93,10 +110,6 @@ public class ParkSpaceInfo implements Parcelable {
         return recordId;
     }
 
-    public void setRecordId(long recordId) {
-        this.recordId = recordId;
-    }
-
 
     @Override
     public int describeContents() {
@@ -113,6 +126,8 @@ public class ParkSpaceInfo implements Parcelable {
         dest.writeString(this.carNumber);
         dest.writeInt(this.type);
         dest.writeString(this.spaceNumber);
+        dest.writeString(this.createdAt);
+        dest.writeString(this.parking);
     }
 
     public ParkSpaceInfo() {
@@ -127,6 +142,8 @@ public class ParkSpaceInfo implements Parcelable {
         this.carNumber = in.readString();
         this.type = in.readInt();
         this.spaceNumber = in.readString();
+        this.createdAt = in.readString();
+        this.parking = in.readString();
     }
 
     public static final Creator<ParkSpaceInfo> CREATOR = new Creator<ParkSpaceInfo>() {

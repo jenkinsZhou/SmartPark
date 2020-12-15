@@ -57,9 +57,10 @@ import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
-import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity;
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
 import com.tourcoo.smartpark.ui.record.ArrearsRecordListActivity;
+import com.tourcoo.smartpark.ui.record.WaitSettleListActivity;
 import com.tourcoo.smartpark.ui.report.DailyFeeReportActivity;
 import com.tourcoo.smartpark.ui.record.RecordCarInfoConfirmActivity;
 import com.tourcoo.smartpark.util.GridDividerItemDecoration;
@@ -75,7 +76,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.tourcoo.smartpark.constant.ParkConstant.PARK_STATUS_USED;
-import static com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
+import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
 
 
 /**
@@ -125,6 +126,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         homeToolBar = findViewById(R.id.homeToolBar);
         ivMenu = findViewById(R.id.ivMenu);
         drawerLayout = findViewById(R.id.drawerLayout);
+        findViewById(R.id.tvPay).setOnClickListener(this);
         tvUserName = findViewById(R.id.tvUserName);
         tvUserWorkTime = findViewById(R.id.tvUserWorkTime);
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
@@ -211,6 +213,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             case R.id.tvSignIn:
             case R.id.tvSignOut:
                 requestSign();
+                break;
+            case R.id.tvPay:
+                CommonUtil.startActivity(HomeActivity.this, WaitSettleListActivity.class);
                 break;
             default:
                 break;
@@ -453,10 +458,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void skipSignSpace(ParkSpaceInfo parkSpaceInfo) {
         Intent intent = new Intent();
         if (parkSpaceInfo != null && parkSpaceInfo.getUsed() == PARK_STATUS_USED) {
-            intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
             intent.putExtra(EXTRA_SETTLE_RECORD_ID, parkSpaceInfo.getRecordId());
-            intent.putExtra(ExitPayFeeDetailActivity.EXTRA_PARK_ID, parkSpaceInfo.getId());
-            intent.setClass(mContext, ExitPayFeeDetailActivity.class);
+            intent.putExtra(SettleFeeDetailActivity.EXTRA_PARK_ID, parkSpaceInfo.getId());
+            intent.setClass(mContext, SettleFeeDetailActivity.class);
         } else {
             intent.setClass(mContext, RecordCarInfoConfirmActivity.class);
             intent.putExtra(EXTRA_SPACE_INFO, parkSpaceInfo);

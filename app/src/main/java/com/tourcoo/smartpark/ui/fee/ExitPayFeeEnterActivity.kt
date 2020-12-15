@@ -29,7 +29,7 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.SizeUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.Companion.EXTRA_SETTLE_RECORD_ID
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.Companion.EXTRA_SETTLE_RECORD_ID
 import com.tourcoo.smartpark.util.GridDividerItemDecoration
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.trello.rxlifecycle3.android.ActivityEvent
@@ -212,8 +212,8 @@ class ExitPayFeeEnterActivity : BaseTitleActivity(), OnRefreshListener {
     private fun skipSettle(recordId: Long,parkId: Long) {
         val intent = Intent()
         intent.putExtra(EXTRA_SETTLE_RECORD_ID, recordId)
-        intent.putExtra(ExitPayFeeDetailActivity.EXTRA_PARK_ID, parkId)
-        intent.setClass(mContext, ExitPayFeeDetailActivity::class.java)
+        intent.putExtra(SettleFeeDetailActivity.EXTRA_PARK_ID, parkId)
+        intent.setClass(mContext, SettleFeeDetailActivity::class.java)
         startActivity(intent)
     }
 }

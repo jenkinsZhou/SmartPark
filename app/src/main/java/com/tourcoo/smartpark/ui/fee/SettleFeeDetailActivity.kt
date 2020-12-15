@@ -41,12 +41,11 @@ import kotlin.collections.ArrayList
  * @date 2020年11月09日9:12
  * @Email: 971613168@qq.com
  */
-class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshListener {
-    private var recordId = -1L
-
+class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshListener {
     /**
      * 停车记录id
      */
+    private var recordId = -1L
     private var parkId = -1L
 
     private var carId = -1L
@@ -240,7 +239,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
     private fun skipArrearsRecord() {
         val intent = Intent()
         intent.putExtra(EXTRA_CAR_ID, carId)
-        intent.setClass(this@ExitPayFeeDetailActivity, PayArrearsRecordActivity::class.java)
+        intent.setClass(this@SettleFeeDetailActivity, PayArrearsRecordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_FEE_RECORD)
     }
 
@@ -301,7 +300,7 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
 
     private fun skipScanCode() {
         val intent = Intent()
-        intent.setClass(this@ExitPayFeeDetailActivity, ScanCodePayActivity::class.java)
+        intent.setClass(this@SettleFeeDetailActivity, ScanCodePayActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_PAY_BY_SCAN)
     }
 
@@ -337,8 +336,8 @@ class ExitPayFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRe
         val intent = Intent()
         intent.putExtra(EXTRA_PAY_RESULT, payResult)
         intent.putExtra(EXTRA_PAY_STATUS, success)
-        intent.putExtra(EXTRA_PARK_ID, parkId)
-        intent.setClass(this@ExitPayFeeDetailActivity, PayResultActivity::class.java)
+        intent.putExtra(EXTRA_PARK_ID,settleId )
+        intent.setClass(this@SettleFeeDetailActivity, PayResultActivity::class.java)
         startActivity(intent)
     }
 

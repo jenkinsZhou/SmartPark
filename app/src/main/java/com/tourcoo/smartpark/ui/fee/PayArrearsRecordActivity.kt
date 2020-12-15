@@ -15,7 +15,7 @@ import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.fee.ExitPayFeeDetailActivity.Companion.EXTRA_ARREARS_IDS
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.Companion.EXTRA_ARREARS_IDS
 import com.tourcoo.smartpark.util.DoubleUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_arrears_record.*
@@ -39,7 +39,7 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     }
 
     override fun initView(savedInstanceState: Bundle?) {
-        carId = intent?.getLongExtra(ExitPayFeeDetailActivity.EXTRA_CAR_ID, -1)
+        carId = intent?.getLongExtra(SettleFeeDetailActivity.EXTRA_CAR_ID, -1)
         if (carId!! < 0) {
             finish()
             ToastUtil.showWarning("未获取到车辆信息")

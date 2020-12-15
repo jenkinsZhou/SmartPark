@@ -7,7 +7,6 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.adapter.fee.FeeRecordAdapter
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.PageBean
-import com.tourcoo.smartpark.bean.fee.ArrearsRecord
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord
 import com.tourcoo.smartpark.core.UiManager
 import com.tourcoo.smartpark.core.base.activity.BaseRefreshLoadActivity
@@ -27,7 +26,7 @@ import java.util.*
 class DailyFeeRecordListActivity : BaseRefreshLoadActivity<DailyFeeRecord>() {
     private var adapter: FeeRecordAdapter? = null
     override fun getContentLayout(): Int {
-        return R.layout.activity_report_fee_list
+        return R.layout.activity_report_fee_common
     }
 
     override fun initView(savedInstanceState: Bundle?) {
