@@ -4,20 +4,27 @@ package com.tourcoo.smartpark.bean.fee;
  * @author :JenkinsZhou
  * @description : 支付凭证
  * @company :途酷科技
- * @date 2020年12月11日10:24
+ * @date 2020年12月16日16:41
  * @Email: 971613168@qq.com
  */
 public class PayCertificate {
 
 
     /**
-     * member : aliquip quis
-     * parking : labore dolor
-     * number : qui eiusmod cupidatat reprehenderit officia
-     * spaceNumber : reprehenderit
-     * createdAt : cupidatat ad ullamco exercitation
-     * title : in Excepteur
-     * codeContent : Duis tempor mollit fugiat sint
+     * member : nisi dolore
+     * parking : enim
+     * number : tempor in dolore sunt
+     * spaceNumber : ad ut ullamco
+     * createdAt : irure
+     * title : laborum culpa nulla enim dolor
+     * BTW : nisi laborum minim ut
+     * outTradeNo : Ut mollit eu ullamco
+     * totalFee : commodo dolore esse laborum
+     * fee : nisi amet in consectetur ad
+     * arrears : deserunt adipisicing
+     * payType : laborum amet
+     * leaveAt : et est nisi fugiat
+     * duration : qui
      */
 
     private String member;
@@ -26,7 +33,16 @@ public class PayCertificate {
     private String spaceNumber;
     private String createdAt;
     private String title;
-    private String codeContent;
+    private String BTW;
+    private String outTradeNo;
+    private String totalFee;
+    private String fee;
+    private String arrears;
+    private String payType;
+    private String leaveAt;
+    private String duration;
+    private String chargedAt;
+
 
     public String getMember() {
         return member;
@@ -76,11 +92,75 @@ public class PayCertificate {
         this.title = title;
     }
 
-    public String getCodeContent() {
-        return codeContent;
+    public String getBTW() {
+        return BTW;
     }
 
-    public void setCodeContent(String codeContent) {
-        this.codeContent = codeContent;
+    public void setBTW(String BTW) {
+        this.BTW = BTW;
+    }
+
+    public String getOutTradeNo() {
+        return outTradeNo;
+    }
+
+    public void setOutTradeNo(String outTradeNo) {
+        this.outTradeNo = outTradeNo;
+    }
+
+    public String getTotalFee() {
+        return totalFee;
+    }
+
+    public void setTotalFee(String totalFee) {
+        this.totalFee = totalFee;
+    }
+
+    public String getFee() {
+        return fee;
+    }
+
+    public void setFee(String fee) {
+        this.fee = fee;
+    }
+
+    public String getArrears() {
+        return arrears;
+    }
+
+    public void setArrears(String arrears) {
+        this.arrears = arrears;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getLeaveAt() {
+        return leaveAt;
+    }
+
+    public void setLeaveAt(String leaveAt) {
+        this.leaveAt = leaveAt;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getChargedAt() {
+        return chargedAt;
+    }
+
+    public void setChargedAt(String chargedAt) {
+        this.chargedAt = chargedAt;
     }
 }

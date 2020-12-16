@@ -1,7 +1,5 @@
 package com.tourcoo.smartpark.core.utils;
 
-import android.app.Application;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +15,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 
+import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.SmartParkApplication;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.UiManager;
@@ -116,7 +115,7 @@ public class FileUtil {
         if (context == null || apkPath == null) {
             return;
         }
-        installApk(apkPath, context.getPackageName() + ".FastFileProvider");
+        installApk(apkPath, context.getPackageName() + ".SmartParkFileProvider");
     }
 
     /**
@@ -126,29 +125,30 @@ public class FileUtil {
      * @param apkPath apk 文件对象
      */
     public static void installApk(File apkPath, @NonNull String authority) {
-        Context context = UiManager.getInstance().getApplication().getApplicationContext();
-        if (context == null || apkPath == null) {
+        if (apkPath == null) {
             return;
         }
         Intent intent = new Intent(Intent.ACTION_VIEW);
         // context 使用startActivity需增加 FLAG_ACTIVITY_NEW_TASK TAG 否则低版本上(目前发现在7.0以下版本)会提示以下错误
         //android.util.AndroidRuntimeException: Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
         Uri apkUri;
         //判断版本是否在7.0以上
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             //加入provider
-            apkUri = FileProvider.getUriForFile(context, authority, apkPath);
+            apkUri = FileProvider.getUriForFile(SmartParkApplication.getContext(), authority, apkPath);
             //授予一个URI的临时权限
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            LogUtils.i("apkUri=" + apkUri);
         } else {
             apkUri = Uri.fromFile(apkPath);
+            LogUtils.i("apkUri=" + apkUri);
         }
         intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
-        context.startActivity(intent);
+        SmartParkApplication.getContext().startActivity(intent);
     }
-
-
 
 
     public static Uri pathToUri(String path) {
@@ -312,7 +312,7 @@ public class FileUtil {
     /**
      * 全平台处理方法
      */
-    public static String getPath(final Uri uri)  {
+    public static String getPath(final Uri uri) {
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
         final boolean isN = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
         if (isN) {
@@ -405,4 +405,6 @@ public class FileUtil {
         }
         return null;
     }
+
+
 }

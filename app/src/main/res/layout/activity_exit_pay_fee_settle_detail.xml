@@ -163,7 +163,6 @@
                         android:paddingTop="@dimen/dp_3_5"
                         android:paddingEnd="@dimen/dp_11"
                         android:paddingBottom="@dimen/dp_3_5"
-                        android:text="苏B·A3456"
                         android:textColor="@color/white"
                         android:textSize="@dimen/sp_12"
                         android:textStyle="bold" />

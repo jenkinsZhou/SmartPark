@@ -41,6 +41,8 @@ public class GridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseViewHol
         }
         TextView tvPlantNum = helper.getView(R.id.tvPlantNum);
         helper.setText(R.id.tvPlantNum,item.getCarNumber());
+        helper.setText(R.id.tvParkingNum,item.getNumber());
+
         switch (item.getType()) {
             case ParkConstant.CAR_TYPE_NORMAL:
                 tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff));

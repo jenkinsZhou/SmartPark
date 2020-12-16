@@ -13,6 +13,7 @@ import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
+import com.tourcoo.smartpark.bean.fee.FeeCertificate;
 import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
@@ -244,11 +245,18 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestArrearsRecordList(params).retryWhen(new RetryWhen()));
     }
 
+    public Observable<BaseResult<FeeCertificate>> requestFeeCertificate(long recordId) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", recordId);
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestFeeCertificate(params).retryWhen(new RetryWhen()));
+    }
+
+
     public Observable<BaseResult<PayCertificate>> requestPayCertificate(long recordId) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("id", recordId);
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestPayCertificate(params).retryWhen(new RetryWhen()));
     }
-
 }

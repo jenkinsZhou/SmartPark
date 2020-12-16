@@ -11,6 +11,7 @@ import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.account.UserInfo
 import com.tourcoo.smartpark.bean.fee.PayCertificate
 import com.tourcoo.smartpark.bean.fee.PayResult
+import com.tourcoo.smartpark.constant.PayConstant
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
@@ -207,16 +208,25 @@ class PayResultActivity : BaseTitleActivity() {
     }
 
     private fun printContent(userInfo: UserInfo, certificate: PayCertificate) {
+        showLoading("正在打印...")
         try {
             //设置纸张大小为两英寸（5.08cm）
             iPrinter?.setPaperSize(0x00)
             //设置间距 0-60 默认为6
-            iPrinter?.setPaperSize(15)
+            iPrinter?.setPaperSize(6)
             val format = Bundle()
             format.putInt("zoom", 4)
             format.putString("font", FONT_SIZE_SMALL)
             format.putString("align", GRAVITY_CENTER)
-            iPrinter?.addText(format, "宜兴车辆停车凭证")
+            iPrinter?.addText(format, certificate.title)
+
+            iPrinter?.addText(format, "\n")
+
+            format.putString("font", FONT_SIZE_NORMAL)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_CENTER)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "停车人存根")
 
             iPrinter?.addText(format, "\n")
 
@@ -224,7 +234,7 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "操作员:" + userInfo.name)
+            iPrinter?.addText(format, "操作员:" + certificate.member)
 
 
             format.putString("font", FONT_SIZE_LARGE)
@@ -256,31 +266,93 @@ class PayResultActivity : BaseTitleActivity() {
             iPrinter?.addText(format, "\n")
 
             format.putString("font", FONT_SIZE_LARGE)
-            format.putString("align", GRAVITY_LEFT)
             format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "请使用微信扫码缴费")
+            iPrinter?.addText(format, "离开时间:" + certificate.leaveAt)
+
+            format.putString("font", FONT_SIZE_LARGE)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "停车时长:" + certificate.duration)
 
 
             format.putString("font", FONT_SIZE_LARGE)
-            format.putString("align", GRAVITY_LEFT)
             format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "二维码:")
+            iPrinter?.addText(format, "本次费用:RMB(元)" + certificate.fee)
+
+            format.putString("font", FONT_SIZE_LARGE)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "历史费用:RMB(元)" + certificate.arrears)
+
+            format.putString("font", FONT_SIZE_LARGE)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "应收费用:RMB(元)" + certificate.arrears)
+
+            /*    format.putString("font", FONT_SIZE_LARGE)
+                format.putString("align", GRAVITY_LEFT)
+                format.putInt("zoom", 3)
+                format.putBoolean("linefeed", true)
+                iPrinter?.addText(format, "请使用微信扫码缴费")*/
+            format.putString("font", FONT_SIZE_SMALL)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
             iPrinter?.addText(format, "\n")
 
+            format.putInt("zoom", 4)
+            format.putString("font", FONT_SIZE_SMALL)
+            format.putString("align", GRAVITY_CENTER)
+            iPrinter?.addText(format, "实收费用:RMB(元)" + certificate.totalFee)
 
-            format.putString("align", "center")
-            format.putInt("height", 200)
-            iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "\n")
+            iPrinter?.addText(format, "line")
+            format.putString("font", "normal")
+            var payType = ""
+            when (certificate.payType) {
+                PayConstant.PAY_TYPE_ALI -> payType = "支付宝支付"
+                PayConstant.PAY_TYPE_WEI_XIN -> payType = "微信支付"
+                PayConstant.PAY_TYPE_CASH -> payType = "现金支付"
+                else -> {
+                }
+            }
+            format.putString("font", FONT_SIZE_LARGE)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, payType + ":RMB(元)" + certificate.totalFee)
+
+
+            format.putInt("hzFont", 3)
+            format.putInt("zmFont", 21)
+            format.putInt("szFont", 21)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "交易时间:" + certificate.leaveAt)
 
             format.putString("font", FONT_SIZE_NORMAL)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "凭条打印时间:" +getCurrentTime())
+            iPrinter?.addText(format, "订单编号:" + certificate.outTradeNo)
+
+            /*   format.putString("align", "center")
+               format.putInt("height", 200)
+               iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
+               iPrinter?.addText(format, "\n")
+               iPrinter?.addText(format, "\n")*/
+
+            format.putString("font", FONT_SIZE_NORMAL)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "凭条打印时间:" + getCurrentTime())
 
 
             iPrinter?.addText(format, "line")
@@ -291,7 +363,7 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "免责声明:本泊位系统利用爱神的箭阿萨德爱仕达大所大所阿斯蒂芬斯蒂芬" )
+            iPrinter?.addText(format, certificate.btw)
             format.putString("font", FONT_SIZE_SMALL)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
@@ -304,17 +376,19 @@ class PayResultActivity : BaseTitleActivity() {
             iPrinter?.startPrinter(object : AidlPrinterListener.Stub() {
                 @Throws(RemoteException::class)
                 override fun onFinish() {
-                    ToastUtil.showSuccess("打印完成")
+                    closeLoading()
                 }
 
                 @Throws(RemoteException::class)
                 override fun onError(arg0: Int, arg1: String) {
                     ToastUtil.showFailedDebug("打印出错:$arg1")
+                    closeLoading()
                 }
             })
         } catch (e: Exception) {
             e.printStackTrace()
             ToastUtil.showFailedDebug("打印故障:$e")
+            closeLoading()
         }
     }
 

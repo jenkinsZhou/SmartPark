@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -88,7 +89,7 @@ import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_
  */
 public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener, Callback.OnReloadListener {
     private Toolbar homeToolBar;
-    private String mFilePath = FileUtil.getCacheDir();
+    private String mFilePath;
     private ImageView ivMenu;
     private DrawerLayout drawerLayout;
     private boolean drawerOpenStatus = false;
@@ -108,6 +109,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private AppUpdateDialog appUpdateDialog;
     private boolean isDownloading = false;
     private LoadService loadService;
+    private boolean isInstalling = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -203,19 +205,23 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 Intent intent3 = new Intent();
                 intent3.setClass(HomeActivity.this, DailyFeeReportActivity.class);
                 startActivity(intent3);
+                closeDrawerLayout();
                 break;
             case R.id.tvHomeArrears:
                 CommonUtil.startActivity(HomeActivity.this, ArrearsRecordListActivity.class);
                 break;
             case R.id.tvHomeEditPass:
                 CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
+                closeDrawerLayout();
                 break;
             case R.id.tvSignIn:
             case R.id.tvSignOut:
                 requestSign();
+                closeDrawerLayout();
                 break;
             case R.id.tvPay:
                 CommonUtil.startActivity(HomeActivity.this, WaitSettleListActivity.class);
+                closeDrawerLayout();
                 break;
             default:
                 break;
@@ -270,6 +276,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         showUserInfo(AccountHelper.getInstance().getUserInfo());
+        isInstalling = false;
     }
 
 
@@ -456,8 +463,10 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
     private void skipSignSpace(ParkSpaceInfo parkSpaceInfo) {
+        closeDrawerLayout();
         Intent intent = new Intent();
         if (parkSpaceInfo != null && parkSpaceInfo.getUsed() == PARK_STATUS_USED) {
+            LogUtils.i("recordId=" + parkSpaceInfo.getRecordId() + ",parkId=" + parkSpaceInfo.getId());
             intent.putExtra(EXTRA_SETTLE_RECORD_ID, parkSpaceInfo.getRecordId());
             intent.putExtra(SettleFeeDetailActivity.EXTRA_PARK_ID, parkSpaceInfo.getId());
             intent.setClass(mContext, SettleFeeDetailActivity.class);
@@ -495,6 +504,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         Intent intent = new Intent();
         intent.setClass(HomeActivity.this, ExitPayFeeEnterActivity.class);
         startActivity(intent);
+        closeDrawerLayout();
     }
 
     @Override
@@ -591,7 +601,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void handleUpdateCallback(AppVersion appVersion) {
-        if (appVersion == null || !appVersion.isForce()) {
+        if (appVersion == null || !appVersion.isForce() || isInstalling) {
             return;
         }
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
@@ -600,6 +610,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         appUpdateDialog = new AppUpdateDialog(mContext).create(true);
         appUpdateDialog.setTitle("发现新版本").
                 setDesc(StringUtil.getNotNullValueLine(appVersion.getDescription())).
+                setContent("v" + appVersion.getVersion()).
                 setPositiveButtonClick("立即更新", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -615,22 +626,32 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
 
     private void downApk(String url) {
-        String fileName = "/" + "smart_park_" + CommonUtil.getRandom(100) + ".apk";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mFilePath = FileUtil.getCacheDir();
+        } else {
+            mFilePath = FileUtil.getExternalStorageDirectory();
+        }
+        String fileName = "/" + System.currentTimeMillis() + "_" + CommonUtil.getRandom(100000) + ".apk";
         isDownloading = true;
+        appUpdateDialog.setPositiveText("正在下载");
         RetrofitHelper.getInstance().downloadFile(url).compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(new DownloadObserver(mFilePath, fileName) {
                     @Override
                     public void onSuccess(File file) {
-                        ToastUtil.showSuccess("下载成功");
                         appUpdateDialog.dismiss();
                         isDownloading = false;
+                        isInstalling = true;
+                        LogUtils.i("文件路径:" + file.getPath());
                         RetrofitHelper.getInstance().setLogEnable(true);
+                        doInstallApk(file);
                     }
 
                     @Override
                     public void onFail(Throwable e) {
                         ToastUtil.showFailed("下载失败" + e.getMessage());
                         isDownloading = false;
+                        isInstalling = false;
+                        appUpdateDialog.dismiss();
                         RetrofitHelper.getInstance().setLogEnable(true);
                     }
 
@@ -655,5 +676,32 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     public void onReload(View v) {
         requestUserInfoAndParkList();
+    }
+
+    private void closeDrawerLayout() {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                drawerLayout.close();
+            }
+        }, 300);
+
+    }
+
+
+    private void doInstallApk(File file) {
+        appUpdateDialog.setPositiveText("下载完成");
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    FileUtil.installApk(file);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ToastUtil.showFailed("安装失败：" + e.toString());
+                }
+            }
+        }, 1000);
+
     }
 }

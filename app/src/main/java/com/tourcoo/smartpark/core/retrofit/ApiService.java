@@ -10,6 +10,7 @@ import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
+import com.tourcoo.smartpark.bean.fee.FeeCertificate;
 import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
@@ -172,5 +173,13 @@ public interface ApiService {
      * 凭条获取接口
      */
     @GET("/handheld/parking/certificate")
+    Observable<BaseResult<FeeCertificate>> requestFeeCertificate(@QueryMap Map<String, Object> map);
+
+
+    /**
+     * 获取支付凭条接口
+     */
+    @GET("/handheld/parking/consumptioncertificate")
     Observable<BaseResult<PayCertificate>> requestPayCertificate(@QueryMap Map<String, Object> map);
+
 }

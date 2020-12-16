@@ -166,6 +166,13 @@ public class AppUpdateDialog {
         return this;
     }
 
+    public AppUpdateDialog setPositiveText(CharSequence charSequence) {
+        if (charSequence != null && tvPositive != null) {
+            tvPositive.setText(charSequence);
+        }
+        return this;
+    }
+
     public AppUpdateDialog setPositiveButton(View.OnClickListener onClickListener) {
         if (tvPositive != null && onClickListener != null) {
             tvPositive.setOnClickListener(onClickListener);

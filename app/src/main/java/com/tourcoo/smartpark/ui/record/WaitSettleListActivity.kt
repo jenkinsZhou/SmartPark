@@ -17,7 +17,7 @@ import com.tourcoo.smartpark.adapter.fee.WaitSettleAdapter
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.ParkSpaceInfo
 import com.tourcoo.smartpark.bean.account.UserInfo
-import com.tourcoo.smartpark.bean.fee.PayCertificate
+import com.tourcoo.smartpark.bean.fee.FeeCertificate
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
@@ -32,7 +32,6 @@ import com.tourcoo.smartpark.ui.account.AccountHelper
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
-import kotlinx.android.synthetic.main.activity_exit_pay_fee_enter.*
 import kotlinx.android.synthetic.main.activity_report_fee_common.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -56,34 +55,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
     override fun initView(savedInstanceState: Bundle?) {
         initRefresh()
-        deviceService = DeviceService(mContext, object : DeviceConnectListener {
-            override fun deviceConnectSuccess() {
-                LogUtils.i("deviceConnectSuccess")
-                if (deviceService != null) {
-                    if (iPrinter == null) {
-                        iPrinter = DeviceService.getPrinter()
-                    }
-                    printEnable = true
-                }
-            }
-
-            override fun deviceDisConnected() {
-                printEnable = false
-                LogUtils.e("deviceDisConnected")
-            }
-
-            override fun deviceConnecting() {
-                printEnable = false
-                LogUtils.d("deviceConnecting")
-            }
-
-            override fun deviceNoConnect() {
-                printEnable = false
-                LogUtils.e("deviceNoConnect")
-            }
-
-        })
-        deviceService?.connect()
+        initPrinter()
     }
 
     override fun loadData() {
@@ -136,7 +108,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
                 override fun onRequestError(throwable: Throwable?) {
                     super.onRequestError(throwable)
-                    exitRefresh.finishRefresh(false)
+                    feeRecordRefreshLayout.finishRefresh(false)
                 }
 
             })
@@ -148,7 +120,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
                 override fun onRequestError(throwable: Throwable?) {
                     super.onRequestError(throwable)
-                    exitRefresh.finishRefresh(false)
+                    feeRecordRefreshLayout.finishRefresh(false)
                 }
 
             })
@@ -205,7 +177,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
         when (iPrinter?.status) {
             //正常
             PrinterCode.PrinterState.PRINTER_NORMAL -> {
-                requestPayCertificate(recordId)
+                requestFeeCertificate(recordId)
             }
             PrinterCode.PrinterState.PRINTER_OUTOF_PAPER -> {
                 //打印机缺纸
@@ -234,21 +206,22 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
     /**
      * 获取打印凭条内容
      */
-    private fun requestPayCertificate(recordId: Long?) {
-        ApiRepository.getInstance().requestPayCertificate(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<PayCertificate>>() {
-            override fun onRequestSuccess(entity: BaseResult<PayCertificate>?) {
+    private fun requestFeeCertificate(recordId: Long?) {
+        ApiRepository.getInstance().requestFeeCertificate(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeCertificate>>() {
+            override fun onRequestSuccess(entity: BaseResult<FeeCertificate>?) {
                 handleCertificateCallback(entity)
             }
         })
 //        printContent(AccountHelper.getInstance().userInfo,)
     }
 
-    private fun printContent(userInfo: UserInfo, certificate: PayCertificate) {
+    private fun printContent(userInfo: UserInfo, certificate: FeeCertificate) {
+        showLoading("正在打印...")
         try {
             //设置纸张大小为两英寸（5.08cm）
             iPrinter?.setPaperSize(0x00)
             //设置间距 0-60 默认为6
-            iPrinter?.setPaperSize(15)
+            iPrinter?.setPaperSize(6)
             val format = Bundle()
             format.putInt("zoom", 4)
             format.putString("font", PrintConstant.FONT_SIZE_SMALL)
@@ -308,7 +281,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
 
             format.putString("align", "center")
-            format.putInt("height", 200)
+            format.putInt("height", 250)
             iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
             iPrinter?.addText(format, "\n")
             iPrinter?.addText(format, "\n")
@@ -341,22 +314,24 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
             iPrinter?.startPrinter(object : AidlPrinterListener.Stub() {
                 @Throws(RemoteException::class)
                 override fun onFinish() {
-                    ToastUtil.showSuccess("打印完成")
+                   closeLoading()
                 }
 
                 @Throws(RemoteException::class)
                 override fun onError(arg0: Int, arg1: String) {
                     ToastUtil.showFailedDebug("打印出错:$arg1")
+                    closeLoading()
                 }
             })
         } catch (e: Exception) {
             e.printStackTrace()
             ToastUtil.showFailedDebug("打印故障:$e")
+            closeLoading()
         }
     }
 
 
-    private fun handleCertificateCallback(result: BaseResult<PayCertificate>?) {
+    private fun handleCertificateCallback(result: BaseResult<FeeCertificate>?) {
         if (result == null) {
             ToastUtil.showFailed("服务器数据异常")
             return
@@ -396,12 +371,42 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
     }
 
     private fun skipSettle(recordId: Long, parkId: Long) {
+        LogUtils.i("recordId="+recordId+",parkId="+parkId)
         val intent = Intent()
         intent.putExtra(SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID, recordId)
-        intent.putExtra(SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID, parkSpaceInfo.getRecordId())
         intent.putExtra(SettleFeeDetailActivity.EXTRA_PARK_ID, parkId)
-        ,
         intent.setClass(mContext, SettleFeeDetailActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun initPrinter(){
+        deviceService = DeviceService(mContext, object : DeviceConnectListener {
+            override fun deviceConnectSuccess() {
+                LogUtils.i("deviceConnectSuccess")
+                if (deviceService != null) {
+                    if (iPrinter == null) {
+                        iPrinter = DeviceService.getPrinter()
+                    }
+                    printEnable = true
+                }
+            }
+
+            override fun deviceDisConnected() {
+                printEnable = false
+                LogUtils.e("deviceDisConnected")
+            }
+
+            override fun deviceConnecting() {
+                printEnable = false
+                LogUtils.d("deviceConnecting")
+            }
+
+            override fun deviceNoConnect() {
+                printEnable = false
+                LogUtils.e("deviceNoConnect")
+            }
+
+        })
+        deviceService?.connect()
     }
 }

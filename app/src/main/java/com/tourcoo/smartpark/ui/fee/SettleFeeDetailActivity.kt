@@ -100,10 +100,9 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.llPayByCash -> {
-//                showPayCashConfirm()
-                payResult = PayResult()
-
-                skipPayResult(true)
+                showPayCashConfirm()
+              /*  payResult = PayResult()
+                skipPayResult(true)*/
             }
             R.id.llPayByCode -> {
                 skipScanCode()

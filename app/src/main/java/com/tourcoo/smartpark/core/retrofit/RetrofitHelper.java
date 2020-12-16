@@ -452,6 +452,9 @@ public class RetrofitHelper {
                     isJson = isJson && mLogJsonEnable;
                     if (isJson) {
 //                        LogUtils.json(mLogTag, message);
+                        if(message.length()>1000){
+                            return;
+                        }
                         LogUtils.json(message);
                         return;
                     }

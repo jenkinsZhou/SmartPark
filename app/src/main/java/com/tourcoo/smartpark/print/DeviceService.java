@@ -256,7 +256,9 @@ public class DeviceService {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        connectListener.deviceDisConnected();
+                        if(connectListener != null){
+                            connectListener.deviceDisConnected();
+                        }
                     }
                 });
             }

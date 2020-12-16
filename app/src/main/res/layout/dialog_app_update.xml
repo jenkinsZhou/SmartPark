@@ -30,7 +30,6 @@
             android:id="@+id/tvUpdateDesc"
             style="@style/textBlackStyle12"
             android:layout_gravity="center_horizontal"
-            android:text="V1.1.2"
             android:textColor="@color/grayA2A2A2"
             android:visibility="gone" />
 
