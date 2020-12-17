@@ -1,6 +1,7 @@
 package com.tourcoo.smartpark.widget.selecter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,18 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         return list;
     }
 
+    public List<String> getServiceUrlList() {
+        List<String> urlList = new ArrayList<>();
+        if (list == null) {
+            return urlList;
+        }
+        for (LocalImage localImage : list) {
+            if (localImage != null && !TextUtils.isEmpty(localImage.getServiceImageUrl())) {
+                urlList.add(localImage.getServiceImageUrl());
+            }
+        }
+        return urlList;
+    }
 
   /*  public String getJsonPaths() {
         List<String> paths = new ArrayList<>();
@@ -230,6 +243,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     /**
      * 获取orc照片的位置
+     *
      * @return
      */
     public int getOrcPhotoIndex() {
@@ -237,7 +251,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
             if (list.get(i) == null) {
                 continue;
             }
-            if (list.get(i).isRecognize()&&list.get(i).getLocalImagePath() !=null) {
+            if (list.get(i).isRecognize() && list.get(i).getLocalImagePath() != null) {
                 return i;
             }
         }

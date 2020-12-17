@@ -405,7 +405,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private val onAddPicClickListener = PhotoAdapter.onAddPicClickListener {
         // 进入相册 以下是例子：不需要的api可以不写
         needOrc = false
-        isOrcPhoto =false
+        isOrcPhoto = false
         takePhoto()
     }
 
@@ -534,8 +534,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     }
 
 
-
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // Forward results to EasyPermissions
@@ -616,7 +614,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     /**
      * 来车登记（车辆入库）
      */
-    private fun requestAddParkingSpace(imageUrlList: ArrayList<String>) {
+    private fun requestAddParkingSpace(imageUrlList: List<String>) {
         val imageArray = StringUtil.listParseStringArray(imageUrlList)
         if (imageArray.isEmpty()) {
             ToastUtil.showNormal("请至少上传一张图片")
@@ -643,8 +641,13 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         val orcPhotoPosition = photoAdapter!!.orcPhotoIndex
         if (orcPhotoPosition < 0) {
             //说明没有拍照识别 直接登记
+            if (photoAdapter!!.serviceUrlList.isEmpty()) {
+                ToastUtil.showWarning("至少要上传一张带有车牌的图片")
+                return
+            }
             isOrcPhoto = false
-            ToastUtil.showNormal("直接上传")
+            requestAddParkingSpace(photoAdapter!!.serviceUrlList)
+
         } else {
             //说明有拍照识别的照片 需要先上传
             isOrcPhoto = true
@@ -661,7 +664,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                 ToastUtil.showNormal("请输入正确的车牌号")
                 return
             }
-            if(plantNum.length ==LENGTH_CAR_TYPE_GREEN ){
+            if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 carType = CAR_TYPE_GREEN
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
@@ -682,7 +685,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         return imageList
     }
 
-    private fun handleSignSuccessCallback(){
+    private fun handleSignSuccessCallback() {
         setResult(RESULT_OK)
         finish()
     }

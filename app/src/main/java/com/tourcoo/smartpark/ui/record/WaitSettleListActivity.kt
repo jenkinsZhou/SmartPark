@@ -1,11 +1,20 @@
 package com.tourcoo.smartpark.ui.record
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.RemoteException
+import android.text.Editable
+import android.text.InputType
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.apkfuns.logutils.LogUtils
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.newland.aidl.printer.AidlPrinter
 import com.newland.aidl.printer.AidlPrinterListener
 import com.newland.aidl.printer.PrinterCode
@@ -29,12 +38,20 @@ import com.tourcoo.smartpark.print.DeviceConnectListener
 import com.tourcoo.smartpark.print.DeviceService
 import com.tourcoo.smartpark.print.PrintConstant
 import com.tourcoo.smartpark.ui.account.AccountHelper
+import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
 import com.tourcoo.smartpark.util.StringUtil
+import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.trello.rxlifecycle3.android.ActivityEvent
+import io.reactivex.android.schedulers.AndroidSchedulers
+import kotlinx.android.synthetic.main.activity_exit_pay_fee_enter.*
 import kotlinx.android.synthetic.main.activity_report_fee_common.*
+import kotlinx.android.synthetic.main.activity_report_fee_common.etPlantNum
+import kotlinx.android.synthetic.main.activity_report_fee_common.ivDeleteSmall
+import java.lang.reflect.Method
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  *@description : JenkinsZhou
@@ -48,13 +65,16 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
     private var deviceService: DeviceService? = null
     private var printEnable = false
     private var adapter: WaitSettleAdapter? = null
+    private var keyboardView: PlateKeyboardView? = null
     override fun getContentLayout(): Int {
         return R.layout.activity_report_fee_common
     }
 
 
     override fun initView(savedInstanceState: Bundle?) {
+        setViewGone(llSearch, true)
         initRefresh()
+        initSearchInput()
         initPrinter()
     }
 
@@ -143,7 +163,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
     }
 
     private fun getExitSpaceList(needShowLoading: Boolean) {
-        requestSpaceSettleList("", needShowLoading)
+        requestSpaceSettleList(etPlantNum.text.toString(), needShowLoading)
     }
 
 
@@ -281,7 +301,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
 
             format.putString("align", "center")
-            format.putInt("height", 250)
+            format.putInt("height", 280)
             iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
             iPrinter?.addText(format, "\n")
             iPrinter?.addText(format, "\n")
@@ -314,7 +334,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
             iPrinter?.startPrinter(object : AidlPrinterListener.Stub() {
                 @Throws(RemoteException::class)
                 override fun onFinish() {
-                   closeLoading()
+                    closeLoading()
                 }
 
                 @Throws(RemoteException::class)
@@ -371,7 +391,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
     }
 
     private fun skipSettle(recordId: Long, parkId: Long) {
-        LogUtils.i("recordId="+recordId+",parkId="+parkId)
+        LogUtils.i("recordId=" + recordId + ",parkId=" + parkId)
         val intent = Intent()
         intent.putExtra(SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID, recordId)
         intent.putExtra(SettleFeeDetailActivity.EXTRA_PARK_ID, parkId)
@@ -379,7 +399,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
         startActivity(intent)
     }
 
-    private fun initPrinter(){
+    private fun initPrinter() {
         deviceService = DeviceService(mContext, object : DeviceConnectListener {
             override fun deviceConnectSuccess() {
                 LogUtils.i("deviceConnectSuccess")
@@ -408,5 +428,64 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
         })
         deviceService?.connect()
+    }
+
+
+    /**
+     * 禁止Edittext弹出软件盘，光标依然正常显示。
+     */
+    private fun disableShowSoftInput(editTest: EditText) {
+        val cls = EditText::class.java
+        var method: Method
+        try {
+            method = cls.getMethod("setShowSoftInputOnFocus", Boolean::class.javaPrimitiveType)
+            method.isAccessible = true
+            method.invoke(editTest, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
+            method = cls.getMethod("setSoftInputShownOnFocus", Boolean::class.javaPrimitiveType)
+            method.setAccessible(true)
+            method.invoke(editTest, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    private fun initSearchInput() {
+        keyboardView = PlateKeyboardView(mContext)
+        disableShowSoftInput(etPlantNum)
+        etPlantNum.setOnClickListener(View.OnClickListener {
+            keyboardView?.showKeyboard(etPlantNum, InputType.TYPE_CLASS_PHONE)
+        })
+        keyboardView?.setOnKeyboardFinishListener(object : PlateKeyboardView.OnKeyboardFinishListener {
+            override fun onFinish(input: String?) {
+//                getExitSpaceList(true)
+            }
+        }, "关闭")
+        listenInput(etPlantNum, ivDeleteSmall)
+    }
+
+
+    @SuppressLint("CheckResult")
+    private fun listenInput(editText: EditText, imageView: ImageView) {
+        setViewVisible(imageView, !TextUtils.isEmpty(editText.text.toString()))
+        imageView.setOnClickListener { v: View? -> editText.setText("") }
+        RxTextView.textChanges(editText)
+                .debounce(ExitPayFeeEnterActivity.DELAY_TIME, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { charSequence -> charSequence.toString() }
+                .subscribe { s ->
+                    getExitSpaceList(false)
+                }
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable) {
+                setViewVisible(imageView, s.isNotEmpty())
+            }
+        })
     }
 }

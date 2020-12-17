@@ -33,4 +33,6 @@
     <item name="state_touch_scale_rotate" type="id"/>
 
     <item name="view_image_watcher" type="id" />
+
+    <item type="id" name="tag_pass_visible"/>
 </resources>

@@ -113,6 +113,19 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestUpdatePass(params).retryWhen(new RetryWhen()));
     }
 
+    /**
+     * 修改密码
+     *
+     * @param newPass
+     * @return
+     */
+    public Observable<BaseResult<Object>> requestEditPass(String oldPass, String newPass, String rePass) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("originalPassword", oldPass);
+        params.put("password", newPass);
+        params.put("rePassword", rePass);
+        return ThreadTransformer.switchSchedulers(getApiService().requestUpdatePass(params).retryWhen(new RetryWhen()));
+    }
 
     public Observable<BaseResult<Object>> requestAddParkingSpace(long parkingSpaceId, String plantNum, int carType, String[] photos) {
         Map<String, Object> params = new HashMap<>(4);

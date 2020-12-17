@@ -70,6 +70,7 @@ dependencies {
     //3.12.x是支持Android 4.4的
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.2'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
     //处理rxjava内存泄漏-生命周期绑定
     implementation 'com.trello.rxlifecycle3:rxlifecycle-components:3.0.0'
     //多状态布局
@@ -114,6 +115,8 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     implementation project(':zxing')
     implementation files('libs/st-sdkserviceapi-4.00.07.jar')
+
+    implementation 'com.neovisionaries:nv-websocket-client:2.10'
 }
 repositories {
     mavenCentral()
