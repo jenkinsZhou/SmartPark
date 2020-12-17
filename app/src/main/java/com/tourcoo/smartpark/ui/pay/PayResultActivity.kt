@@ -269,7 +269,13 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "离开时间:" + certificate.leaveAt)
+            iPrinter?.addText(format, "离开时间:" )
+
+            format.putString("font", FONT_SIZE_LARGE)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_RIGHT)
+            iPrinter?.addText(format,  certificate.leaveAt)
+            iPrinter?.addText(format, "\n")
 
             format.putString("font", FONT_SIZE_LARGE)
             format.putInt("zoom", 3)
@@ -309,8 +315,7 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 4)
             format.putString("font", FONT_SIZE_SMALL)
             format.putString("align", GRAVITY_CENTER)
-            iPrinter?.addText(format, "实收费用:RMB(元)" + certificate.totalFee)
-
+            iPrinter?.addText(format, "实收费用:RMB(元)" + "¥ "+certificate.totalFee)
             iPrinter?.addText(format, "line")
             format.putString("font", "normal")
             var payType = ""
@@ -327,21 +332,32 @@ class PayResultActivity : BaseTitleActivity() {
             format.putBoolean("linefeed", true)
             iPrinter?.addText(format, payType + ":RMB(元)" + certificate.totalFee)
 
+            format.putInt("hzFont", 9)
+            format.putInt("zmFont", 38)
+            format.putInt("zoom", 3)
+            format.putString("align", GRAVITY_LEFT)
+            format.putBoolean("linefeed", true)
+            iPrinter?.addText(format, "\n")
 
-            format.putInt("hzFont", 3)
-            format.putInt("zmFont", 21)
-            format.putInt("szFont", 21)
+            format.putInt("hzFont", 9)
+            format.putInt("zmFont", 38)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
             iPrinter?.addText(format, "交易时间:" + certificate.leaveAt)
 
+            iPrinter?.addText(format, "\n")
+
             format.putString("font", FONT_SIZE_NORMAL)
+            format.putInt("hzFont", 9)
+            format.putInt("zmFont", 38)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
             iPrinter?.addText(format, "订单编号:" + certificate.outTradeNo)
 
+
+            iPrinter?.addText(format, "\n")
             /*   format.putString("align", "center")
                format.putInt("height", 200)
                iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
@@ -349,17 +365,21 @@ class PayResultActivity : BaseTitleActivity() {
                iPrinter?.addText(format, "\n")*/
 
             format.putString("font", FONT_SIZE_NORMAL)
+            format.putInt("hzFont", 9)
+            format.putInt("zmFont", 38)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
             iPrinter?.addText(format, "凭条打印时间:" + getCurrentTime())
 
-
+            iPrinter?.addText(format, "\n")
             iPrinter?.addText(format, "line")
             format.putString("font", "normal")
 
-
+            iPrinter?.addText(format, "\n")
             format.putString("font", FONT_SIZE_SMALL)
+            format.putInt("hzFont", 9)
+            format.putInt("zmFont", 38)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
@@ -368,6 +388,9 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
+
+
+
             iPrinter?.addText(format, "\n")
             iPrinter?.addText(format, "\n")
             iPrinter?.addText(format, "\n")
@@ -413,7 +436,7 @@ class PayResultActivity : BaseTitleActivity() {
 
     private fun getCurrentTime(): String? {
         val time = System.currentTimeMillis() //long now = android.os.SystemClock.uptimeMillis();
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm:SS")
+        val format = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
         val d1 = Date(time)
         return format.format(d1)
     }
