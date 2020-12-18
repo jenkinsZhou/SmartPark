@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -63,9 +64,12 @@ import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
+import com.tourcoo.smartpark.socket.WebSocketConfig;
+import com.tourcoo.smartpark.socket.WebSocketManager;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
+import com.tourcoo.smartpark.ui.account.login.LoginActivity;
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
 import com.tourcoo.smartpark.ui.record.ArrearsRecordListActivity;
@@ -85,8 +89,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static com.tourcoo.smartpark.constant.ParkConstant.PARK_STATUS_USED;
+import static com.tourcoo.smartpark.socket.WebSocketConfig.SOCKET_URL;
+import static com.tourcoo.smartpark.socket.WebSocketConfig.TIME_OUT;
 import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
 
 
@@ -120,6 +127,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private boolean isDownloading = false;
     private LoadService loadService;
     private boolean isInstalling = false;
+    private WebSocketManager socketManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,13 +140,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         initSpaceRecyclerView();
         initAdapterClick();
         setImmersionBar(true);
-        ThreadPoolManager.getThreadPoolProxy().execute(new Runnable() {
-            @Override
-            public void run() {
-                testFun();
-            }
-        });
-
     }
 
     private void initView() {
@@ -392,7 +393,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onDestroy() {
         closeLoading();
+        releaseService();
         super.onDestroy();
+    }
+
+    private void releaseService() {
+        if (socketManager != null) {
+            socketManager.release();
+            LogUtils.w("socket资源已释放");
+        }
     }
 
     private void requestUserInfoAndParkList() {
@@ -527,6 +536,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
+        initSocket();
         requestUserInfoAndParkList();
         requestAppVersion();
     }
@@ -725,159 +735,217 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     }
 
-    private void testFun() {
-        WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(5000);
-        try {
-            WebSocket ws = factory.createSocket("ws://192.168.0.238:8007/push", 5000);
-            ws.addListener(new WebSocketListener() {
+  /*  private void initWebServiceConnect() {
+        if (!AccountHelper.getInstance().isLogin()) {
+            return;
+        }
+        if (factory == null || ws == null) {
+            factory = new WebSocketFactory().setConnectionTimeout(5000);
+            try {
+                ws = factory.createSocket("ws://192.168.0.238:8007/push", TIME_OUT);
+                //设置心跳频率为20秒
+                ws.setPingInterval(20 * 1000);
+                ws.addHeader("Authorization", AccountHelper.getInstance().getAccessToken());
+                ws.addListener(new WebSocketListener() {
+                    @Override
+                    public void onStateChanged(WebSocket websocket, WebSocketState newState) throws Exception {
+                        LogUtils.d("----》onStateChanged:"+newState);
+                        if(newState ==WebSocketState.CLOSED){
+                            LogUtils.d("----》CLOSED:"+newState);
+                            reConnect();
+                        }
+                    }
+
+                    @Override
+                    public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
+                        LogUtils.i("----》onConnected");
+                    }
+
+                    @Override
+                    public void onConnectError(WebSocket websocket, WebSocketException cause) throws Exception {
+                        LogUtils.e("----》onConnectError");
+                    }
+
+                    @Override
+                    public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
+                        //这里设置重连
+                        LogUtils.e("----》onDisconnected,"+"是否在主线程:" + (Looper.myLooper() == Looper.getMainLooper()));
+                        reConnect();
+                    }
+
+                    @Override
+                    public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onFrame");
+                    }
+
+                    @Override
+                    public void onContinuationFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onContinuationFrame");
+                    }
+
+                    @Override
+                    public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onTextFrame");
+                    }
+
+                    @Override
+                    public void onBinaryFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onBinaryFrame");
+                    }
+
+                    @Override
+                    public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onCloseFrame");
+                    }
+
+                    @Override
+                    public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onPingFrame");
+                    }
+
+                    @Override
+                    public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onPongFrame");
+                    }
+
+                    @Override
+                    public void onTextMessage(WebSocket websocket, String text) throws Exception {
+                        LogUtils.i("----》onTextMessage="+text);
+                    }
+
+                    @Override
+                    public void onTextMessage(WebSocket websocket, byte[] data) throws Exception {
+                        LogUtils.i("----》onTextMessage字节数据长度:"+data.length);
+                    }
+
+                    @Override
+                    public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
+                        LogUtils.i("----》onBinaryMessage");
+                    }
+
+                    @Override
+                    public void onSendingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onSendingFrame");
+                    }
+
+                    @Override
+                    public void onFrameSent(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onFrameSent");
+                    }
+
+                    @Override
+                    public void onFrameUnsent(WebSocket websocket, WebSocketFrame frame) throws Exception {
+                        LogUtils.i("----》onFrameUnsent");
+                    }
+
+                    @Override
+                    public void onThreadCreated(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
+                        LogUtils.i("----》onThreadCreated");
+                    }
+
+                    @Override
+                    public void onThreadStarted(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
+                        LogUtils.i("----》onThreadStarted");
+                    }
+
+                    @Override
+                    public void onThreadStopping(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
+                        LogUtils.w("----》onThreadStopping");
+                    }
+
+                    @Override
+                    public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
+                        LogUtils.e("----》onError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
+                        LogUtils.e("----》onFrameError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onMessageError(WebSocket websocket, WebSocketException cause, List<WebSocketFrame> frames) throws Exception {
+                        LogUtils.e("----》onMessageError：" + "--->" + cause);
+                    }
+
+                    @Override
+                    public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause, byte[] compressed) throws Exception {
+                        LogUtils.e("----》onMessageDecompressionError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onTextMessageError(WebSocket websocket, WebSocketException cause, byte[] data) throws Exception {
+                        LogUtils.e("----》onTextMessageError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
+                        LogUtils.e("----》onSendError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
+                        LogUtils.e("----》onUnexpectedError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void handleCallbackError(WebSocket websocket, Throwable cause) throws Exception {
+                        LogUtils.e("----》handleCallbackError：" + "---" + cause.toString());
+                    }
+
+                    @Override
+                    public void onSendingHandshake(WebSocket websocket, String requestLine, List<String[]> headers) throws Exception {
+                        LogUtils.d("----》onSendingHandshake：" + "正在握手");
+                    }
+                });
+                ws.connect();
+            } catch (IOException | WebSocketException e) {
+                e.printStackTrace();
+                LogUtils.e("----》onConnectError：" + e.toString());
+            }
+        }
+    }*/
+
+
+    /*private void reConnect(){
+        if (ws != null) {
+            LogUtils.i("----》正在重连...是否在主线程:" + (Looper.myLooper() == Looper.getMainLooper()));
+            try {
+                if(ws.getState() ==){
+
+                }
+                ws.recreate(TIME_OUT).connect();
+            } catch (WebSocketException | IOException e) {
+                e.printStackTrace();
+                LogUtils.e("e----》ws:" + (Looper.myLooper() == Looper.getMainLooper()));
+            }
+
+        }
+    }*/
+
+    private void initSocket() {
+        if (!AccountHelper.getInstance().isLogin()) {
+            ToastUtil.showFailed("登录已过期");
+            CommonUtil.startActivity(mContext, LoginActivity.class);
+            finish();
+        }
+        if (socketManager == null) {
+            socketManager = new WebSocketManager(SOCKET_URL, AccountHelper.getInstance().getAccessToken());
+            socketManager.connect();
+            socketManager.setWebSocketListener(new WebSocketManager.WebSocketListener() {
                 @Override
-                public void onStateChanged(WebSocket websocket, WebSocketState newState) throws Exception {
-                    LogUtils.d("----》onStateChanged");
+                public void onConnected(Map<String, List<String>> headers) {
+                    LogUtils.d("---->OS. WebSocket onConnected:" + headers.size());
                 }
 
                 @Override
-                public void onConnected(WebSocket websocket, Map<String, List<String>> headers) throws Exception {
-                    LogUtils.i("----》onConnected");
-                }
-
-                @Override
-                public void onConnectError(WebSocket websocket, WebSocketException cause) throws Exception {
-                    LogUtils.e("----》onConnectError");
-                }
-
-                @Override
-                public void onDisconnected(WebSocket websocket, WebSocketFrame serverCloseFrame, WebSocketFrame clientCloseFrame, boolean closedByServer) throws Exception {
-                    LogUtils.e("----》onConnectError");
-                }
-
-                @Override
-                public void onFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                    LogUtils.i("----》onFrame");
-                }
-
-                @Override
-                public void onContinuationFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                    LogUtils.i("----》onFrame");
-                }
-
-                @Override
-                public void onTextFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onBinaryFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onCloseFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onPingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                    LogUtils.i("----》onPingFrame");
-                }
-
-                @Override
-                public void onPongFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-                    LogUtils.i("----》onPongFrame");
-                }
-
-                @Override
-                public void onTextMessage(WebSocket websocket, String text) throws Exception {
-
-                }
-
-                @Override
-                public void onTextMessage(WebSocket websocket, byte[] data) throws Exception {
-
-                }
-
-                @Override
-                public void onBinaryMessage(WebSocket websocket, byte[] binary) throws Exception {
-
-                }
-
-                @Override
-                public void onSendingFrame(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onFrameSent(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onFrameUnsent(WebSocket websocket, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onThreadCreated(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-                }
-
-                @Override
-                public void onThreadStarted(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-                }
-
-                @Override
-                public void onThreadStopping(WebSocket websocket, ThreadType threadType, Thread thread) throws Exception {
-
-                }
-
-                @Override
-                public void onError(WebSocket websocket, WebSocketException cause) throws Exception {
-
-                }
-
-                @Override
-                public void onFrameError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onMessageError(WebSocket websocket, WebSocketException cause, List<WebSocketFrame> frames) throws Exception {
-
-                }
-
-                @Override
-                public void onMessageDecompressionError(WebSocket websocket, WebSocketException cause, byte[] compressed) throws Exception {
-
-                }
-
-                @Override
-                public void onTextMessageError(WebSocket websocket, WebSocketException cause, byte[] data) throws Exception {
-
-                }
-
-                @Override
-                public void onSendError(WebSocket websocket, WebSocketException cause, WebSocketFrame frame) throws Exception {
-
-                }
-
-                @Override
-                public void onUnexpectedError(WebSocket websocket, WebSocketException cause) throws Exception {
-
-                }
-
-                @Override
-                public void handleCallbackError(WebSocket websocket, Throwable cause) throws Exception {
-
-                }
-
-                @Override
-                public void onSendingHandshake(WebSocket websocket, String requestLine, List<String[]> headers) throws Exception {
-
+                public void onTextMessage(String text) {
+                    LogUtils.d("---->OS. WebSocket onTextMessage:" + text);
                 }
             });
-            ws.connect();
-        } catch (IOException | WebSocketException e) {
-            e.printStackTrace();
         }
+
     }
+
+
 }
