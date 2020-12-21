@@ -1,6 +1,8 @@
 package com.tourcoo.smartpark.ui.record
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.tourcoo.smartpark.R
@@ -8,11 +10,15 @@ import com.tourcoo.smartpark.adapter.fee.ArrearsRecordAdapter
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.PageBean
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord
+import com.tourcoo.smartpark.constant.ParkConstant.EXTRA_RECORD_ID
 import com.tourcoo.smartpark.core.UiManager
 import com.tourcoo.smartpark.core.base.activity.BaseRefreshLoadActivity
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.ui.fee.ArrearsDetailActivity
+import com.tourcoo.smartpark.ui.fee.FeeDetailActivity
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
 import com.trello.rxlifecycle3.android.ActivityEvent
 import java.util.ArrayList
 
@@ -38,7 +44,6 @@ class ArrearsRecordListActivity : BaseRefreshLoadActivity<ArrearsRecord>() {
     }
 
 
-
     override fun getAdapter(): BaseQuickAdapter<ArrearsRecord, BaseViewHolder> {
         adapter = ArrearsRecordAdapter()
         return adapter!!
@@ -56,5 +61,16 @@ class ArrearsRecordListActivity : BaseRefreshLoadActivity<ArrearsRecord>() {
         })
     }
 
+    override fun onItemClicked(adapter: BaseQuickAdapter<ArrearsRecord, BaseViewHolder>?, view: View?, position: Int) {
+        super.onItemClicked(adapter, view, position)
+        val item = adapter!!.data[position] as ArrearsRecord
+        skipArrearsDetail(item.id)
+    }
 
+    private fun skipArrearsDetail(recordId: Long) {
+        val intent = Intent()
+        intent.putExtra(EXTRA_RECORD_ID, recordId)
+        intent.setClass(mContext, ArrearsDetailActivity::class.java)
+        startActivity(intent)
+    }
 }

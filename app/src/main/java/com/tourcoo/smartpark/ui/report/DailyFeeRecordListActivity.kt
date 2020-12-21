@@ -1,18 +1,23 @@
 package com.tourcoo.smartpark.ui.report
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.adapter.fee.FeeRecordAdapter
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.PageBean
+import com.tourcoo.smartpark.bean.fee.ArrearsRecord
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord
+import com.tourcoo.smartpark.constant.ParkConstant
 import com.tourcoo.smartpark.core.UiManager
 import com.tourcoo.smartpark.core.base.activity.BaseRefreshLoadActivity
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.ui.fee.FeeDetailActivity
 import com.trello.rxlifecycle3.android.ActivityEvent
 import java.util.*
 
@@ -37,7 +42,6 @@ class DailyFeeRecordListActivity : BaseRefreshLoadActivity<DailyFeeRecord>() {
     }
 
 
-
     override fun getAdapter(): BaseQuickAdapter<DailyFeeRecord, BaseViewHolder> {
         adapter = FeeRecordAdapter()
         return adapter!!
@@ -55,6 +59,16 @@ class DailyFeeRecordListActivity : BaseRefreshLoadActivity<DailyFeeRecord>() {
         })
     }
 
+    override fun onItemClicked(adapter: BaseQuickAdapter<DailyFeeRecord, BaseViewHolder>?, view: View?, position: Int) {
+        super.onItemClicked(adapter, view, position)
+        val item = adapter!!.data[position] as DailyFeeRecord
+        skipFeeDetail(item.id)
+    }
 
-
+    private fun skipFeeDetail(recordId: Long) {
+        val intent = Intent()
+        intent.putExtra(ParkConstant.EXTRA_RECORD_ID, recordId)
+        intent.setClass(mContext, FeeDetailActivity::class.java)
+        startActivity(intent)
+    }
 }

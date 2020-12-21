@@ -29,4 +29,9 @@ public class ParkConstant {
     public static final int PARK_STATUS_USED = 1;
 
     public static final int PARK_STATUS_NOT_USED = 0;
+
+    /**
+     * 记录id
+     */
+    public static final String EXTRA_RECORD_ID = "EXTRA_RECORD_ID";
 }

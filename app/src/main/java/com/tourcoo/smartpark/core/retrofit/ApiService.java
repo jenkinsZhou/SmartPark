@@ -11,6 +11,7 @@ import com.tourcoo.smartpark.bean.fee.ArrearsHistoryRecord;
 import com.tourcoo.smartpark.bean.fee.ArrearsRecord;
 import com.tourcoo.smartpark.bean.fee.DailyFeeRecord;
 import com.tourcoo.smartpark.bean.fee.FeeCertificate;
+import com.tourcoo.smartpark.bean.fee.FeeDetail;
 import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
 import com.tourcoo.smartpark.bean.report.DailyReport;
@@ -181,5 +182,24 @@ public interface ApiService {
      */
     @GET("/handheld/parking/consumptioncertificate")
     Observable<BaseResult<PayCertificate>> requestPayCertificate(@QueryMap Map<String, Object> map);
+
+
+    /**
+     * 收费记录详情
+     * @param map
+     * @return
+     */
+    @GET("/handheld/member/dailyrecordinfo")
+    Observable<BaseResult<FeeDetail>> requestFeeDetail(@QueryMap Map<String, Object> map);
+
+
+    /**
+     * 欠费记录详情
+     * @param map
+     * @return
+     */
+    @GET("/handheld/member/arrearsinfo")
+    Observable<BaseResult<FeeDetail>> requestArrearsDetail(@QueryMap Map<String, Object> map);
+
 
 }

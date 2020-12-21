@@ -28,6 +28,7 @@ public class DailyFeeRecord {
     private int type;
     private String parkingNumber;
     private double fee;
+    private long id;
 
     public String getNumber() {
         return number;
@@ -91,5 +92,14 @@ public class DailyFeeRecord {
 
     public void setFee(double fee) {
         this.fee = fee;
+    }
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

@@ -78,6 +78,8 @@
             android:configChanges="orientation|keyboardHidden"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             />
+        <activity android:name=".ui.fee.FeeDetailActivity" />
+        <activity android:name=".ui.fee.ArrearsDetailActivity" />
     </application>
 
 </manifest>

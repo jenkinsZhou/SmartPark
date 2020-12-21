@@ -50,7 +50,7 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
 
     private var carId = -1L
     private var settleId = -1L
-    private var needIgnore = false
+    private var mNeedIgnore = false
 
     private var mArrearsIds: String? = null
     private var mPayType: Int? = null
@@ -94,7 +94,7 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
 
     override fun loadData() {
         super.loadData()
-        requestSettleInfo(needIgnore)
+        requestSettleInfo(mNeedIgnore)
     }
 
     override fun onClick(v: View?) {
@@ -108,8 +108,8 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
                 skipScanCode()
             }
             R.id.tvIgnoreHistoryFee -> {
-                requestSettleInfo(!needIgnore)
-                needIgnore = !needIgnore
+                requestSettleInfo(!mNeedIgnore)
+
             }
             R.id.tvFeeHistory -> {
                 skipArrearsRecord()
@@ -128,7 +128,7 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
     }
 
     override fun onRefresh(refreshLayout: RefreshLayout) {
-        requestSettleInfo(needIgnore)
+        requestSettleInfo(mNeedIgnore)
     }
 
     private fun showSettleInfo(settleDetail: SettleDetail?, ignore: Boolean) {
@@ -180,6 +180,7 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
                 arrearsIdList.addAll(entity.data.arrearsId)
             }
             showSettleInfo(entity.data, ignore)
+            mNeedIgnore = !mNeedIgnore
 
         } else {
             ToastUtil.showFailed(entity.errMsg)
