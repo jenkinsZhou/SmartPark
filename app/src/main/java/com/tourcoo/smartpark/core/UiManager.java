@@ -5,13 +5,12 @@ import android.app.Application;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreator;
 import com.tourcoo.SmartParkApplication;
-import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.core.control.ActivityDispatchEventControl;
 import com.tourcoo.smartpark.core.control.ActivityFragmentControl;
+import com.tourcoo.smartpark.core.control.HttpPageRequestControl;
 import com.tourcoo.smartpark.core.control.HttpRequestControl;
 import com.tourcoo.smartpark.core.control.LoadMoreFoot;
 import com.tourcoo.smartpark.core.control.LoadingDialog;
@@ -21,7 +20,6 @@ import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.control.RecyclerViewControl;
 import com.tourcoo.smartpark.core.control.TitleBarViewControl;
 import com.tourcoo.smartpark.core.control.ToastControl;
-import com.tourcoo.smartpark.core.manager.GlideManager;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.tourcoo.smartpark.core.widget.dialog.loading.LoadingDialogWrapper;
@@ -104,6 +102,8 @@ public class UiManager {
     /**
      * 配置网络请求
      */
+    private HttpPageRequestControl mHttpPageRequestControl;
+
     private HttpRequestControl mHttpRequestControl;
 
     /**
@@ -158,7 +158,6 @@ public class UiManager {
 
     /**
      * 设置Adapter统一加载更多相关脚布局
-     * 最终调用{@link RefreshLoadDelegate#initRecyclerView()}
      *
      * @param mLoadMoreFoot
      * @return
@@ -189,7 +188,6 @@ public class UiManager {
 
     /**
      * 设置SmartRefreshLayout 下拉刷新头
-     * 最终调用{@link RefreshDelegate#initRefreshHeader()}
      *
      * @param control
      * @return
@@ -205,7 +203,6 @@ public class UiManager {
 
     /**
      * 设置多状态布局--加载中/空数据/错误/无网络
-     * 最终调用{@link RefreshDelegate#initRefreshHeader()}
      *
      * @param control
      * @return
@@ -221,7 +218,6 @@ public class UiManager {
 
     /**
      * 设置全局网络请求等待Loading提示框如登录等待loading
-     * 最终调用{@link BaseLoadingObserver#FastLoadingObserver(Activity)}
      *
      * @param control
      * @return
@@ -278,21 +274,28 @@ public class UiManager {
         return this;
     }
 
-    public HttpRequestControl getHttpRequestControl() {
-        return mHttpRequestControl;
+    public HttpPageRequestControl getHttpRequestControl() {
+        return mHttpPageRequestControl;
     }
 
+    public HttpRequestControl getRequestControl() {
+        return mHttpRequestControl;
+    }
     /**
      * 配置Http请求成功及失败相关回调-方便全局处理
      *
      * @param control
      * @return
      */
+    public UiManager setHttpPageRequestControl(HttpPageRequestControl control) {
+        mHttpPageRequestControl = control;
+        return this;
+    }
+
     public UiManager setHttpRequestControl(HttpRequestControl control) {
         mHttpRequestControl = control;
         return this;
     }
-
     public ObserverControl getObserverControl() {
         return mObserverControl;
     }
@@ -337,4 +340,7 @@ public class UiManager {
         mToastControl = control;
         return this;
     }
+
+
+
 }

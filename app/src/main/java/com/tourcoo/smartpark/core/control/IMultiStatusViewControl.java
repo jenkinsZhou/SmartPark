@@ -59,4 +59,17 @@ public interface IMultiStatusViewControl extends Callback.OnReloadListener {
     default View.OnClickListener getCustomerClickListener() {
         return null;
     }
+
+    /**
+     * 设置全局监听接口
+     *
+     * @return
+     */
+    default IHttpRequestControl getHttpRequestControl() {
+        return null;
+    }
+
+
+
+
 }

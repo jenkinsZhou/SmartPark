@@ -1,6 +1,7 @@
 package com.tourcoo.smartpark.core.retrofit;
 
 import com.tourcoo.smartpark.core.UiManager;
+import com.tourcoo.smartpark.core.control.IHttpPageRequestControl;
 import com.tourcoo.smartpark.core.control.IHttpRequestControl;
 
 import io.reactivex.annotations.NonNull;
@@ -14,14 +15,24 @@ import io.reactivex.observers.DefaultObserver;
  * @Email: 971613168@qq.com
  */
 public abstract class BaseObserver<T> extends DefaultObserver<T> {
-    public IHttpRequestControl mHttpRequestControl;
+    protected IHttpPageRequestControl mHttpPageRequestControl;
+    protected IHttpRequestControl requestControl;
 
-    public BaseObserver(IHttpRequestControl httpRequestControl) {
-        this.mHttpRequestControl = httpRequestControl;
+    public BaseObserver(IHttpPageRequestControl httpRequestControl) {
+        this.mHttpPageRequestControl = httpRequestControl;
+    }
+
+    public BaseObserver(IHttpRequestControl requestControl) {
+        this.requestControl = requestControl;
     }
 
     public BaseObserver() {
-        this(null);
+        this(null, null);
+    }
+
+    public BaseObserver(IHttpPageRequestControl mHttpPageRequestControl, IHttpRequestControl requestControl) {
+        this.mHttpPageRequestControl = mHttpPageRequestControl;
+        this.requestControl = requestControl;
     }
 
     @Override
@@ -30,7 +41,7 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
     }
 
     @Override
-    public void onNext( T t) {
+    public void onNext(T t) {
         onRequestSuccess(t);
     }
 
@@ -41,7 +52,7 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
      */
     public abstract void onRequestSuccess(T entity);
 
-    public  void onRequestError(Throwable throwable){
+    public void onRequestError(Throwable throwable) {
 
     }
 
@@ -57,8 +68,11 @@ public abstract class BaseObserver<T> extends DefaultObserver<T> {
             onNext(null);
             return;
         }
-        if(UiManager.getInstance().getHttpRequestControl() != null){
-            UiManager.getInstance().getHttpRequestControl().httpRequestError(mHttpRequestControl,e);
+        if (UiManager.getInstance().getHttpRequestControl() != null) {
+            UiManager.getInstance().getHttpRequestControl().httpRequestError(mHttpPageRequestControl, e);
+        }
+        if (UiManager.getInstance().getRequestControl() != null) {
+            UiManager.getInstance().getRequestControl().httpRequestError(requestControl, e);
         }
         onRequestError(e);
     }

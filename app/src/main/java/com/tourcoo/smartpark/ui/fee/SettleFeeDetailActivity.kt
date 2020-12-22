@@ -3,8 +3,10 @@ package com.tourcoo.smartpark.ui.fee
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.Gravity
 import android.view.View
+import com.apkfuns.logutils.LogUtils
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
@@ -14,11 +16,14 @@ import com.tourcoo.smartpark.bean.fee.PayResult
 import com.tourcoo.smartpark.bean.settle.SettleDetail
 import com.tourcoo.smartpark.constant.ParkConstant
 import com.tourcoo.smartpark.core.CommonUtil
+import com.tourcoo.smartpark.core.UiManager
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
+import com.tourcoo.smartpark.core.base.activity.BaseTitleMultiStatusActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.BaseObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
+import com.tourcoo.smartpark.core.utils.NetworkUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_CASH
@@ -31,6 +36,7 @@ import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
 import org.apache.commons.lang3.StringUtils
+import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -41,7 +47,7 @@ import kotlin.collections.ArrayList
  * @date 2020年11月09日9:12
  * @Email: 971613168@qq.com
  */
-class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshListener {
+class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickListener, OnRefreshListener {
     /**
      * 停车记录id
      */
@@ -51,11 +57,14 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
     private var carId = -1L
     private var settleId = -1L
     private var mNeedIgnore = false
-
     private var mArrearsIds: String? = null
     private var mPayType: Int? = null
     private val arrearsIdList: MutableList<Int> = ArrayList()
     private var payResult: PayResult? = null
+    private val timer = Timer()
+    private var timerTask: TimerTask? = null
+    private val mHandler = Handler()
+    private var ignoreTemp = false
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
@@ -67,6 +76,9 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
         const val EXTRA_PAY_STATUS = "EXTRA_PAY_STATUS"
         const val REQUEST_CODE_FEE_RECORD = 1002
         const val REQUEST_CODE_PAY_BY_SCAN = 1003
+        //刷新的时间间隔（单位:秒）
+        const val REFRESH_INTERVAL = 30L
+
     }
 
     override fun getContentLayout(): Int {
@@ -86,10 +98,25 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
         tvFeeHistory.setOnClickListener(this)
         tvIgnoreHistoryFee.setOnClickListener(this)
         initRefreshLayout()
+        scheduleRequestTask()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
         titleBar?.setTitleMainText("离场收费")
+    }
+
+    override fun onReload(v: View?) {
+        requestSettleInfo(mNeedIgnore)
+    }
+
+
+    override fun getMultiStatusView(): View {
+        return rlContentView
+    }
+
+    override fun handleNetSuccessCallback(data: BaseResult<*>?) {
+        val entity = data as BaseResult<SettleDetail>?
+        handleRequestSuccess(entity, ignoreTemp)
     }
 
     override fun loadData() {
@@ -101,15 +128,14 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
         when (v?.id) {
             R.id.llPayByCash -> {
                 showPayCashConfirm()
-              /*  payResult = PayResult()
-                skipPayResult(true)*/
+                /*  payResult = PayResult()
+                  skipPayResult(true)*/
             }
             R.id.llPayByCode -> {
                 skipScanCode()
             }
             R.id.tvIgnoreHistoryFee -> {
                 requestSettleInfo(!mNeedIgnore)
-
             }
             R.id.tvFeeHistory -> {
                 skipArrearsRecord()
@@ -152,9 +178,15 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
 
 
     private fun requestSettleInfo(needIgnore: Boolean) {
-        ApiRepository.getInstance().requestSpaceSettleDetail(recordId, needIgnore, mArrearsIds).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SettleDetail>>() {
+        if (!NetworkUtil.isConnected(mContext)) {
+            settleRefreshLayout.finishRefresh(false)
+            ToastUtil.showNormal(R.string.exception_network_not_connected)
+            return
+        }
+        ApiRepository.getInstance().requestSpaceSettleDetail(recordId, needIgnore, mArrearsIds).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SettleDetail>>(httpRequestControl) {
             override fun onRequestSuccess(entity: BaseResult<SettleDetail>?) {
-                handleRequestSuccess(entity, needIgnore)
+                ignoreTemp = needIgnore
+                UiManager.getInstance().requestControl.httpRequestSuccess(httpRequestControl, entity)
             }
 
             override fun onRequestError(throwable: Throwable?) {
@@ -229,6 +261,9 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
                 }
                 if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
                     ToastUtil.showSuccess(entity.errMsg)
+                    mHandler.postDelayed({
+                        finish()
+                    }, 300)
                 } else {
                     ToastUtil.showFailed(entity.errMsg)
                 }
@@ -336,7 +371,7 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
         val intent = Intent()
         intent.putExtra(EXTRA_PAY_RESULT, payResult)
         intent.putExtra(EXTRA_PAY_STATUS, success)
-        intent.putExtra(EXTRA_PARK_ID,settleId )
+        intent.putExtra(EXTRA_PARK_ID, settleId)
         intent.setClass(this@SettleFeeDetailActivity, PayResultActivity::class.java)
         startActivity(intent)
     }
@@ -350,9 +385,36 @@ class SettleFeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRef
                 .setCancelable(false)
                 .setCanceledOnTouchOutside(false)
                 .setTitle("标为欠费")
-                .setMsg("确定要标为欠费吗?")
+                .setMsg("标记后本次停车将不再收费，且本页面会自动关闭，确定要标为欠费吗?")
                 .setPositiveButton("确定", View.OnClickListener { requestFlagArrears(recordId) })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()
+    }
+
+
+    private fun scheduleRequestTask() {
+
+        timerTask = object : TimerTask() {
+            override fun run() {
+                LogUtils.i("执行run（）")
+                mHandler.post {
+                    requestSettleInfo(mNeedIgnore)
+                }
+            }
+        }
+        timer.schedule(timerTask, REFRESH_INTERVAL * 1000, REFRESH_INTERVAL * 1000)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releaseTimerTask()
+    }
+
+    private fun releaseTimerTask() {
+        timer.cancel()
+        if (timerTask != null) {
+            timerTask!!.cancel()
+            timerTask = null
+        }
     }
 }

@@ -1,34 +1,26 @@
 package com.tourcoo.smartpark.core.control;
 
+import com.tourcoo.smartpark.bean.BaseResult;
+
 import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 
 /**
  * @author :JenkinsZhou
- * @description :
+ * @description : HttpRequestControl
  * @company :途酷科技
- * @date 2020年10月28日10:26
+ * @date 2020年12月22日10:50
  * @Email: 971613168@qq.com
  */
-public interface HttpRequestControl {
+public interface HttpRequestControl  {
 
     /**
-     * @param httpRequestControl 调用页面相关参数
-     * @param dataList           数据列表
-     * @param httpDataListener   设置完成回调--用于特殊需求页面做后续操作
-     */
-    void httpRequestSuccess(IHttpRequestControl httpRequestControl, List<?> dataList, OnHttpDataListener httpDataListener);
-
-    /**
-     * 网络成功回调
      *
-     * @param httpRequestControl 调用页面相关参数
-     * @param dataList           数据列表
+     * @param httpRequestControl
      */
-    default void httpRequestSuccess(IHttpRequestControl httpRequestControl, List<?> dataList) {
-        httpRequestSuccess(httpRequestControl, dataList, null);
-    }
+    void httpRequestSuccess(IHttpRequestControl httpRequestControl,BaseResult<?> data);
+
 
     /**
      * 请求失败后回调

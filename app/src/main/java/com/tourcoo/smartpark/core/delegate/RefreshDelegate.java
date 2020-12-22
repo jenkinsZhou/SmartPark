@@ -11,6 +11,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.IRefreshView;
 import com.tourcoo.smartpark.core.utils.FindViewUtil;

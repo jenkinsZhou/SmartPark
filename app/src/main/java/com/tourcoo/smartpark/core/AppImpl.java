@@ -66,7 +66,6 @@ public class AppImpl implements DefaultRefreshHeaderCreator, LoadMoreFoot, Recyc
     @Override
     public RefreshHeader createRefreshHeader(@NonNull Context context, @NonNull RefreshLayout layout) {
         layout.setEnableHeaderTranslationContent(true)
-                .setPrimaryColorsId(R.color.colorAccent)
                 .setEnableOverScrollDrag(true);
         return new ClassicsHeader(mContext);
     }

@@ -620,6 +620,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             ToastUtil.showNormal("请至少上传一张图片")
             return
         }
+        if (parkInfo == null) {
+            ToastUtil.showWarning("请选择车位")
+            return
+        }
         getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, imageArray).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
             override fun onRequestSuccess(entity: BaseResult<Any>?) {
                 if (entity == null) {

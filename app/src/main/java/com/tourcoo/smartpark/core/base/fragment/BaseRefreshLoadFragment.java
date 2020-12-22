@@ -8,9 +8,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.kingja.loadsir.core.LoadService;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.tourcoo.smartpark.core.control.IHttpRequestControl;
+import com.tourcoo.smartpark.core.control.IHttpPageRequestControl;
 import com.tourcoo.smartpark.core.control.IRefreshLoadView;
-import com.tourcoo.smartpark.core.control.MultiStatusView;
 import com.tourcoo.smartpark.core.delegate.RefreshLoadDelegate;
 
 /**
@@ -45,8 +44,8 @@ public abstract class BaseRefreshLoadFragment<T> extends BaseFragment implements
     }
 
     @Override
-    public IHttpRequestControl getIHttpRequestControl() {
-        return new IHttpRequestControl() {
+    public IHttpPageRequestControl getIHttpRequestControl() {
+        return new IHttpPageRequestControl() {
             @Override
             public SmartRefreshLayout getRefreshLayout() {
                 return mRefreshLayout;

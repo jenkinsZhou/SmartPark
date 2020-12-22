@@ -13,6 +13,7 @@ import com.simple.spiderman.SpiderMan;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
 import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
+import com.tourcoo.smartpark.core.control.HttpPageRequestControlImpl;
 import com.tourcoo.smartpark.core.control.HttpRequestControlImpl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
 import com.tourcoo.smartpark.core.multi_status.MultiEmptyStatusCallback;
@@ -96,6 +97,7 @@ public class SmartParkApplication extends Application {
                 //配置BasisActivity 子类事件派发相关
                 .setActivityDispatchEventControl(activityControl)
                 //设置http请求结果全局控制
+                .setHttpPageRequestControl(new HttpPageRequestControlImpl())
                 .setHttpRequestControl(new HttpRequestControlImpl())
                 //配置{@link FastObserver#onError(Throwable)}全局处理
                 .setObserverControl(impl)

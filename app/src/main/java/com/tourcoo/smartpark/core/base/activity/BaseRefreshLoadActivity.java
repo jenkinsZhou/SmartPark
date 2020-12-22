@@ -9,7 +9,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.kingja.loadsir.core.LoadService;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
-import com.tourcoo.smartpark.core.control.IHttpRequestControl;
+import com.tourcoo.smartpark.core.control.IHttpPageRequestControl;
 import com.tourcoo.smartpark.core.control.IRefreshLoadView;
 import com.tourcoo.smartpark.core.delegate.RefreshLoadDelegate;
 import com.tourcoo.smartpark.core.delegate.TitleDelegate;
@@ -47,8 +47,8 @@ public abstract class BaseRefreshLoadActivity<T> extends BaseTitleActivity imple
     }
 
     @Override
-    public IHttpRequestControl getIHttpRequestControl() {
-        IHttpRequestControl requestControl = new IHttpRequestControl() {
+    public IHttpPageRequestControl getIHttpRequestControl() {
+        IHttpPageRequestControl requestControl = new IHttpPageRequestControl() {
             @Override
             public SmartRefreshLayout getRefreshLayout() {
                 return mRefreshLayout;

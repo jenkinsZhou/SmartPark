@@ -82,5 +82,5 @@ public interface IRefreshLoadView<T> extends IRefreshView, BaseQuickAdapter.Requ
      *
      * @return
      */
-    IHttpRequestControl getIHttpRequestControl();
+    IHttpPageRequestControl getIHttpRequestControl();
 }

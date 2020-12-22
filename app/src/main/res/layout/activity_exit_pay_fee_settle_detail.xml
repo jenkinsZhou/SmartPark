@@ -9,6 +9,7 @@
     <include layout="@layout/layout_title_bar" />
 
     <RelativeLayout
+        android:id="@+id/rlContentView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -133,10 +134,10 @@
                         android:id="@+id/tvSpaceNum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="@dimen/dp_60"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="@dimen/dp_12"
                         android:gravity="center"
-                        android:text="A01001"
                         android:textColor="@color/colorBlackTitle"
                         android:textSize="@dimen/sp_14"
                         android:textStyle="bold" />
@@ -153,6 +154,7 @@
                         android:id="@+id/tvPlantNum"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:minWidth="@dimen/dp_60"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginStart="@dimen/dp_10"
                         android:layout_marginTop="@dimen/dp_12"
@@ -199,7 +201,6 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="2020-09-09  12:30"
                             android:textColor="@color/colorGraySmallText" />
                     </LinearLayout>
 
@@ -223,7 +224,6 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="2020-09-09  12:30"
                             android:textColor="@color/colorGraySmallText" />
                     </LinearLayout>
 
@@ -247,7 +247,6 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="2020-09-09  12:30"
                             android:textColor="@color/colorGraySmallText" />
                     </LinearLayout>
 
@@ -295,7 +294,6 @@
                             android:includeFontPadding="false"
                             android:paddingTop="@dimen/dp_18"
                             android:paddingBottom="@dimen/dp_8"
-                            android:text="¥ 0.00"
                             android:textColor="@color/colorGraySmallText" />
                     </LinearLayout>
 
@@ -327,7 +325,6 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="¥ 10.00"
                             android:textColor="@color/colorGraySmallText" />
                     </LinearLayout>
 
@@ -352,7 +349,6 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_weight="1"
                             android:gravity="end"
-                            android:text="¥ 10.00"
                             android:textColor="#629BFF" />
                     </LinearLayout>
 

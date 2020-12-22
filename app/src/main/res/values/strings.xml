@@ -16,7 +16,7 @@
     <string name="exception_socket">Socket连接超时</string>
     <string name="exception_http">HTTP异常</string>
     <string name="exception_unknown_host">无法解析主机(DNS错误)</string>
-    <string name="exception_json_syntax">Json数据格式化错误</string>
+    <string name="exception_json_syntax">服务器数据解析异常</string>
     <string name="exception_time_out">访问超时</string>
     <string name="exception_class_cast">类型转换错误</string>
     <string name="exception_other_error">其它错误</string>

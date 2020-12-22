@@ -6,13 +6,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import com.tourcoo.smartpark.core.UiManager;
+import com.tourcoo.smartpark.core.control.IHttpPageRequestControl;
 import com.tourcoo.smartpark.core.control.IHttpRequestControl;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.LoadingDialogWrapper;
 
 /**
  * @author :JenkinsZhou
- * @description : JenkinsZhou
+ * @description :
  * @company :途酷科技
  * @date 2020年11月13日16:44
  * @Email: 971613168@qq.com
@@ -28,19 +29,19 @@ public abstract class BaseLoadingObserver<T> extends BaseObserver<T> {
      *
      * @param activity
      */
-    public BaseLoadingObserver(@Nullable Activity activity, IHttpRequestControl httpRequestControl, @StringRes int resId) {
+    public BaseLoadingObserver(@Nullable Activity activity, IHttpPageRequestControl httpRequestControl, @StringRes int resId) {
         this(UiManager.getInstance().getLoadingDialog().createLoadingDialog(activity).setMessage(resId), httpRequestControl);
     }
 
-    public BaseLoadingObserver(IHttpRequestControl httpRequestControl, @StringRes int resId) {
+    public BaseLoadingObserver(IHttpPageRequestControl httpRequestControl, @StringRes int resId) {
         this(StackUtil.getInstance().getCurrent(), httpRequestControl, resId);
     }
 
-    public BaseLoadingObserver(@Nullable Activity activity, IHttpRequestControl httpRequestControl, CharSequence msg) {
+    public BaseLoadingObserver(@Nullable Activity activity, IHttpPageRequestControl httpRequestControl, CharSequence msg) {
         this(UiManager.getInstance().getLoadingDialog().createLoadingDialog(activity).setMessage(msg), httpRequestControl);
     }
 
-    public BaseLoadingObserver(IHttpRequestControl httpRequestControl, CharSequence msg) {
+    public BaseLoadingObserver(IHttpPageRequestControl httpRequestControl, CharSequence msg) {
         this(StackUtil.getInstance().getCurrent(), httpRequestControl, msg);
     }
 
@@ -60,9 +61,18 @@ public abstract class BaseLoadingObserver<T> extends BaseObserver<T> {
         this(StackUtil.getInstance().getCurrent(), msg);
     }
 
+    public BaseLoadingObserver(@Nullable Activity activity, IHttpPageRequestControl httpRequestControl) {
+        this(UiManager.getInstance().getLoadingDialog().createLoadingDialog(activity), httpRequestControl);
+    }
+
     public BaseLoadingObserver(@Nullable Activity activity, IHttpRequestControl httpRequestControl) {
         this(UiManager.getInstance().getLoadingDialog().createLoadingDialog(activity), httpRequestControl);
     }
+    public BaseLoadingObserver(IHttpPageRequestControl httpPageRequestControl) {
+        this(StackUtil.getInstance().getCurrent(), httpPageRequestControl);
+    }
+
+
 
     public BaseLoadingObserver(IHttpRequestControl httpRequestControl) {
         this(StackUtil.getInstance().getCurrent(), httpRequestControl);
@@ -77,13 +87,26 @@ public abstract class BaseLoadingObserver<T> extends BaseObserver<T> {
     }
 
     public BaseLoadingObserver(LoadingDialogWrapper dialog) {
-        this(dialog, null);
+        this(dialog, null,null);
     }
 
-    public BaseLoadingObserver(LoadingDialogWrapper dialog, IHttpRequestControl httpRequestControl) {
+
+
+    public BaseLoadingObserver(LoadingDialogWrapper dialog, IHttpPageRequestControl httpRequestControl) {
         super(httpRequestControl);
         this.mDialog = dialog;
     }
+
+    public BaseLoadingObserver(LoadingDialogWrapper dialog, IHttpPageRequestControl httpPageRequestControl,IHttpRequestControl httpRequestControl) {
+        super(httpPageRequestControl,httpRequestControl);
+        this.mDialog = dialog;
+    }
+    public BaseLoadingObserver(LoadingDialogWrapper dialog, IHttpRequestControl requestControl) {
+        super(requestControl);
+        this.mDialog = dialog;
+    }
+
+
 
     @Override
     public void onNext(T entity) {
