@@ -83,20 +83,21 @@ class EditPassActivity : BaseTitleActivity() {
     }
 
     private fun listenPassVisible(editText: EditText, imageView: ImageView) {
-        //默认可见
+        //默认不可见
         imageView.setTag(VISIBLE_STATUS, false)
-        imageView.setImageResource(R.mipmap.ic_eye_blue_closed)
+        imageView.setImageResource(R.mipmap.ic_eye_blue_open)
+        editText.transformationMethod = PasswordTransformationMethod.getInstance()
         imageView.setOnClickListener {
             if (imageView.getTag(VISIBLE_STATUS) != null) {
                 val isVisible = imageView.getTag(VISIBLE_STATUS) as Boolean
                 if (isVisible) {
-                    imageView.setImageResource(R.mipmap.ic_eye_blue_closed)
-                    editText.transformationMethod = PasswordTransformationMethod.getInstance()
-                    imageView.setTag(VISIBLE_STATUS, false)
-                } else {
                     imageView.setImageResource(R.mipmap.ic_eye_blue_open)
+                    editText.transformationMethod = PasswordTransformationMethod.getInstance()
+                    imageView.setTag(VISIBLE_STATUS, !isVisible)
+                } else {
+                    imageView.setImageResource(R.mipmap.ic_eye_blue_closed)
                     editText.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                    imageView.setTag(VISIBLE_STATUS, true)
+                    imageView.setTag(VISIBLE_STATUS, !isVisible)
 
                 }
                 editText.setSelection(editText.getText().toString().length)
