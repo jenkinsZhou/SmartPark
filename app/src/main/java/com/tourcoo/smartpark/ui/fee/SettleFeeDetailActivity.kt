@@ -65,6 +65,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private var timerTask: TimerTask? = null
     private val mHandler = Handler()
     private var ignoreTemp = false
+    private var refreshEnable = true
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
@@ -76,8 +77,9 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         const val EXTRA_PAY_STATUS = "EXTRA_PAY_STATUS"
         const val REQUEST_CODE_FEE_RECORD = 1002
         const val REQUEST_CODE_PAY_BY_SCAN = 1003
+
         //刷新的时间间隔（单位:秒）
-        const val REFRESH_INTERVAL = 30L
+        const val REFRESH_INTERVAL = 5L
 
     }
 
@@ -398,10 +400,13 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             override fun run() {
                 LogUtils.i("执行run（）")
                 mHandler.post {
-                    requestSettleInfo(mNeedIgnore)
+                    if (refreshEnable) {
+                        requestSettleInfo(mNeedIgnore)
+                    }
                 }
             }
         }
+
         timer.schedule(timerTask, REFRESH_INTERVAL * 1000, REFRESH_INTERVAL * 1000)
     }
 
@@ -416,5 +421,15 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             timerTask!!.cancel()
             timerTask = null
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        refreshEnable = false
+    }
+
+    override fun onResume() {
+        refreshEnable = true
+        super.onResume()
     }
 }

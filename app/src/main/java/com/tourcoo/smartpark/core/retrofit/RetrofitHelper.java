@@ -1,10 +1,12 @@
 package com.tourcoo.smartpark.core.retrofit;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.apkfuns.logutils.LogUtils;
+import com.tourcoo.smartpark.config.AppConfig;
 import com.tourcoo.smartpark.core.utils.SSLUtil;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 
@@ -457,7 +459,10 @@ public class RetrofitHelper {
                         LogUtils.tag(mLogTag).json(message);
                         return;
                     }
-                    LogUtils.d(mLogTag, message);
+                    if(AppConfig.DEBUG_BODE){
+                        Log.d(mLogTag, message);
+                    }
+
                 });
             }
             mLoggingInterceptor.setLevel(level);

@@ -6,6 +6,7 @@ import android.os.RemoteException
 import com.apkfuns.logutils.LogUtils
 import com.newland.aidl.printer.AidlPrinter
 import com.newland.aidl.printer.AidlPrinterListener
+import com.newland.aidl.printer.PrinterCode
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.report.DailyReport
@@ -18,6 +19,7 @@ import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.print.DeviceConnectListener
 import com.tourcoo.smartpark.print.DeviceService
 import com.tourcoo.smartpark.print.PrintConstant
+import com.tourcoo.smartpark.ui.account.AccountHelper
 import com.tourcoo.smartpark.util.StringUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_report_fee_daily.*
@@ -250,8 +252,42 @@ class DailyFeeReportActivity : BaseTitleActivity() {
             ToastUtil.showWarning("未获取到日报数据")
             return
         }
-        //真正执行打印的地方
-        printContent(dailyReport)
+        if (!printEnable) {
+            ToastUtil.showWarning("打印机繁忙或未连接")
+            return
+        }
+        if (iPrinter == null) {
+            ToastUtil.showWarning("打印机未连接")
+            return
+        }
+        when (iPrinter?.status) {
+            //正常
+            PrinterCode.PrinterState.PRINTER_NORMAL -> {
+                //真正执行打印的地方
+                printContent(dailyReport)
+            }
+            PrinterCode.PrinterState.PRINTER_OUTOF_PAPER -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机缺纸")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_HEAT_LIMITED -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机超温")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_BUSY -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机繁忙")
+                return
+            }
+            else -> {
+                ToastUtil.showWarning("打印机不可用")
+                return
+            }
+        }
     }
 
 

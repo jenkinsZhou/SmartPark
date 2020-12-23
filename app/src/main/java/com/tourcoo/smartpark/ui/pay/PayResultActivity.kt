@@ -53,7 +53,7 @@ class PayResultActivity : BaseTitleActivity() {
         paySuccess = intent?.getBooleanExtra(SettleFeeDetailActivity.EXTRA_PAY_STATUS, false)
         recordId = intent?.getLongExtra(EXTRA_PARK_ID, -1L)
         payResult = intent?.getSerializableExtra(SettleFeeDetailActivity.EXTRA_PAY_RESULT) as PayResult?
-        if (payResult == null || paySuccess == null) {
+        if (paySuccess == null) {
             ToastUtil.showWarning("未获取到支付结果")
             finish()
         }
@@ -269,12 +269,12 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "离开时间:" )
+            iPrinter?.addText(format, "离开时间:")
 
             format.putString("font", FONT_SIZE_LARGE)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_RIGHT)
-            iPrinter?.addText(format,  certificate.leaveAt)
+            iPrinter?.addText(format, certificate.leaveAt)
             iPrinter?.addText(format, "\n")
 
             format.putString("font", FONT_SIZE_LARGE)
@@ -294,13 +294,13 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "历史费用:RMB(元)" + certificate.arrears)
+            iPrinter?.addText(format, "历史欠费:RMB(元)" + certificate.arrears)
 
             format.putString("font", FONT_SIZE_LARGE)
             format.putInt("zoom", 3)
             format.putString("align", GRAVITY_LEFT)
             format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "应收费用:RMB(元)" + certificate.arrears)
+            iPrinter?.addText(format, "应收费用:RMB(元)" + certificate.totalFee)
 
             /*    format.putString("font", FONT_SIZE_LARGE)
                 format.putString("align", GRAVITY_LEFT)
@@ -315,7 +315,7 @@ class PayResultActivity : BaseTitleActivity() {
             format.putInt("zoom", 4)
             format.putString("font", FONT_SIZE_SMALL)
             format.putString("align", GRAVITY_CENTER)
-            iPrinter?.addText(format, "实收费用:RMB(元)" + "¥ "+certificate.totalFee)
+            iPrinter?.addText(format, "实收费用:RMB(元)" + "¥ " + certificate.totalFee)
             iPrinter?.addText(format, "line")
             format.putString("font", "normal")
             var payType = ""

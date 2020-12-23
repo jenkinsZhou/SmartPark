@@ -100,7 +100,7 @@ class EditPassActivity : BaseTitleActivity() {
                     imageView.setTag(VISIBLE_STATUS, !isVisible)
 
                 }
-                editText.setSelection(editText.getText().toString().length)
+                editText.setSelection(editText.text.toString().length)
             }
         }
     }

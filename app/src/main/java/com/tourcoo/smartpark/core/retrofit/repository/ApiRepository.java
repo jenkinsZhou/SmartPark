@@ -219,8 +219,12 @@ public class ApiRepository extends BaseRepository {
      *
      * @return
      */
-    public Observable<BaseResult<Object>> requestSign() {
-        return ThreadTransformer.switchSchedulers(getApiService().requestSign().retryWhen(new RetryWhen()));
+    public Observable<BaseResult<Object>> requestSign(int isCheckIn) {
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("isCheckIn", isCheckIn);
+        LogUtils.tag("提交到后台的参数").i(params);
+
+        return ThreadTransformer.switchSchedulers(getApiService().requestSign(params).retryWhen(new RetryWhen()));
     }
 
     /**

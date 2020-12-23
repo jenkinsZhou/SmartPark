@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.apkfuns.logutils.LogUtils
 import com.newland.aidl.printer.AidlPrinter
 import com.newland.aidl.printer.AidlPrinterListener
+import com.newland.aidl.printer.PrinterCode
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
@@ -112,6 +113,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
     private fun requestFeeDetail(needIgnore: Boolean) {
         ApiRepository.getInstance().requestFeeDetail(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeDetail>>() {
             override fun onRequestSuccess(entity: BaseResult<FeeDetail>?) {
+                commonRefreshLayout.finishRefresh(true)
                 if (entity == null) {
                     return
                 }
@@ -123,6 +125,10 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
                 }
             }
 
+            override fun onRequestError(throwable: Throwable?) {
+                commonRefreshLayout.finishRefresh(false)
+                super.onRequestError(throwable)
+            }
         })
     }
 
@@ -216,8 +222,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ToastUtil.showFailed("服务器数据异常")
             return
         }
-        //真正执行打印的地方
-        printContent(AccountHelper.getInstance().userInfo, result.data!!)
+       doPrint(result)
     }
 
 
@@ -389,7 +394,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         deviceService?.connect()
     }
 
-    private fun initPrintClick(){
+    private fun initPrintClick() {
         val rightLayout = mTitleBar?.getLinearLayout(Gravity.END) ?: return
         rightLayout.removeAllViews()
         val rightTextView = View.inflate(mContext, R.layout.view_right_title, null) as TextView
@@ -397,6 +402,50 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         rightLayout.addView(rightTextView)
         rightTextView.setOnClickListener {
             requestFeeCertificate(recordId)
+        }
+    }
+
+
+    private fun doPrint(result: BaseResult<FeeCertificate>) {
+        if (AccountHelper.getInstance().userInfo == null) {
+            ToastUtil.showWarning("未获取到收费员信息")
+            return
+        }
+        if (!printEnable) {
+            ToastUtil.showWarning("打印机繁忙或未连接")
+            return
+        }
+        if (iPrinter == null) {
+            ToastUtil.showWarning("打印机未连接")
+            return
+        }
+        when (iPrinter?.status) {
+            //正常
+            PrinterCode.PrinterState.PRINTER_NORMAL -> {
+                //真正执行打印的地方
+                printContent(AccountHelper.getInstance().userInfo, result.data!!)
+            }
+            PrinterCode.PrinterState.PRINTER_OUTOF_PAPER -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机缺纸")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_HEAT_LIMITED -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机超温")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_BUSY -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机繁忙")
+                return
+            }
+            else -> {
+                ToastUtil.showWarning("打印机不可用")
+                return
+            }
         }
     }
 }

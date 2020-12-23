@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.apkfuns.logutils.LogUtils
 import com.newland.aidl.printer.AidlPrinter
 import com.newland.aidl.printer.AidlPrinterListener
+import com.newland.aidl.printer.PrinterCode
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
@@ -71,6 +72,7 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
     private fun requestArrearsDetail() {
         ApiRepository.getInstance().requestArrearsDetail(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeDetail>>() {
             override fun onRequestSuccess(entity: BaseResult<FeeDetail>?) {
+                commonRefreshLayout.finishRefresh()
                 if (entity == null) {
                     return
                 }
@@ -79,6 +81,11 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
                 } else {
                     ToastUtil.showFailed(entity.errMsg)
                 }
+            }
+
+            override fun onRequestError(throwable: Throwable?) {
+                super.onRequestError(throwable)
+                commonRefreshLayout.finishRefresh(false)
             }
 
         })
@@ -229,8 +236,7 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
             ToastUtil.showFailed("服务器数据异常")
             return
         }
-        //真正执行打印的地方
-        printContent(AccountHelper.getInstance().userInfo, result.data!!)
+        doPrint(result)
     }
 
     private fun printContent(userInfo: UserInfo, certificate: FeeCertificate) {
@@ -345,6 +351,50 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
             e.printStackTrace()
             ToastUtil.showFailedDebug("打印故障:$e")
             closeLoading()
+        }
+    }
+
+
+    private fun doPrint(result: BaseResult<FeeCertificate>) {
+        if (AccountHelper.getInstance().userInfo == null) {
+            ToastUtil.showWarning("未获取到收费员信息")
+            return
+        }
+        if (!printEnable) {
+            ToastUtil.showWarning("打印机繁忙或未连接")
+            return
+        }
+        if (iPrinter == null) {
+            ToastUtil.showWarning("打印机未连接")
+            return
+        }
+        when (iPrinter?.status) {
+            //正常
+            PrinterCode.PrinterState.PRINTER_NORMAL -> {
+                //真正执行打印的地方
+                printContent(AccountHelper.getInstance().userInfo, result.data!!)
+            }
+            PrinterCode.PrinterState.PRINTER_OUTOF_PAPER -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机缺纸")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_HEAT_LIMITED -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机超温")
+                return
+            }
+
+            PrinterCode.PrinterState.PRINTER_BUSY -> {
+                //打印机缺纸
+                ToastUtil.showWarning("打印机繁忙")
+                return
+            }
+            else -> {
+                ToastUtil.showWarning("打印机不可用")
+                return
+            }
         }
     }
 }

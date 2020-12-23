@@ -284,12 +284,16 @@ public class DeviceService {
     private void setDisconnecting() {
         if (connectListener != null) {
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                connectListener.deviceConnecting();
+                if(connectListener != null){
+                    connectListener.deviceConnecting();
+                }
             } else {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        connectListener.deviceConnecting();
+                        if(connectListener != null){
+                            connectListener.deviceConnecting();
+                        }
                     }
                 });
             }
@@ -300,12 +304,16 @@ public class DeviceService {
     private void setNoDisconnect() {
         if (connectListener != null) {
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                connectListener.deviceNoConnect();
+                if(connectListener != null){
+                    connectListener.deviceNoConnect();
+                }
             } else {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        connectListener.deviceNoConnect();
+                        if(connectListener != null){
+                            connectListener.deviceNoConnect();
+                        }
                     }
                 });
             }

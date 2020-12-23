@@ -156,7 +156,7 @@ public interface ApiService {
      * @return
      */
     @POST("/handheld/member/check")
-    Observable<BaseResult<Object>> requestSign();
+    Observable<BaseResult<Object>> requestSign(@Body Map<String, Object> map);
 
     @GET("/handheld/version")
     Observable<BaseResult<AppVersion>> requestAppVersion(@QueryMap Map<String, Object> map);

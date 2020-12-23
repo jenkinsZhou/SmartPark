@@ -233,8 +233,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 closeDrawerLayout();
                 break;
             case R.id.tvSignIn:
+                requestSign(1);
+                closeDrawerLayout();
+                break;
             case R.id.tvSignOut:
-                requestSign();
+                requestSign(0);
                 closeDrawerLayout();
                 break;
             case R.id.tvPay:
@@ -560,8 +563,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         dialog.create().setTitle("退出登录后 会返回到登录页").show();
     }
 
-    private void requestSign() {
-        ApiRepository.getInstance().requestSign().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<Object>>() {
+    private void requestSign(int signIn) {
+        ApiRepository.getInstance().requestSign(signIn).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<Object>>() {
             @Override
             public void onRequestSuccess(BaseResult<Object> entity) {
                 if (entity == null) {
