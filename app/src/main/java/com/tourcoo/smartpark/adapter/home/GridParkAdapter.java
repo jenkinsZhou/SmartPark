@@ -51,7 +51,7 @@ public class GridParkAdapter extends BaseQuickAdapter<ParkSpaceInfo, BaseViewHol
                 tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.bg_radius_30_yellow_fbc95f));
                 break;
             case ParkConstant.CAR_TYPE_GREEN:
-                tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b));
+                tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b));
                 break;
         }
 

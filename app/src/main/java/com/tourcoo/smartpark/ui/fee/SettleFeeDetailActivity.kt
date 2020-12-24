@@ -229,10 +229,10 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff)
             }
             ParkConstant.CAR_TYPE_YELLOW -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b)
+                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
             }
             ParkConstant.CAR_TYPE_GREEN -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b)
+                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
             }
             else -> {
             }

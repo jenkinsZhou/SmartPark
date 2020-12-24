@@ -378,8 +378,9 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener {
 
 
     override fun onDestroy() {
-        super.onDestroy()
         disconnectPrinter()
+        keyboardView = null
+        super.onDestroy()
     }
 
     private fun disconnectPrinter() {

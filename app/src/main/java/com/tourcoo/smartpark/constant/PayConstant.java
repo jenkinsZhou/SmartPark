@@ -11,4 +11,8 @@ public class PayConstant {
     public static final String PAY_TYPE_ALI = "alipay_scan";
     public static final String PAY_TYPE_WEI_XIN = "wechat_scan";
     public static final String PAY_TYPE_CASH= "money";
+    /**
+     * 小程序
+     */
+    public static final String PAY_TYPE_SMALL_PROGRAM= "mini";
 }

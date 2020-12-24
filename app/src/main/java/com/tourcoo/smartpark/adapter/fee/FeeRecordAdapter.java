@@ -15,6 +15,7 @@ import com.tourcoo.smartpark.util.StringUtil;
 
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_ALI;
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_CASH;
+import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_SMALL_PROGRAM;
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_WEI_XIN;
 
 /**
@@ -41,7 +42,7 @@ public class FeeRecordAdapter extends BaseQuickAdapter<DailyFeeRecord, BaseViewH
                 tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.bg_radius_30_yellow_fbc95f));
                 break;
             case ParkConstant.CAR_TYPE_GREEN:
-                tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.bg_radius_30_green_4ebf8b));
+                tvPlantNum.setBackground(CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b));
                 break;
         }
         tvPlantNum.setText(StringUtil.getNotNullValueLine(item.getCarNumber()));
@@ -59,8 +60,11 @@ public class FeeRecordAdapter extends BaseQuickAdapter<DailyFeeRecord, BaseViewH
             case PAY_TYPE_CASH:
                 ivParkingType.setImageResource(R.mipmap.ic_pay_type_cash);
                 break;
+            case PAY_TYPE_SMALL_PROGRAM:
+                //小程序支付
+                ivParkingType.setImageResource(R.mipmap.ic_pay_type_small_program);
+                break;
             default:
-
                 break;
         }
     }
