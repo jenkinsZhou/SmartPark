@@ -141,11 +141,14 @@ public class SmartParkApplication extends Application {
 
             });
             //授权初始化
-            if (!PredictorWrapper.initLicense(this)) {
-                return;
+            try {
+                PredictorWrapper.initLicense(this);
+                // 初始化模型
+                PredictorWrapper.initModel(this);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            // 初始化模型
-            PredictorWrapper.initModel(this);
+
         });
     }
 

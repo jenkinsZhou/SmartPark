@@ -36,18 +36,21 @@ public class PredictorWrapper {
 
     public static boolean initLicense(Context context) {
         // 获取鉴权相关本地设备及应用相关信息
-        BDLicenseLocalInfo bdLicenseLocalInfo = AndroidLicenser.getInstance().authGetLocalInfo(context, Predictor.getAlgorithmId());
-        Log.d(TAG, "BDLicenseLocalInfo :" + bdLicenseLocalInfo.toString());
-
-        // 使用申请的license-key 及 收钱文件进行本地授权
+        try {
+            BDLicenseLocalInfo bdLicenseLocalInfo = AndroidLicenser.getInstance().authGetLocalInfo(context, Predictor.getAlgorithmId());
+            Log.d(TAG, "BDLicenseLocalInfo :" + bdLicenseLocalInfo.toString());
+            // 使用申请的license-key 及 收钱文件进行本地授权
       /*  AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(activity, "ocrplatenumberdemo_test_license",
                 "idl-license.ocrplatenumberdemo_test_license", true, Predictor.getAlgorithmId());*/
      /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "yixing_platenumber_7_B2ECF",
                 "yixing_platenumber_7_B2ECF", true, Predictor.getAlgorithmId());*/
-        AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "TUKU_TEST",
-                "idl_license_ocr_platenumber", true, Predictor.getAlgorithmId());
-        if (ret != AndroidLicenser.ErrorCode.SUCCESS) {
-            LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
+            AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "TUKU_TEST",
+                    "idl_license_ocr_platenumber", true, Predictor.getAlgorithmId());
+            if (ret != AndroidLicenser.ErrorCode.SUCCESS) {
+                LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
+                return false;
+            }
+        }catch (Exception e){
             return false;
         }
 //        setTextViewOnUiThread(activity, textView, "鉴权成功");

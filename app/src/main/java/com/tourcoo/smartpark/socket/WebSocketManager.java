@@ -87,7 +87,7 @@ public class WebSocketManager {
         this.isEnableDisconnect = isEnableDisconnect;
     }
 
-    public void setPingInterval() {
+    public void setPingInterval(long time) {
         if (mPingTimerTask == null) {
             releaseTask(pingTaskList);
             mPingTimerTask = new TimerTask() {
@@ -100,7 +100,14 @@ public class WebSocketManager {
             };
             pingTaskList.add(mPingTimerTask);
         }
-        mPingTimer.schedule(mPingTimerTask, 0, DEFAULT_SOCKET_PING_INTERVAL);
+        if (time <= 0) {
+            time = DEFAULT_SOCKET_PING_INTERVAL;
+        }
+        mPingTimer.schedule(mPingTimerTask, 0, time);
+    }
+
+    public void setPingInterval() {
+        setPingInterval(DEFAULT_SOCKET_PING_INTERVAL);
     }
 
     // 客户端像服务器发送消息

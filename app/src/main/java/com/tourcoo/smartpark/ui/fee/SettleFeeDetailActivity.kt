@@ -138,6 +138,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             }
             R.id.tvIgnoreHistoryFee -> {
                 requestSettleInfo(!mNeedIgnore)
+                mNeedIgnore = !mNeedIgnore
             }
             R.id.tvFeeHistory -> {
                 skipArrearsRecord()
@@ -175,6 +176,15 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.count)
         tvFeeReally.text = StringUtil.getNotNullValueLine("")
         showCarInfo(settleDetail)
+        if(settleDetail.count <=0){
+            setViewGone(llPayByCash,false)
+            setViewGone(llPayByCode,false)
+            setViewGone(llExitConfirm,true)
+        }else{
+            setViewGone(llPayByCash,true)
+            setViewGone(llPayByCode,true)
+            setViewGone(llExitConfirm,false)
+        }
         showTitleInfoByCondition(settleDetail)
     }
 
@@ -214,8 +224,6 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 arrearsIdList.addAll(entity.data.arrearsId)
             }
             showSettleInfo(entity.data, ignore)
-            mNeedIgnore = !mNeedIgnore
-
         } else {
             ToastUtil.showFailed(entity.errMsg)
         }

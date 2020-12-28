@@ -9,5 +9,5 @@ package com.tourcoo.smartpark.socket;
  */
 public class WebSocketConfig {
     public static final int TIME_OUT = 10000;
-    public static final String SOCKET_URL = "ws://192.168.0.238:8007/push";
+    public static final String SOCKET_URL = "ws://192.168.0.113:8007/push";
 }
