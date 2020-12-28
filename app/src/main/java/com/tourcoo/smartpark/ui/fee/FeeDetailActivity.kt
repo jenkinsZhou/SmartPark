@@ -142,13 +142,15 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         } else {
             tvIgnoreHistoryFee.text = StringUtil.getNotNullValueLine("[忽略]")
         }
+        setViewVisible(llFeeReal,true)
         tvParkingName.text = StringUtil.getNotNullValueLine(data.parking)
         tvEnterTime.text = StringUtil.getNotNullValueLine(data.createdAt)
         tvExitTime.text = StringUtil.getNotNullValueLine(data.leaveAt)
         tvParkingDuration.text = StringUtil.getNotNullValueLine(data.duration)
         tvFeeCurrent.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
         tvFeeHistory.text = StringUtil.getNotNullValueLine("¥ " + data.arrears)
-        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.totalFee)
+        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.theoreticalFee)
+        tvFeeReally.text = StringUtil.getNotNullValueLine("¥ " + data.totalFee)
         showCarInfo(data)
     }
 

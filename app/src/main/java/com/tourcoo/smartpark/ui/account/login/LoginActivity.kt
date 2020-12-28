@@ -2,9 +2,15 @@ package com.tourcoo.smartpark.ui.account.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
+import android.text.TextWatcher
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.EditText
+import android.widget.ImageView
 import com.bryant.editlibrary.BSearchEdit
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.account.ParkingInfo
@@ -18,6 +24,7 @@ import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.HomeActivity
 import com.tourcoo.smartpark.ui.account.AccountHelper
+import com.tourcoo.smartpark.ui.account.EditPassActivity
 import com.tourcoo.smartpark.util.StringUtil
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -46,6 +53,8 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
         etCurrentParking.post {
             initSearchView(etCurrentParking.width.toFloat())
         }
+        listenInput(etUserName, ivClearUser)
+        listenInput(etPass, ivClearPass)
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -86,7 +95,7 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
     }
 
     override fun loginFailed() {
-     closeLoadingDialog()
+        closeLoadingDialog()
     }
 
     override fun showUserInfo(userInfo: UserInfo?) {
@@ -154,14 +163,46 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
     }
 
 
-    private fun listenInput() {
-
-    }
-
     private fun skipHome() {
         CommonUtil.startActivity(mContext, HomeActivity::class.java)
         finish()
     }
 
+    private fun listenInput(editText: EditText, imageView: ImageView) {
+        imageView.setOnClickListener {
+            editText.setText("")
+        }
+        editText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                setViewVisible(imageView, s != null && s.toString().isNotEmpty())
+            }
+
+        })
+        /*  //默认不可见
+          imageView.setImageResource(R.mipmap.ic_eye_blue_open)
+          editText.transformationMethod = PasswordTransformationMethod.getInstance()
+          imageView.setOnClickListener {
+              if (imageView.getTag(EditPassActivity.VISIBLE_STATUS) != null) {
+                  val isVisible = imageView.getTag(EditPassActivity.VISIBLE_STATUS) as Boolean
+                  if (isVisible) {
+                      imageView.setImageResource(R.mipmap.ic_eye_blue_open)
+                      editText.transformationMethod = PasswordTransformationMethod.getInstance()
+                      imageView.setTag(EditPassActivity.VISIBLE_STATUS, !isVisible)
+                  } else {
+                      imageView.setImageResource(R.mipmap.ic_eye_blue_closed)
+                      editText.transformationMethod = HideReturnsTransformationMethod.getInstance()
+                      imageView.setTag(EditPassActivity.VISIBLE_STATUS, !isVisible)
+
+                  }
+                  editText.setSelection(editText.text.toString().length)
+              }
+          }*/
+    }
 }

@@ -1,6 +1,7 @@
 package com.tourcoo.smartpark.ui.account
 
 import android.os.Bundle
+import android.os.Handler
 import android.text.InputType
 import android.text.TextUtils
 import android.text.method.HideReturnsTransformationMethod
@@ -75,6 +76,7 @@ class EditPassActivity : BaseTitleActivity() {
             override fun onRequestSuccess(entity: BaseResult<Any?>?) {
                 if (entity?.code == RequestConfig.REQUEST_CODE_SUCCESS) {
                     ToastUtil.showSuccess(entity.errMsg)
+                    Handler().postDelayed(Runnable { finish() }, 300)
                 } else {
                     ToastUtil.showNormal(entity?.errMsg)
                 }

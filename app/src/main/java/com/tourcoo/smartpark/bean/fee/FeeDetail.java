@@ -47,6 +47,7 @@ public class FeeDetail {
     private String leaveAt;
     private double totalFee;
     private double arrears;
+    private double theoreticalFee;
 
     public String getNumber() {
         return number;
@@ -134,5 +135,13 @@ public class FeeDetail {
 
     public void setArrears(double arrears) {
         this.arrears = arrears;
+    }
+
+    public double getTheoreticalFee() {
+        return theoreticalFee;
+    }
+
+    public void setTheoreticalFee(double theoreticalFee) {
+        this.theoreticalFee = theoreticalFee;
     }
 }

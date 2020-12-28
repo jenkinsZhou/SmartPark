@@ -65,7 +65,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private var timerTask: TimerTask? = null
     private val mHandler = Handler()
     private var ignoreTemp = false
-    private var refreshEnable = true
+    private var refreshEnable = false
 
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
@@ -79,7 +79,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         const val REQUEST_CODE_PAY_BY_SCAN = 1003
 
         //刷新的时间间隔（单位:秒）
-        const val REFRESH_INTERVAL = 5L
+        const val REFRESH_INTERVAL = 15L
 
     }
 
@@ -100,7 +100,6 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         tvFeeHistory.setOnClickListener(this)
         tvIgnoreHistoryFee.setOnClickListener(this)
         initRefreshLayout()
-        scheduleRequestTask()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -176,14 +175,14 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.count)
         tvFeeReally.text = StringUtil.getNotNullValueLine("")
         showCarInfo(settleDetail)
-        if(settleDetail.count <=0){
-            setViewGone(llPayByCash,false)
-            setViewGone(llPayByCode,false)
-            setViewGone(llExitConfirm,true)
-        }else{
-            setViewGone(llPayByCash,true)
-            setViewGone(llPayByCode,true)
-            setViewGone(llExitConfirm,false)
+        if (settleDetail.count <= 0) {
+            setViewGone(llPayByCash, false)
+            setViewGone(llPayByCode, false)
+            setViewGone(llExitConfirm, true)
+        } else {
+            setViewGone(llPayByCash, true)
+            setViewGone(llPayByCode, true)
+            setViewGone(llExitConfirm, false)
         }
         showTitleInfoByCondition(settleDetail)
     }
@@ -199,6 +198,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             override fun onRequestSuccess(entity: BaseResult<SettleDetail>?) {
                 ignoreTemp = needIgnore
                 UiManager.getInstance().requestControl.httpRequestSuccess(httpRequestControl, entity)
+                scheduleRequestTask()
             }
 
             override fun onRequestError(throwable: Throwable?) {
@@ -403,7 +403,9 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
 
 
     private fun scheduleRequestTask() {
-
+        if (timerTask != null) {
+            timerTask!!.cancel()
+        }
         timerTask = object : TimerTask() {
             override fun run() {
                 LogUtils.i("执行run（）")
@@ -414,7 +416,6 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 }
             }
         }
-
         timer.schedule(timerTask, REFRESH_INTERVAL * 1000, REFRESH_INTERVAL * 1000)
     }
 
@@ -424,11 +425,11 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     }
 
     private fun releaseTimerTask() {
-        timer.cancel()
         if (timerTask != null) {
             timerTask!!.cancel()
             timerTask = null
         }
+        timer.cancel()
     }
 
     override fun onPause() {

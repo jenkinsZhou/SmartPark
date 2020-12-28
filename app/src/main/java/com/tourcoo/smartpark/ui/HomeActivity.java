@@ -252,6 +252,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.tvHomeArrears:
                 CommonUtil.startActivity(HomeActivity.this, ArrearsRecordListActivity.class);
+                closeDrawerLayout();
                 break;
             case R.id.tvHomeEditPass:
                 CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
@@ -259,11 +260,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.tvSignIn:
                 requestSign(1);
-                closeDrawerLayout();
                 break;
             case R.id.tvSignOut:
                 requestSign(0);
-                closeDrawerLayout();
                 break;
             case R.id.tvPay:
                 CommonUtil.startActivity(HomeActivity.this, WaitSettleListActivity.class);
