@@ -2,6 +2,8 @@ package com.tourcoo.smartpark.util;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -126,5 +128,14 @@ public class StringUtil {
             return new Integer[]{};
         }
         return values.toArray(new Integer[0]);
+    }
+
+
+    public static   <T> T fromJson(String result, Class<T> classOfT) {
+        if (result == null) {
+            return null;
+        }
+        Gson gson = new Gson();
+        return gson.fromJson(result, classOfT);
     }
 }

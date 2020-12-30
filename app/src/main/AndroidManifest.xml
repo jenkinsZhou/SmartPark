@@ -83,6 +83,7 @@
             />
         <activity android:name=".ui.fee.FeeDetailActivity" />
         <activity android:name=".ui.fee.ArrearsDetailActivity" />
+        <activity android:name=".ui.message.MessageListActivity" />
     </application>
 
 </manifest>

@@ -17,6 +17,7 @@ import com.tourcoo.smartpark.bean.fee.FeeCertificate;
 import com.tourcoo.smartpark.bean.fee.FeeDetail;
 import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
+import com.tourcoo.smartpark.bean.message.MessageInfo;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 import com.tourcoo.smartpark.bean.system.AppVersion;
@@ -299,6 +300,14 @@ public class ApiRepository extends BaseRepository {
         }
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestParkUnusedList(params).retryWhen(new RetryWhen()));
+    }
+
+    /**
+     * 消息列表
+     * @return
+     */
+    public Observable<BaseResult<List<MessageInfo>>> requestMessageList() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestMessageList().retryWhen(new RetryWhen()));
     }
 
 }

@@ -679,7 +679,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
             if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 carType = CAR_TYPE_GREEN
-            }else{
+            } else {
                 carType = CAR_TYPE_NORMAL
             }
             isOrcPhoto = false
@@ -703,7 +703,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
             if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 carType = CAR_TYPE_GREEN
-            }else{
+            } else {
                 carType = CAR_TYPE_NORMAL
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
@@ -738,7 +738,11 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         bSearchEdit!!.setTextClickListener { position, text ->
             currentSelectPosition = position
             tvParkNumber.setText(text!!)
-            tvParkNumber.setSelection(text.length)
+            try {
+                tvParkNumber.setSelection(text.length)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         bSearchEdit!!.setOnClickListener {
             spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)

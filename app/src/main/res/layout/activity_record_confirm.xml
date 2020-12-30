@@ -81,7 +81,7 @@
                                 android:hint="请选择车位"
                                 android:background="@null"
                                 android:letterSpacing="0.2"
-                                android:maxLength="8"
+                                android:maxLength="20"
                                 android:textColor="#629BFF"
                                 android:textSize="@dimen/sp_14" />
 

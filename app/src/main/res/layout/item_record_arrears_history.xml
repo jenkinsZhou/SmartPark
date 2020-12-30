@@ -26,8 +26,8 @@
             android:layout_weight="3"
             android:orientation="vertical"
             android:paddingStart="@dimen/dp_10"
-            android:paddingEnd="@dimen/dp_1"
             android:paddingTop="@dimen/dp_18"
+            android:paddingEnd="@dimen/dp_1"
             android:paddingBottom="@dimen/dp_18">
 
             <LinearLayout
@@ -36,20 +36,18 @@
                 android:orientation="horizontal">
 
                 <TextView
-                   style="@style/textBlackStyle13"
+                    style="@style/textBlackStyle13"
                     android:drawableStart="@mipmap/ic_locate_small_yello"
                     android:drawablePadding="@dimen/dp_5"
                     android:text="停车位置"
-                    android:textColor="@color/colorGraySmallText"
-                 />
+                    android:textColor="@color/colorGraySmallText" />
 
                 <TextView
                     android:id="@+id/tvParkingName"
                     style="@style/textBlackStyle13"
                     android:layout_marginStart="@dimen/dp_8"
                     android:text="宜兴停车场"
-                    android:textColor="@color/colorGraySmallText"
-                     />
+                    android:textColor="@color/colorGraySmallText" />
             </LinearLayout>
 
             <LinearLayout
@@ -63,16 +61,14 @@
                     android:drawableStart="@mipmap/ic_enter_time_small"
                     android:drawablePadding="@dimen/dp_5"
                     android:text="入场时间"
-                    android:textColor="@color/colorGraySmallText"
-                    />
+                    android:textColor="@color/colorGraySmallText" />
 
                 <TextView
                     android:id="@+id/tvCarEnterTime"
                     style="@style/textBlackStyle13"
                     android:layout_marginStart="@dimen/dp_8"
                     android:text="2020-09-15  21:00:00"
-                    android:textColor="@color/colorGraySmallText"
-                 />
+                    android:textColor="@color/colorGraySmallText" />
             </LinearLayout>
 
             <LinearLayout
@@ -82,21 +78,19 @@
                 android:orientation="horizontal">
 
                 <TextView
-                   style="@style/textBlackStyle13"
+                    style="@style/textBlackStyle13"
                     android:drawableStart="@mipmap/ic_exit_time_small"
                     android:drawablePadding="@dimen/dp_5"
                     android:text="离场时间"
-                    android:textColor="@color/colorGraySmallText"
-                   />
+                    android:textColor="@color/colorGraySmallText" />
 
                 <TextView
-                    style="@style/textBlackStyle13"
                     android:id="@+id/tvCarExitTime"
+                    style="@style/textBlackStyle13"
 
                     android:layout_marginStart="@dimen/dp_8"
                     android:text="2020-09-15  23:00:00"
-                    android:textColor="@color/colorGraySmallText"
-                     />
+                    android:textColor="@color/colorGraySmallText" />
             </LinearLayout>
 
 
@@ -107,43 +101,64 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    style="@style/textBlackStyle13"
                     android:drawableStart="@mipmap/ic_alarm_small_yello"
                     android:drawablePadding="@dimen/dp_5"
                     android:text="计费时长"
-                    style="@style/textBlackStyle13"
-                    android:textColor="@color/colorGraySmallText"
-                  />
+                    android:textColor="@color/colorGraySmallText" />
 
                 <TextView
                     android:id="@+id/tvParkingTime"
                     style="@style/textBlackStyle13"
                     android:layout_marginStart="@dimen/dp_8"
                     android:text="2小时0分10秒"
-                    android:textColor="@color/colorGraySmallText"
-                 />
+                    android:textColor="@color/colorGraySmallText" />
             </LinearLayout>
 
         </LinearLayout>
 
         <View
-            android:layout_width="@dimen/dp_1"
+            android:layout_width="@dimen/dp_0_5"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/dp_12"
             android:layout_marginTop="@dimen/dp_19"
             android:layout_marginBottom="@dimen/dp_19"
             android:background="@color/grayE0E0E0" />
 
-        <TextView
-            android:id="@+id/tvParkingFee"
+        <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:layout_marginEnd="@dimen/dp_5"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:text="¥ 9999.00"
-            android:textColor="#E54E3F"
-            android:textSize="@dimen/sp_18" />
+            android:layout_marginStart="@dimen/dp_5"
+            android:paddingTop="@dimen/dp_18"
+            android:paddingBottom="@dimen/dp_18"
+            android:layout_marginEnd="@dimen/dp_5"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvArrearsType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:text="［延时欠缴］"
+                android:textColor="#FFC906"
+                android:textSize="@dimen/sp_13"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvParkingFee"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="¥ 9999.00"
+                android:textColor="#E54E3F"
+                android:textSize="@dimen/sp_18" />
+        </RelativeLayout>
+
 
     </LinearLayout>
 

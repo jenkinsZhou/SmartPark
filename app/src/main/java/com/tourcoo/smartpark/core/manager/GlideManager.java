@@ -179,13 +179,28 @@ public class GlideManager {
                 .transform(new CircleCrop())).into(iv);
     }
 
+    public static void loadCircleImgAuto(Object obj, ImageView iv, Drawable placeholder) {
+        Glide.with(iv.getContext()).load(obj).apply(getRequestOptionsAuto()
+                .error(placeholder)
+                .placeholder(placeholder)
+                .fallback(placeholder)
+                .dontAnimate()
+                .transform(new CircleCrop())).into(iv);
+    }
+
     public static void loadCircleImgCenterCrop(Object obj, ImageView iv, int placeholderResource) {
         Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
         loadCircleImgCenterCrop(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
     }
 
-    public static void loadCircleImg(Object obj, ImageView iv) {
-        loadCircleImgCenterCrop(obj, iv, sCirclePlaceholder);
+    public static void loadCircleImgCenterAuto(Object obj, ImageView iv, int placeholderResource) {
+        Drawable drawable = getDrawable(iv.getContext(), placeholderResource);
+        loadCircleImgAuto(obj, iv, drawable != null ? drawable : sCirclePlaceholderDrawable);
+    }
+
+
+    public static void loadCircleImgAuto(Object obj, ImageView iv) {
+        loadCircleImgCenterAuto(obj, iv, sCirclePlaceholder);
     }
 
     public static void loadRoundImageAuto(Object obj, ImageView iv) {

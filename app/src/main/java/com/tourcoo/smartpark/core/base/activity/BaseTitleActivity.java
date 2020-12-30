@@ -1,6 +1,9 @@
 package com.tourcoo.smartpark.core.base.activity;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import com.gyf.immersionbar.ImmersionBar;
 import com.tourcoo.smartpark.core.control.ITitleView;
@@ -22,6 +25,12 @@ public abstract class BaseTitleActivity extends BaseActivity implements ITitleVi
     public void beforeInitView(Bundle savedInstanceState) {
         super.beforeInitView(savedInstanceState);
         mTitleBar = FindViewUtil.getTargetView(mContentView, TitleBarView.class);
+        if (mTitleBar != null) {
+            TextView mainTitle = mTitleBar.getTextView(Gravity.CENTER);
+            if (mainTitle != null) {
+                mainTitle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            }
+        }
         ImmersionBar.with(this)
                 .statusBarDarkFont(true)
                 .navigationBarDarkIcon(true)

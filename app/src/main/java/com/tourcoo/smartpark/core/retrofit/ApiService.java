@@ -14,6 +14,7 @@ import com.tourcoo.smartpark.bean.fee.FeeCertificate;
 import com.tourcoo.smartpark.bean.fee.FeeDetail;
 import com.tourcoo.smartpark.bean.fee.PayCertificate;
 import com.tourcoo.smartpark.bean.fee.PayResult;
+import com.tourcoo.smartpark.bean.message.MessageInfo;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 import com.tourcoo.smartpark.bean.system.AppVersion;
@@ -204,5 +205,8 @@ public interface ApiService {
 
     @GET("/handheld/parking/spaceunusedlist")
     Observable<BaseResult<List<ParkSpaceInfo>>> requestParkUnusedList(@QueryMap Map<String, Object> map);
+
+    @GET("/handheld/msg/list")
+    Observable<BaseResult<List<MessageInfo>>> requestMessageList();
 
 }

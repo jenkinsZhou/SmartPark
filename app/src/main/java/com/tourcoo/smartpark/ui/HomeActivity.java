@@ -28,17 +28,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.apkfuns.logutils.LogUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.gyf.immersionbar.ImmersionBar;
 import com.kingja.loadsir.callback.Callback;
 import com.kingja.loadsir.core.LoadService;
 import com.kingja.loadsir.core.LoadSir;
-import com.neovisionaries.ws.client.ThreadType;
-import com.neovisionaries.ws.client.WebSocket;
-import com.neovisionaries.ws.client.WebSocketException;
-import com.neovisionaries.ws.client.WebSocketFactory;
-import com.neovisionaries.ws.client.WebSocketFrame;
-import com.neovisionaries.ws.client.WebSocketListener;
-import com.neovisionaries.ws.client.WebSocketState;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
@@ -53,6 +48,7 @@ import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.UiManager;
 import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.control.RequestConfig;
+import com.tourcoo.smartpark.core.manager.GlideManager;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.multi_status.MultiEmptyStatusCallback;
 import com.tourcoo.smartpark.core.multi_status.MultiStatusErrorCallback;
@@ -68,14 +64,14 @@ import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.StackUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
-import com.tourcoo.smartpark.socket.WebSocketConfig;
+import com.tourcoo.smartpark.socket.SocketData;
 import com.tourcoo.smartpark.socket.WebSocketManager;
-import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
 import com.tourcoo.smartpark.ui.account.EditPassActivity;
 import com.tourcoo.smartpark.ui.account.login.LoginActivity;
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity;
 import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity;
+import com.tourcoo.smartpark.ui.message.MessageListActivity;
 import com.tourcoo.smartpark.ui.record.ArrearsRecordListActivity;
 import com.tourcoo.smartpark.ui.record.WaitSettleListActivity;
 import com.tourcoo.smartpark.ui.report.DailyFeeReportActivity;
@@ -90,17 +86,15 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 
 import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
 
 import static com.tourcoo.smartpark.constant.ParkConstant.PARK_STATUS_USED;
 import static com.tourcoo.smartpark.socket.WebSocketConfig.SOCKET_URL;
-import static com.tourcoo.smartpark.socket.WebSocketConfig.TIME_OUT;
 import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
 
 
@@ -142,6 +136,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private long upTime;//记录抬起的时间
     private ImageView mIvMessage;
     private List<TimerTask> timerTaskList = new ArrayList<>();
+    private ImageView ivAvatar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -163,6 +158,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         findViewById(R.id.tvPay).setOnClickListener(this);
         tvUserName = findViewById(R.id.tvUserName);
         tvUserWorkTime = findViewById(R.id.tvUserWorkTime);
+        ivAvatar = findViewById(R.id.ivAvatar);
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
         tvCarRecord = findViewById(R.id.tvCarRecord);
         tvUserLocation = findViewById(R.id.tvUserLocation);
@@ -213,7 +209,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 switchDrawerLayout();
             }
         });
-
+        mIvMessage.setOnClickListener(this);
         //控件绘制完成之后再获取其宽高
         mIvMessage.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -270,6 +266,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             case R.id.tvPay:
                 CommonUtil.startActivity(HomeActivity.this, WaitSettleListActivity.class);
                 closeDrawerLayout();
+                break;
+            case R.id.ivMessage:
+                CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
                 break;
             default:
                 break;
@@ -340,6 +339,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvTotalCarCount.setText(getNotNullStr(userInfo.getCarNum() + ""));
         tvTheoreticalIncome.setText(getNotNullStr(userInfo.getTheoreticalIncome() + ""));
         tvActualIncome.setText(getNotNullStr(userInfo.getActualIncome() + ""));
+        GlideManager.loadCircleImgCenterAuto(getNotNullStr(userInfo.getAvatar() ),ivAvatar,R.drawable.ic_avatar_default);
         showResetPassByCondition();
     }
 
@@ -503,7 +503,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                LogUtils.i("---->"+AccountHelper.getInstance().isNeedResetPass());
+                LogUtils.i("---->" + AccountHelper.getInstance().isNeedResetPass());
                 if (AccountHelper.getInstance().isNeedResetPass()) {
                     showResetPassDialog();
                 }
@@ -789,8 +789,23 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
                 @Override
                 public void onTextMessage(String text) {
-                    LogUtils.d("---->OS. WebSocket onTextMessage:" + text);
-                    ToastUtil.showSuccess("收到消息:" + text);
+                    if (TextUtils.isEmpty(text)) {
+                        return;
+                    }
+                    try {
+                        Gson gson = new Gson();
+                        Type type = new TypeToken<BaseResult<SocketData>>() {
+                        }.getType();
+                        final BaseResult<SocketData> result = gson.fromJson(text, type);
+                        if (result == null || result.getData() == null) {
+                            LogUtils.e("result==null || result.getData() =null");
+                            return;
+                        }
+                        LogUtils.i("result=" + result.getData().getMsgNum());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        LogUtils.e("e=" + e.toString());
+                    }
                 }
             });
         }
@@ -888,4 +903,5 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             timerTaskList.remove(i);
         }
     }
+
 }

@@ -13,8 +13,9 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!--消息部分-->
+     <!--   &lt;!&ndash;消息部分&ndash;&gt;
         <RelativeLayout
+            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -38,18 +39,20 @@
                 android:text="21"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sp_7" />
-        </RelativeLayout>
+        </RelativeLayout>-->
         <!--头像部分-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dp_25"
-            android:layout_marginTop="@dimen/dp_12">
+            android:layout_marginEnd="@dimen/dp_12"
+            android:layout_marginTop="@dimen/dp_30">
 
             <ImageView
                 android:id="@+id/ivAvatar"
                 android:layout_width="@dimen/dp_75"
                 android:layout_height="@dimen/dp_75"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_avatar_default" />
 
             <TextView
