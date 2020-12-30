@@ -202,4 +202,7 @@ public interface ApiService {
     Observable<BaseResult<FeeDetail>> requestArrearsDetail(@QueryMap Map<String, Object> map);
 
 
+    @GET("/handheld/parking/spaceunusedlist")
+    Observable<BaseResult<List<ParkSpaceInfo>>> requestParkUnusedList(@QueryMap Map<String, Object> map);
+
 }

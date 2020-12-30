@@ -100,8 +100,8 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
         tvExitTime.text = StringUtil.getNotNullValueLine(data.leaveAt)
         tvParkingDuration.text = StringUtil.getNotNullValueLine(data.duration)
         tvFeeCurrent.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
-        tvFeeArrears.text = StringUtil.getNotNullValueLine("¥ " + data.arrears)
-        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.totalFee)
+        tvFeeArrears.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
+        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
         showCarInfo(data)
     }
 
@@ -181,8 +181,8 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
 
 
     override fun onDestroy() {
-        super.onDestroy()
         disconnectPrinter()
+        super.onDestroy()
     }
 
     private fun disconnectPrinter() {

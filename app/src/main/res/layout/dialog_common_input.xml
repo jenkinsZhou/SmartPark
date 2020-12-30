@@ -45,6 +45,7 @@
                 android:textSize="@dimen/sp_14" />
 
             <ImageView
+                android:id="@+id/ivEyes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"

@@ -26,8 +26,7 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.NetworkUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_CASH
-import com.tourcoo.smartpark.ui.fee.PayConstant.PAY_TYPE_SCAN
+import com.tourcoo.smartpark.ui.fee.PayConstant.*
 import com.tourcoo.smartpark.ui.pay.PayResultActivity
 import com.tourcoo.smartpark.ui.pay.ScanCodePayActivity
 import com.tourcoo.smartpark.util.StringUtil
@@ -66,7 +65,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private val mHandler = Handler()
     private var ignoreTemp = false
     private var refreshEnable = false
-
+    private val arrearsIdArray = java.util.ArrayList<Long>()
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
         const val EXTRA_PARK_ID = "EXTRA_PARK_ID"
@@ -99,6 +98,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         llPayByCode.setOnClickListener(this)
         tvFeeHistory.setOnClickListener(this)
         tvIgnoreHistoryFee.setOnClickListener(this)
+        llExitConfirm.setOnClickListener(this)
         initRefreshLayout()
     }
 
@@ -141,6 +141,9 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             }
             R.id.tvFeeHistory -> {
                 skipArrearsRecord()
+            }
+            R.id.llExitConfirm->{
+                showExitConfirm()
             }
 
             else -> {
@@ -284,6 +287,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private fun skipArrearsRecord() {
         val intent = Intent()
         intent.putExtra(EXTRA_CAR_ID, carId)
+        intent.putExtra(EXTRA_ARREARS_IDS,arrearsIdArray)
         intent.setClass(this@SettleFeeDetailActivity, PayArrearsRecordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_FEE_RECORD)
     }
@@ -295,6 +299,8 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     val arrearsIds = data.getSerializableExtra(EXTRA_ARREARS_IDS) as ArrayList<Long>?
                     if (arrearsIds != null) {
+                        arrearsIdArray.clear()
+                        arrearsIdArray.addAll(arrearsIds)
                         mArrearsIds = StringUtils.join(arrearsIds, ",")
                     }
                 }
@@ -328,6 +334,10 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         requestPay(null)
     }
 
+    private fun doExit() {
+        mPayType = PAY_TYPE_FREE
+        requestPay(null)
+    }
     private fun requestPay(scanCode: String?) {
         showLoading("正在支付...")
         ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseIntArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<PayResult?>>() {
@@ -373,6 +383,18 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 .setTitle("现金支付")
                 .setMsg("确定使用现金支付吗?")
                 .setPositiveButton("立即支付", View.OnClickListener { doPayByCash() })
+                .setNegativeButton("取消", View.OnClickListener {
+                }).show()
+    }
+
+    private fun showExitConfirm() {
+        IosAlertDialog(mContext)
+                .init()
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+                .setTitle("确认离场")
+                .setMsg("是否确定直接离场?")
+                .setPositiveButton("确定", View.OnClickListener { doExit() })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()
     }

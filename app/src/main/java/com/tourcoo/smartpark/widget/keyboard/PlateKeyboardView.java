@@ -45,7 +45,7 @@ public class PlateKeyboardView implements View.OnClickListener {
     private int currentEditTextPosition = 0;//默认当前光标在第一个TextView
     private OnKeyboardFinishListener onKeyboardFinishListener;
     private PlantLayout inputLayout;
-
+    private boolean autoShowProvince = true;
     public void setOnKeyboardFinishListener(OnKeyboardFinishListener onKeyboardFinishListener) {
         this.onKeyboardFinishListener = onKeyboardFinishListener;
     }
@@ -129,7 +129,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                         }
                         tvList[currentEditTextPosition].setText("");
                         //将当前tv置为""并currentEditText-1
-                        if (currentEditTextPosition < 1) {
+                        if (currentEditTextPosition < 1 && autoShowProvince) {
                             //切换为省份简称键盘
                             showSymbolView();
                         }
@@ -156,7 +156,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                             showSymbolView();
                         }
                     } else {
-                        if (currentEditTextPosition == 0) {
+                        if (currentEditTextPosition == 0 && autoShowProvince) {
                             //如果currentEditText==0代表当前为省份键盘,
                             //currentEditText+1
                             if (isSymbol) {//中文
@@ -189,6 +189,9 @@ public class PlateKeyboardView implements View.OnClickListener {
                         }
                     }
                 } else {
+                    if(mEditText == null){
+                        return;
+                    }
                     Editable editable = mEditText.getText();
                     int start = mEditText.getSelectionStart();
                     if (primaryCode == Keyboard.KEYCODE_CANCEL) {
@@ -202,7 +205,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                                 insideEditText.setText(editable.toString());
                             }
                         }
-                        if (editable.toString().length() < 1) {
+                        if (editable != null && editable.toString().length() < 1 && autoShowProvince) {
                             showSymbolView();
                         }
                     } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE) {
@@ -375,7 +378,7 @@ public class PlateKeyboardView implements View.OnClickListener {
 //                break;
 //            }
 //        }
-        if (currentEditTextPosition == 0) {
+        if (currentEditTextPosition == 0&&autoShowProvince) {
             showSymbolView();
         } else {
             showLetterView2();
@@ -444,6 +447,8 @@ public class PlateKeyboardView implements View.OnClickListener {
             temp += tvList[i].getText().toString();
         }
         insideEditText.setText(temp);
+     /*   // 保证光标始终在最后面
+        insideEditText.setSelection(temp.length());*/
     }
 
 
@@ -541,11 +546,18 @@ public class PlateKeyboardView implements View.OnClickListener {
                 break;
             }
         }
-        if (currentEditTextPosition == 0) {
+        if (currentEditTextPosition == 0 && autoShowProvince) {
             showSymbolView();
         } else {
             showLetterView2();
         }
+    }
 
+    public boolean isAutoShowProvince() {
+        return autoShowProvince;
+    }
+
+    public void setAutoShowProvince(boolean autoShowProvince) {
+        this.autoShowProvince = autoShowProvince;
     }
 }

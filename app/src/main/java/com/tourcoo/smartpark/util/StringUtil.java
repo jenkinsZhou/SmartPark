@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -87,6 +88,15 @@ public class StringUtil {
 
         return str.matches("[a-zA-Z]+");
 
+    }
+
+    public static boolean judgeContainsLetter(String str) {
+        if(TextUtils.isEmpty(str)){
+            return false;
+        }
+        String regex=".*[a-zA-Z]+.*";
+        Matcher m=Pattern.compile(regex).matcher(str);
+        return m.matches();
     }
 
     public static String getNotNullValueLine(String value) {

@@ -1,17 +1,13 @@
 package com.tourcoo.smartpark.ui.account.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextUtils
 import android.text.TextWatcher
-import android.text.method.HideReturnsTransformationMethod
-import android.text.method.PasswordTransformationMethod
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
-import com.bryant.editlibrary.BSearchEdit
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.account.ParkingInfo
 import com.tourcoo.smartpark.bean.account.TokenInfo
@@ -19,13 +15,12 @@ import com.tourcoo.smartpark.bean.account.UserInfo
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.mvp.BaseMvpTitleActivity
 import com.tourcoo.smartpark.core.utils.SizeUtil
-import com.tourcoo.smartpark.core.utils.StackUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.ui.HomeActivity
 import com.tourcoo.smartpark.ui.account.AccountHelper
-import com.tourcoo.smartpark.ui.account.EditPassActivity
 import com.tourcoo.smartpark.util.StringUtil
+import com.tourcoo.smartpark.widget.searchview.BSearchEdit
 import kotlinx.android.synthetic.main.activity_login.*
 
 
@@ -50,8 +45,8 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
         etCurrentParking.setOnClickListener(this)
         tvLogin.setOnClickListener(this)
         etCurrentParking.inputType = InputType.TYPE_NULL
-        etCurrentParking.post {
-            initSearchView(etCurrentParking.width.toFloat())
+        llSelectParking.post {
+            initSearchView(llSelectParking.width.toFloat())
         }
         listenInput(etUserName, ivClearUser)
         listenInput(etPass, ivClearPass)
@@ -80,6 +75,9 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
         }
         bSearchEdit!!.setSearchList(parkingStrList)
         bSearchEdit!!.showPopup()
+        if (parkingInfoList.isEmpty()) {
+            ToastUtil.showNormal("当前账号不存在或没有绑定停车场")
+        }
     }
 
     /**
@@ -124,7 +122,7 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
 
     private fun initSearchView(widthPx: Float) {
         //第三个必须要设置窗体的宽度，单位dp
-        bSearchEdit = BSearchEdit(this, etCurrentParking, SizeUtil.px2dp(widthPx))
+        bSearchEdit = BSearchEdit(this, llSelectParking, SizeUtil.px2dp(widthPx))
         bSearchEdit!!.setTimely(false)
         bSearchEdit!!.build()
         bSearchEdit!!.setTextClickListener { position, text ->
@@ -171,6 +169,9 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
     private fun listenInput(editText: EditText, imageView: ImageView) {
         imageView.setOnClickListener {
             editText.setText("")
+            if (imageView.id == ivClearUser.id) {
+                etCurrentParking.setText("")
+            }
         }
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

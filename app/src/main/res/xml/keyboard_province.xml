@@ -33,6 +33,7 @@
         <Key
             android:codes="5"
             android:keyLabel="蒙"
+            android:keyEdgeFlags="left"
             android:keyWidth="20%p" />
         <Key
             android:codes="6"
@@ -45,13 +46,12 @@
             android:keyWidth="20%p" />
         <Key
             android:codes="8"
-            android:keyEdgeFlags="right"
             android:keyLabel="黑"
             android:keyWidth="20%p" />
 
         <Key
             android:codes="18"
-            android:keyEdgeFlags="left"
+            android:keyEdgeFlags="right"
             android:keyLabel="粤"
             android:keyWidth="20%p" />
     </Row>

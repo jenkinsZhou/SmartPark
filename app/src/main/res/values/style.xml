@@ -124,4 +124,8 @@
         <item name="android:windowNoTitle">true</item><!--无标题-->
     </style>
 
+    <style name="bs_popup_style" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/bs_popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/bs_popup_exit</item>
+    </style>
 </resources>

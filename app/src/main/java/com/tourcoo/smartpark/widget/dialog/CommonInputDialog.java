@@ -6,6 +6,8 @@ import android.graphics.Point;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -14,12 +16,15 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tourcoo.smartpark.R;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.tourcoo.smartpark.ui.account.EditPassActivity.VISIBLE_STATUS;
 
 /**
  * @author :JenkinsZhou
@@ -35,6 +40,7 @@ public class CommonInputDialog {
     private int width = 0;
     private TextView tvPositive;
     private EditText etInput;
+    private ImageView ivEyes;
    /*
     private TextView tvTitle;
     private TextView tvContent;*/
@@ -56,6 +62,8 @@ public class CommonInputDialog {
         View view = LayoutInflater.from(mContext).inflate(R.layout.dialog_common_input, null);
         tvPositive = view.findViewById(R.id.tvPositive);
         etInput = view.findViewById(R.id.etInput);
+        ivEyes = view.findViewById(R.id.ivEyes);
+        listenPassVisible(etInput, ivEyes);
 //        limitInput();
        /* tvTitle = view.findViewById(R.id.tvTitle);
         tvContent = view.findViewById(R.id.tvContent);
@@ -111,15 +119,7 @@ public class CommonInputDialog {
         return this;
     }
 
-    private void limitInput() {
-        InputFilter typeFilter = (source, start, end, dest, dstart, dend) -> {
-            Pattern p = Pattern.compile("[a-zA-Z|\u4e00-\u9fa5]+");
-            Matcher m = p.matcher(source.toString());
-            if (!m.matches()) return "";
-            return null;
-        };
-        etInput.setFilters(new InputFilter[]{typeFilter});
-    }
+
 
 
   /*  public CommonInputDialog setNegativeButtonClick(CharSequence text, View.OnClickListener onClickListener) {
@@ -146,11 +146,39 @@ public class CommonInputDialog {
         }
     }
 
-    public  String getInputString(){
-        if(etInput != null){
+    public String getInputString() {
+        if (etInput != null) {
             return etInput.getText().toString();
         }
         return "";
+    }
+
+
+    private void listenPassVisible(EditText editText, ImageView imageView) {
+        //默认不可见
+        imageView.setTag(VISIBLE_STATUS, false);
+        imageView.setImageResource(R.mipmap.ic_eye_blue_open);
+        editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (imageView.getTag(VISIBLE_STATUS) != null) {
+                    boolean isVisible = (boolean) imageView.getTag(VISIBLE_STATUS);
+                    if (isVisible) {
+                        imageView.setImageResource(R.mipmap.ic_eye_blue_open);
+                        editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        imageView.setTag(VISIBLE_STATUS, false);
+                    } else {
+                        imageView.setImageResource(R.mipmap.ic_eye_blue_closed);
+                        editText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        imageView.setTag(VISIBLE_STATUS, true);
+
+                    }
+                    editText.setSelection(editText.getText().toString().length());
+                }
+            }
+        });
+
     }
 
 }

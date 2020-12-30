@@ -110,7 +110,6 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation files('libs/commons-lang3-3.11.jar')
     implementation files('libs/st-sdkserviceapi-4.00.07.jar')
-    implementation 'com.github.YangsBryant:BSearchEdit:1.0.8'
     //RXText
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     implementation project(':zxing')

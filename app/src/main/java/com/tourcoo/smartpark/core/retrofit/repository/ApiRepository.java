@@ -292,4 +292,13 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestArrearsDetail(params).retryWhen(new RetryWhen()));
     }
 
+    public Observable<BaseResult<List<ParkSpaceInfo>>> requestParkUnusedList(String keywords) {
+        Map<String, Object> params = new HashMap<>(1);
+        if(!TextUtils.isEmpty(keywords)){
+            params.put("keywords", keywords);
+        }
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestParkUnusedList(params).retryWhen(new RetryWhen()));
+    }
+
 }

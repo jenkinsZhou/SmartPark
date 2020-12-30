@@ -28,7 +28,7 @@ public class UserInfo {
     private int carNum;
     private double actualIncome;
     private double theoreticalIncome;
-    private boolean needResetPass;
+    private boolean needUpdatePassword;
 
     public String getName() {
         return name;
@@ -95,10 +95,10 @@ public class UserInfo {
     }
 
     public boolean isNeedResetPass() {
-        return needResetPass;
+        return needUpdatePassword;
     }
 
     public void setNeedResetPass(boolean needResetPass) {
-        this.needResetPass = needResetPass;
+        this.needUpdatePassword = needResetPass;
     }
 }

@@ -56,7 +56,7 @@ public class SmartParkApplication extends Application {
         // 以下用来捕获程序崩溃异常
         // 程序崩溃时触发线程
 //        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
-        intiPlantOrcSdk();
+//        intiPlantOrcSdk();
 
     }
 

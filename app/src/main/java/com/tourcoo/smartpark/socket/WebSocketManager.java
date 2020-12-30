@@ -202,9 +202,11 @@ public class WebSocketManager {
         disconnect();
         releaseTask(timerTaskList);
         releaseTask(pingTaskList);
+        mWebSocketListener=null;
         if (mPingTimer != null) {
             mPingTimer.cancel();
         }
+
     }
 
     private void releaseTask(List<TimerTask> taskList) {

@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_arrears_record.*
 import java.util.*
 
 /**
- *@description : 缴费记录页面
+ *@description : 欠费记录选择页面
  *@company :途酷科技
  * @author :JenkinsZhou
  * @date 2020年12月07日10:43
@@ -33,6 +33,7 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     private var selectAll = false
     private var historyAdapter: ArrearsRecordHistoryAdapter? = null
     private val arrearsIdArray = ArrayList<Long>()
+    private var receiveIdArray: ArrayList<Long>? = null
     private val arrearsIds: String? = null
     override fun getContentLayout(): Int {
         return R.layout.activity_arrears_record
@@ -40,6 +41,10 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     override fun initView(savedInstanceState: Bundle?) {
         carId = intent?.getLongExtra(SettleFeeDetailActivity.EXTRA_CAR_ID, -1)
+        if (intent?.getSerializableExtra(EXTRA_ARREARS_IDS) != null) {
+            receiveIdArray = intent?.getSerializableExtra(EXTRA_ARREARS_IDS) as ArrayList<Long>
+        }
+
         if (carId!! < 0) {
             finish()
             ToastUtil.showWarning("未获取到车辆信息")
@@ -92,11 +97,25 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
 
     private fun loadRecord(data: List<ArrearsHistoryRecord>?) {
         if (historyAdapter?.emptyView == null) {
-            val emptyView = LayoutInflater.from(mContext).inflate(R.layout.status_layout_car_data_empty, null)
+            val emptyView = LayoutInflater.from(mContext).inflate(R.layout.multi_status_layout_empty, null)
             historyAdapter?.emptyView = emptyView
+            emptyView.setOnClickListener {
+                requestArrearsHistoryList()
+            }
+        }
+        var selectCount = 0
+        if (receiveIdArray != null && receiveIdArray!!.isNotEmpty()) {
+            for (index in 0 until receiveIdArray!!.size) {
+                data!!.forEach {
+                    if (receiveIdArray!![index] == it.id) {
+                        it.isSelect = true
+                        selectCount++
+                    }
+                }
+            }
         }
         historyAdapter?.setNewData(data)
-        showBottomLayoutInfo(0)
+        showBottomLayoutInfo(selectCount)
     }
 
     override fun onClick(v: View?) {

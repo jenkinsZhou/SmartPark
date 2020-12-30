@@ -57,7 +57,10 @@
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
         <activity android:name=".ui.fee.SettleFeeDetailActivity" />
-        <activity android:name=".ui.record.RecordCarInfoConfirmActivity" />
+        <activity android:name=".ui.record.RecordCarInfoConfirmActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            />
         <activity android:name=".ui.account.login.LoginActivity" />
         <activity
             android:name=".ui.fee.ExitPayFeeEnterActivity"

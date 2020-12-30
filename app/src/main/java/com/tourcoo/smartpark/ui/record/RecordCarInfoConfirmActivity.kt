@@ -1,6 +1,7 @@
 package com.tourcoo.smartpark.ui.record
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -12,13 +13,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.provider.MediaStore
+import android.text.InputType
 import android.text.TextUtils
 import android.view.View
+import android.widget.EditText
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.alibaba.fastjson.JSON
 import com.apkfuns.logutils.LogUtils
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.kaopiz.kprogresshud.KProgressHUD
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
@@ -31,21 +35,27 @@ import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
+import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository.*
 import com.tourcoo.smartpark.core.utils.FileUtil
+import com.tourcoo.smartpark.core.utils.SizeUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.event.OrcInitEvent
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager
 import com.tourcoo.smartpark.ui.HomeActivity
+import com.tourcoo.smartpark.ui.fee.ExitPayFeeEnterActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper
 import com.tourcoo.smartpark.widget.orc.RecogniseListener
+import com.tourcoo.smartpark.widget.searchview.BSearchEdit
 import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
 import com.trello.rxlifecycle3.android.ActivityEvent
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_record_confirm.*
+import kotlinx.android.synthetic.main.activity_report_fee_common.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -61,7 +71,9 @@ import top.zibin.luban.Luban
 import top.zibin.luban.OnCompressListener
 import java.io.File
 import java.lang.ref.WeakReference
+import java.lang.reflect.Method
 import java.net.SocketException
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -84,12 +96,17 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private var keyboardView: PlateKeyboardView? = null
     private var carType = CAR_TYPE_NORMAL
     private var isOrcPhoto = false
+    private var bSearchEdit: BSearchEdit? = null
 
     //后台返回的图片地址
     private val serviceImageUrlList = ArrayList<String>()
+    private var currentSelectPosition = -1
 
     //权限参数
     private val needPermissions = arrayOfNulls<String>(3)
+    private val parkingList = ArrayList<ParkSpaceInfo>()
+
+    private var spaceKeyboardView: PlateKeyboardView? = null
 
     companion object {
         const val REQUEST_CODE_TAKE_PHOTO = 1001
@@ -125,6 +142,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             showLoading("正在初始化组件...")
         }
         initInputLayout()
+        llParkingPlace.post {
+            initSearchView(llParkingPlace.width.toFloat())
+        }
+        initSearchInput()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -416,6 +437,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         EventBus.getDefault().unregister(this)
         PredictorWrapper.release()
         mHandler.removeCallbacksAndMessages(null)
+        spaceKeyboardView = null
+        keyboardView = null
         super.onDestroy()
     }
 
@@ -605,10 +628,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
     private fun showParkInfo() {
         if (parkInfo == null) {
-            tvParkNumber.text = ""
+            tvParkNumber.setText("")
             return
         }
-        tvParkNumber.text = StringUtil.getNotNullValue(parkInfo!!.number)
+        tvParkNumber.setText(StringUtil.getNotNullValue(parkInfo!!.number))
     }
 
     /**
@@ -649,6 +672,16 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                 ToastUtil.showWarning("至少要上传一张带有车牌的图片")
                 return
             }
+            val plantNum = plantInputLayout.text
+            if (TextUtils.isEmpty(plantNum) || plantNum.length < MIN_LENGTH_PLANT_NUM) {
+                ToastUtil.showNormal("请输入正确的车牌号")
+                return
+            }
+            if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
+                carType = CAR_TYPE_GREEN
+            }else{
+                carType = CAR_TYPE_NORMAL
+            }
             isOrcPhoto = false
             requestAddParkingSpace(photoAdapter!!.serviceUrlList)
 
@@ -670,6 +703,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
             if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 carType = CAR_TYPE_GREEN
+            }else{
+                carType = CAR_TYPE_NORMAL
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
         }
@@ -693,4 +728,122 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         setResult(RESULT_OK)
         finish()
     }
+
+
+    private fun initSearchView(widthPx: Float) {
+        //第三个必须要设置窗体的宽度，单位dp
+        bSearchEdit = BSearchEdit(this, llParkingPlace, SizeUtil.px2dp(widthPx))
+        bSearchEdit!!.setTimely(false)
+        bSearchEdit!!.build()
+        bSearchEdit!!.setTextClickListener { position, text ->
+            currentSelectPosition = position
+            tvParkNumber.setText(text!!)
+            tvParkNumber.setSelection(text.length)
+        }
+        bSearchEdit!!.setOnClickListener {
+            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+        }
+    }
+
+    private fun showSpaceList(parkingInfoList: List<ParkSpaceInfo>?) {
+        if (parkingInfoList == null) {
+            return
+        }
+        parkingList.clear()
+        val parkingStrList = ArrayList<String>()
+        parkingInfoList.forEach {
+            parkingStrList.add(StringUtil.getNotNullValue(it.number))
+            parkingList.add(it)
+        }
+        bSearchEdit!!.setSearchList(parkingStrList)
+        bSearchEdit!!.showPopup()
+    }
+
+    private fun requestParkUnusedList() {
+        if (TextUtils.isEmpty(tvParkNumber.text.toString())) {
+            return
+        }
+        if (StringUtil.judgeContainsLetter(tvParkNumber.text.toString())) {
+            bSearchEdit?.clear()
+            return
+        }
+        getInstance().requestParkUnusedList(tvParkNumber.text.toString()).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<List<ParkSpaceInfo>>>() {
+            override fun onRequestSuccess(entity: BaseResult<List<ParkSpaceInfo>>?) {
+                handleRequestSuccess(entity)
+            }
+
+            override fun onRequestError(throwable: Throwable?) {
+                super.onRequestError(throwable)
+                feeRecordRefreshLayout.finishRefresh(false)
+            }
+
+        })
+    }
+
+    private fun handleRequestSuccess(entity: BaseResult<List<ParkSpaceInfo>>?) {
+        if (entity == null) {
+            ToastUtil.showNormal(R.string.exception_service_out)
+            return
+        }
+        if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
+            showSpaceList(entity.data)
+        } else {
+            ToastUtil.showFailed(entity.errMsg)
+        }
+    }
+
+
+    @SuppressLint("CheckResult")
+    private fun listenInput(editText: EditText) {
+        RxTextView.textChanges(editText)
+                .debounce(ExitPayFeeEnterActivity.DELAY_TIME, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .map { charSequence -> charSequence.toString() }
+                .subscribe { s ->
+                    requestParkUnusedList()
+                }
+    }
+
+
+    private fun initSearchInput() {
+        tvParkNumber.setFocusable(true)
+        tvParkNumber.setFocusableInTouchMode(true)
+        disableShowSoftInput(tvParkNumber)
+        tvParkNumber.requestFocus()
+        spaceKeyboardView = PlateKeyboardView(mContext)
+        spaceKeyboardView?.isAutoShowProvince = false
+        tvParkNumber.setOnClickListener(View.OnClickListener {
+            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+        })
+        llParkingPlace.setOnClickListener {
+            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+        }
+        spaceKeyboardView?.setOnKeyboardFinishListener({
+        }, "关闭")
+        listenInput(tvParkNumber)
+    }
+
+
+    /**
+     * 禁止Edittext弹出软件盘，光标依然正常显示。
+     */
+    private fun disableShowSoftInput(editTest: EditText) {
+        val cls = EditText::class.java
+        var method: Method
+        try {
+            method = cls.getMethod("setShowSoftInputOnFocus", Boolean::class.javaPrimitiveType)
+            method.isAccessible = true
+            method.invoke(editTest, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        try {
+            method = cls.getMethod("setSoftInputShownOnFocus", Boolean::class.javaPrimitiveType)
+            method.setAccessible(true)
+            method.invoke(editTest, false)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }

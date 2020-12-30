@@ -91,6 +91,7 @@ import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -140,6 +141,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private Timer timer;//计时器
     private long upTime;//记录抬起的时间
     private ImageView mIvMessage;
+    private List<TimerTask> timerTaskList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -171,6 +173,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         mIvMessage = findViewById(R.id.ivMessage);
         homeRefreshLayout.setRefreshHeader(new ClassicsHeader(mContext));
         homeRefreshLayout.setOnRefreshListener(this);
+        homeRefreshLayout.setEnableLoadMore(false);
         findViewById(R.id.tvSignIn).setOnClickListener(this);
         findViewById(R.id.tvSignOut).setOnClickListener(this);
 
@@ -421,9 +424,10 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onDestroy() {
         closeLoading();
         releaseService();
-        if(timer != null){
+        if (timer != null) {
             timer.cancel();
         }
+        cancelTask();
         super.onDestroy();
     }
 
@@ -499,6 +503,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                LogUtils.i("---->"+AccountHelper.getInstance().isNeedResetPass());
                 if (AccountHelper.getInstance().isNeedResetPass()) {
                     showResetPassDialog();
                 }
@@ -766,8 +771,6 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-
-
     private void initSocket() {
         if (!AccountHelper.getInstance().isLogin()) {
             ToastUtil.showFailed("登录已过期");
@@ -818,8 +821,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     //抬起手指1s后再显示悬浮按钮
                     //开始1s倒计时
                     upTime = System.currentTimeMillis();
+                    cancelTask();
                     timer = new Timer();
-                    timer.schedule(new FloatTask(), 800);
+                    FloatTask floatTask = new FloatTask();
+                    timerTaskList.add(floatTask);
+                    timer.schedule(floatTask, 800);
                 }
                 break;
         }
@@ -874,5 +880,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         set.addAnimation(ta);
         set.addAnimation(al);
         mIvMessage.startAnimation(set);
+    }
+
+    private void cancelTask() {
+        for (int i = timerTaskList.size() - 1; i >= 0; i--) {
+            timerTaskList.get(i).cancel();
+            timerTaskList.remove(i);
+        }
     }
 }

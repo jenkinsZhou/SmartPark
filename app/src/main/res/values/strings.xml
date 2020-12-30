@@ -10,6 +10,7 @@
     <string name="web_alert_right">关闭</string>
     <string name="copy_success">已复制到剪贴板</string>
     <string name="exception_network_not_connected">未连接网络,请检查网络连接状态</string>
+    <string name="exception_service_out">服务器走丢了</string>
     <string name="exception_network_error">网络错误</string>
     <string name="exception_accounts">登录失效,请重新登录</string>
     <string name="exception_connect">连接错误</string>

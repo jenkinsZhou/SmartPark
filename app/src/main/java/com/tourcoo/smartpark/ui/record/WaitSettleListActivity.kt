@@ -44,7 +44,6 @@ import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.keyboard.PlateKeyboardView
 import com.trello.rxlifecycle3.android.ActivityEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.activity_exit_pay_fee_enter.*
 import kotlinx.android.synthetic.main.activity_report_fee_common.*
 import kotlinx.android.synthetic.main.activity_report_fee_common.etPlantNum
 import kotlinx.android.synthetic.main.activity_report_fee_common.ivDeleteSmall
@@ -54,7 +53,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
- *@description : JenkinsZhou
+ *@description : 待结算页面
  *@company :途酷科技
  * @author :JenkinsZhou
  * @date 2020年12月15日17:16
