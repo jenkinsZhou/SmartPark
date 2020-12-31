@@ -36,9 +36,9 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
                 android:text="路面收费"
-                android:textStyle="bold"
                 android:textColor="#000000"
-                android:textSize="@dimen/sp_17" />
+                android:textSize="@dimen/sp_17"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvPay"
@@ -109,11 +109,11 @@
                 android:id="@+id/homeRefreshLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srlEnableLoadMore="true"
                 android:layout_above="@id/llBottomLayout"
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="@dimen/dp_20"
                 android:layout_marginBottom="@dimen/dp_20"
+                app:srlEnableLoadMore="true"
 
                 >
 
@@ -123,15 +123,33 @@
                     android:layout_height="match_parent" />
             </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
-            <ImageView
-                android:id="@+id/ivMessage"
+            <RelativeLayout
+                android:id="@+id/rlMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_above="@id/llBottomLayout"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="@dimen/dp_10"
-                android:layout_marginBottom="@dimen/dp_30"
-                android:layout_above="@id/llBottomLayout"
-                android:src="@mipmap/ic_launcher"/>
+                android:layout_marginBottom="@dimen/dp_30">
+
+                <ImageView
+                    android:id="@+id/ivMessage"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="@dimen/dp_50"
+                    android:layout_height="@dimen/dp_50"
+                    android:src="@drawable/ic_message" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:background="@drawable/shape_msg_circle_blue"
+                    android:gravity="center"
+                    android:text="21"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/sp_11" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
     </LinearLayout>

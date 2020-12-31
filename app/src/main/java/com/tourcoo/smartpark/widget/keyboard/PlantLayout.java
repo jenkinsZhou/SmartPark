@@ -10,7 +10,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.core.utils.SizeUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 
@@ -68,6 +70,9 @@ public class PlantLayout extends LinearLayout {
             //textview放进数组中，方便修改操作
             TextViews[i] = addTextView(context, VIEW_IDS[i]);
             TextViews[i].setOnTouchListener(mTouchListener);
+            if (i == textsLength - 1) {
+                TextViews[i].setBackground(CommonUtil.getDrawable(R.drawable.ic_bg_car_green));
+            }
             addView(TextViews[i]);
         }
         //第一个输入框默认设置点中效果
@@ -155,6 +160,7 @@ public class PlantLayout extends LinearLayout {
             if (position == ITEM_VIEW_COUNT - 1) {
                 TextViews[ITEM_VIEW_COUNT - 1].setBackgroundResource(R.drawable.license_plate_first_view_all_gray);
                 TextViews[ITEM_VIEW_COUNT - 1].clearFocus();
+                setGreenCarBackground(position);
             }
 
         }
@@ -164,10 +170,10 @@ public class PlantLayout extends LinearLayout {
     public void setTextViewsBackground(int position) {
         for (int i = 0; i < TextViews.length; i++) {
             if (position == i) {
-//                ToastUtil.showNormal("设置的位置:"+position);
                 TextViews[i].setBackgroundResource(R.drawable.license_plate_first_view_blue);
             } else {
                 TextViews[i].setBackgroundResource(R.drawable.license_plate_first_view_all_gray);
+                setGreenCarBackground(i);
             }
         }
     }
@@ -190,6 +196,7 @@ public class PlantLayout extends LinearLayout {
         }
         for (int i = 0; i < value.length(); i++) {
             TextViews[i].setText(value.substring(i, i + 1));
+            setGreenCarBackground(i);
         }
     }
 
@@ -197,7 +204,14 @@ public class PlantLayout extends LinearLayout {
         for (int i = 0; i < ITEM_VIEW_COUNT; i++) {
             if (i < TextViews.length) {
                 TextViews[i].setText("");
+                setGreenCarBackground(i);
             }
+        }
+    }
+
+    private void setGreenCarBackground(int index) {
+        if (index == TextViews.length - 1) {
+            TextViews[index].setBackgroundResource(R.drawable.ic_bg_car_green);
         }
     }
 }

@@ -17,6 +17,9 @@ import android.text.InputType
 import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,6 +33,7 @@ import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.bean.ParkSpaceInfo
 import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_GREEN
 import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_NORMAL
+import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
@@ -146,6 +150,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             initSearchView(llParkingPlace.width.toFloat())
         }
         initSearchInput()
+        listenCarTypeSelect()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -629,8 +634,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private fun showParkInfo() {
         if (parkInfo == null) {
             tvParkNumber.setText("")
+            tvParkNumber.isEnabled = true
             return
         }
+        tvParkNumber.isEnabled = false
         tvParkNumber.setText(StringUtil.getNotNullValue(parkInfo!!.number))
     }
 
@@ -644,7 +651,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             return
         }
         if (parkInfo == null) {
-            ToastUtil.showWarning("请选择车位")
+            ToastUtil.showWarning("未获取到车位信息")
             return
         }
         getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, imageArray).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
@@ -738,6 +745,9 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         bSearchEdit!!.setTextClickListener { position, text ->
             currentSelectPosition = position
             tvParkNumber.setText(text!!)
+            if (position < parkingList.size) {
+                parkInfo = parkingList[position]
+            }
             try {
                 tvParkNumber.setSelection(text.length)
             } catch (e: Exception) {
@@ -745,7 +755,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
         }
         bSearchEdit!!.setOnClickListener {
-            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+            showSpaceKeyboard()
         }
     }
 
@@ -817,10 +827,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         spaceKeyboardView = PlateKeyboardView(mContext)
         spaceKeyboardView?.isAutoShowProvince = false
         tvParkNumber.setOnClickListener(View.OnClickListener {
-            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+            showSpaceKeyboard()
         })
         llParkingPlace.setOnClickListener {
-            spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+            showSpaceKeyboard()
         }
         spaceKeyboardView?.setOnKeyboardFinishListener({
         }, "关闭")
@@ -850,4 +860,35 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         }
     }
 
+    private fun showSpaceKeyboard() {
+        if (!tvParkNumber.isEnabled) {
+            return
+        }
+        spaceKeyboardView?.showKeyboard(tvParkNumber, InputType.TYPE_CLASS_NUMBER)
+    }
+
+
+    private fun listenCarTypeSelect() {
+        rlCarTypeSmall.setOnClickListener {
+            showCarTypeSelect(true, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
+            showCarTypeSelect(false, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+        }
+        rlCarTypeBig.setOnClickListener {
+            showCarTypeSelect(false, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
+            showCarTypeSelect(true, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+        }
+
+    }
+
+    private fun showCarTypeSelect(boolean: Boolean, imageView: ImageView, relativeLayout: RelativeLayout, textView: TextView) {
+        if (boolean) {
+            imageView.setImageResource(R.mipmap.ic_car_type_checked)
+            relativeLayout.setBackgroundResource(R.drawable.bg_radius_10_blue_f0f5ff)
+            textView.setTextColor(CommonUtil.getColor(R.color.colorPrimary))
+        } else {
+            imageView.setImageResource(R.mipmap.ic_car_type_un_checked)
+            relativeLayout.setBackgroundResource(R.drawable.bg_radius_10_gray_eeeeee)
+            textView.setTextColor(CommonUtil.getColor(R.color.grayA2A2A2))
+        }
+    }
 }

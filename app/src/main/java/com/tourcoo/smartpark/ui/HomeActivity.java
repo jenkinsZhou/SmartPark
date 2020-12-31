@@ -16,6 +16,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -134,9 +135,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private boolean isShowFloatImage = true;//标记图片是否显示
     private Timer timer;//计时器
     private long upTime;//记录抬起的时间
-    private ImageView mIvMessage;
+    private RelativeLayout rlMessage;
     private List<TimerTask> timerTaskList = new ArrayList<>();
     private ImageView ivAvatar;
+    private ImageView ivMessage;
+    public static final int DELAY_TIME = 600;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -166,7 +169,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvActualIncome = findViewById(R.id.tvActualIncome);
         tvTheoreticalIncome = findViewById(R.id.tvTheoreticalIncome);
         homeRefreshLayout = findViewById(R.id.homeRefreshLayout);
-        mIvMessage = findViewById(R.id.ivMessage);
+        rlMessage = findViewById(R.id.rlMessage);
+        ivMessage = findViewById(R.id.ivMessage);
         homeRefreshLayout.setRefreshHeader(new ClassicsHeader(mContext));
         homeRefreshLayout.setOnRefreshListener(this);
         homeRefreshLayout.setEnableLoadMore(false);
@@ -209,15 +213,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 switchDrawerLayout();
             }
         });
-        mIvMessage.setOnClickListener(this);
+        rlMessage.setOnClickListener(this);
         //控件绘制完成之后再获取其宽高
-        mIvMessage.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        ivMessage.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 //动画移动的距离 屏幕的宽度减去图片距左边的宽度 就是图片距右边的宽度，再加上隐藏的一半
-                moveDistance = SizeUtil.getScreenWidth() - mIvMessage.getRight() + mIvMessage.getWidth() / 2;
+                moveDistance = SizeUtil.getScreenWidth() - rlMessage.getRight() + ivMessage.getWidth() / 2;
                 //监听结束之后移除监听事件
-                mIvMessage.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                ivMessage.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
 
@@ -267,7 +271,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 CommonUtil.startActivity(HomeActivity.this, WaitSettleListActivity.class);
                 closeDrawerLayout();
                 break;
-            case R.id.ivMessage:
+            case R.id.rlMessage:
                 CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
                 break;
             default:
@@ -840,7 +844,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     timer = new Timer();
                     FloatTask floatTask = new FloatTask();
                     timerTaskList.add(floatTask);
-                    timer.schedule(floatTask, 800);
+                    timer.schedule(floatTask,DELAY_TIME );
                 }
                 break;
         }
@@ -869,13 +873,12 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         //渐变动画
         AlphaAnimation al = new AlphaAnimation(1f, 0.5f);
         al.setDuration(300);
-
         AnimationSet set = new AnimationSet(true);
         //动画完成后不回到原位
         set.setFillAfter(true);
         set.addAnimation(ta);
         set.addAnimation(al);
-        mIvMessage.startAnimation(set);
+        rlMessage.startAnimation(set);
     }
 
     private void showFloatImage(int distance) {
@@ -894,7 +897,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         set.setFillAfter(true);
         set.addAnimation(ta);
         set.addAnimation(al);
-        mIvMessage.startAnimation(set);
+        rlMessage.startAnimation(set);
     }
 
     private void cancelTask() {

@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/dp_5">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/ivLocalPhoto"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_85"
+        android:layout_width="@dimen/dp_75"
+        android:layout_height="@dimen/dp_75"
         android:layout_centerHorizontal="true"
-        android:src="@mipmap/ic_image_add"
-        android:layout_marginTop="@dimen/dp_18"
+        android:layout_marginTop="@dimen/dp_5"
         android:layout_marginEnd="@dimen/dp_10"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:src="@mipmap/ic_image_add" />
 
     <ImageView
         android:id="@+id/ivDelete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:padding="@dimen/dp_10"
+        android:padding="@dimen/dp_7"
         android:src="@mipmap/ic_delete_red_middle" />
 </RelativeLayout>

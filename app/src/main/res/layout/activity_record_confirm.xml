@@ -19,7 +19,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginStart="@dimen/dp_28"
             android:layout_marginEnd="@dimen/dp_28"
-            android:layout_marginBottom="@dimen/dp_30"
+            android:layout_marginBottom="@dimen/dp_12"
             android:background="@drawable/bg_select_primary"
             android:letterSpacing="0.2"
             android:text="登记"
@@ -30,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:layout_above="@id/tvConfirmRecord"
             android:layout_marginBottom="@dimen/dp_20">
 
             <LinearLayout
@@ -60,10 +61,10 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentStart="true"
                             android:layout_centerVertical="true"
-                            android:background="@drawable/bg_radius_10_gray_f0f5ff"
+                            android:background="@drawable/bg_radius_10_blue_f0f5ff"
+                            android:minWidth="@dimen/dp_100"
                             android:orientation="horizontal"
                             android:paddingStart="@dimen/dp_10"
-                            android:minWidth="@dimen/dp_100"
                             android:paddingTop="@dimen/dp_5"
                             android:paddingEnd="@dimen/dp_5"
                             android:paddingBottom="@dimen/dp_5">
@@ -72,24 +73,24 @@
                                 android:id="@+id/tvParkNumber"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:minWidth="@dimen/dp_90"
                                 android:layout_gravity="center_vertical"
-                                android:paddingStart="@dimen/dp_5"
-                                android:paddingEnd="@dimen/dp_5"
-                                android:paddingTop="@dimen/dp_6"
-                                android:paddingBottom="@dimen/dp_6"
-                                android:hint="请选择车位"
                                 android:background="@null"
+                                android:hint="请选择车位"
                                 android:letterSpacing="0.2"
                                 android:maxLength="20"
+                                android:minWidth="@dimen/dp_90"
+                                android:paddingStart="@dimen/dp_5"
+                                android:paddingTop="@dimen/dp_6"
+                                android:paddingEnd="@dimen/dp_5"
+                                android:paddingBottom="@dimen/dp_6"
                                 android:textColor="#629BFF"
                                 android:textSize="@dimen/sp_14" />
 
                             <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/dp_10"
                                 android:layout_gravity="center_vertical"
+                                android:padding="@dimen/dp_10"
                                 android:src="@mipmap/ic_arrow_bottom_blue" />
                         </LinearLayout>
 
@@ -131,14 +132,103 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_2"
-                        android:layout_marginTop="@dimen/dp_23" />
+                        android:layout_marginTop="@dimen/dp_13" />
+
+                    <LinearLayout
+                        android:layout_marginStart="@dimen/dp_10"
+                        android:layout_marginEnd="@dimen/dp_10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dp_15"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:id="@+id/rlCarTypeSmall"
+                            android:layout_width="0dp"
+                            android:minHeight="@dimen/dp_35"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_radius_10_blue_f0f5ff"
+                            android:orientation="horizontal"
+                            android:paddingStart="@dimen/dp_12"
+                            android:paddingTop="@dimen/dp_6"
+                            android:paddingEnd="@dimen/dp_12"
+                            android:paddingBottom="@dimen/dp_6">
+
+                            <ImageView
+                                android:id="@+id/ivCarTypeSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:src="@mipmap/ic_car_type_small_blue" />
+
+                            <TextView
+                                android:textColor="@color/colorPrimary"
+                                android:id="@+id/tvCarTypeSmall"
+                                android:textSize="@dimen/sp_12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="@dimen/dp_8"
+                                android:layout_toEndOf="@id/ivCarTypeSmall"
+                                android:text="小型车" />
+
+                            <ImageView
+                                android:id="@+id/ivCarCheckSmall"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:src="@mipmap/ic_car_type_checked" />
+                        </RelativeLayout>
+
+
+                        <RelativeLayout
+                            android:id="@+id/rlCarTypeBig"
+                            android:layout_marginStart="@dimen/dp_10"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="@dimen/dp_35"
+                            android:background="@drawable/bg_radius_10_gray_eeeeee"
+                            android:orientation="horizontal"
+                            android:paddingStart="@dimen/dp_12"
+                            android:paddingTop="@dimen/dp_6"
+                            android:paddingEnd="@dimen/dp_12"
+                            android:paddingBottom="@dimen/dp_6">
+
+                            <ImageView
+                                android:id="@+id/ivCarTypeBig"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@mipmap/ic_car_type_small_gray" />
+
+                            <TextView
+                                android:id="@+id/tvCarTypeBig"
+                                android:textSize="@dimen/sp_12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="@dimen/dp_10"
+                                android:layout_toEndOf="@id/ivCarTypeBig"
+                                android:text="大型车" />
+
+                            <ImageView
+                                android:id="@+id/ivCarCheckBig"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:src="@mipmap/ic_car_type_un_checked" />
+                        </RelativeLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dp_5"
                     android:layout_marginStart="@dimen/dp_12"
+                    android:layout_marginTop="@dimen/dp_5"
                     android:layout_marginEnd="@dimen/dp_12"
                     android:background="@drawable/bg_radius_15_white"
                     android:orientation="vertical">
@@ -148,7 +238,7 @@
                         style="@style/textBlackStyle13"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/dp_20"
+                        android:layout_marginTop="@dimen/dp_15"
                         android:letterSpacing="0.2"
                         android:text="车辆拍照"
                         android:textStyle="bold" />
@@ -157,7 +247,7 @@
                         android:id="@+id/photoRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="@dimen/dp_190"
+                        android:minHeight="@dimen/dp_100"
                         android:paddingStart="@dimen/dp_15"
                         android:paddingEnd="@dimen/dp_15" />
 
@@ -166,7 +256,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/dp_15"
-                        android:layout_marginTop="@dimen/dp_20"
+                        android:layout_marginTop="@dimen/dp_15"
                         android:layout_marginBottom="@dimen/dp_20"
                         android:drawableStart="@mipmap/ic_warning_red"
                         android:drawablePadding="@dimen/dp_5"

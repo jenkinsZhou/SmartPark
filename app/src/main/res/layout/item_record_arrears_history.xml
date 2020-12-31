@@ -144,7 +144,7 @@
                 android:layout_centerHorizontal="true"
                 android:text="［延时欠缴］"
                 android:textColor="#FFC906"
-                android:textSize="@dimen/sp_13"
+                android:textSize="@dimen/sp_12"
                 android:textStyle="bold" />
 
             <TextView
