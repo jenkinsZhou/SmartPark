@@ -31,8 +31,7 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.bean.ParkSpaceInfo
-import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_GREEN
-import com.tourcoo.smartpark.constant.ParkConstant.CAR_TYPE_NORMAL
+import com.tourcoo.smartpark.constant.ParkConstant.*
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
@@ -872,10 +871,12 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         rlCarTypeSmall.setOnClickListener {
             showCarTypeSelect(true, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
             showCarTypeSelect(false, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+            carType = CAR_TYPE_NORMAL
         }
         rlCarTypeBig.setOnClickListener {
             showCarTypeSelect(false, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
             showCarTypeSelect(true, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+            carType = CAR_TYPE_YELLOW
         }
 
     }

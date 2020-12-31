@@ -5,11 +5,11 @@
 
     <ImageView
         android:id="@+id/ivLocalPhoto"
-        android:layout_width="@dimen/dp_75"
-        android:layout_height="@dimen/dp_75"
+        android:layout_width="@dimen/dp_80"
+        android:layout_height="@dimen/dp_80"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dp_5"
-        android:layout_marginEnd="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_11"
+        android:layout_marginEnd="@dimen/dp_11"
         android:scaleType="fitCenter"
         android:src="@mipmap/ic_image_add" />
 
@@ -19,6 +19,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:padding="@dimen/dp_7"
+        android:padding="@dimen/dp_8"
         android:src="@mipmap/ic_delete_red_middle" />
 </RelativeLayout>

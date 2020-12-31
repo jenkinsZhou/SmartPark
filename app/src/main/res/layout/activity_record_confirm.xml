@@ -145,7 +145,7 @@
                         <RelativeLayout
                             android:id="@+id/rlCarTypeSmall"
                             android:layout_width="0dp"
-                            android:minHeight="@dimen/dp_35"
+                            android:minHeight="@dimen/dp_32"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:background="@drawable/bg_radius_10_blue_f0f5ff"
@@ -189,7 +189,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:minHeight="@dimen/dp_35"
+                            android:minHeight="@dimen/dp_32"
                             android:background="@drawable/bg_radius_10_gray_eeeeee"
                             android:orientation="horizontal"
                             android:paddingStart="@dimen/dp_12"
@@ -199,6 +199,7 @@
 
                             <ImageView
                                 android:id="@+id/ivCarTypeBig"
+                                android:layout_centerVertical="true"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@mipmap/ic_car_type_small_gray" />
@@ -247,7 +248,7 @@
                         android:id="@+id/photoRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="@dimen/dp_100"
+                        android:minHeight="@dimen/dp_150"
                         android:paddingStart="@dimen/dp_15"
                         android:paddingEnd="@dimen/dp_15" />
 
