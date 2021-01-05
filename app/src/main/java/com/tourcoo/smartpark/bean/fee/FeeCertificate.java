@@ -28,6 +28,8 @@ public class FeeCertificate {
     private String title;
     private String codeContent;
 
+    private String BTW;
+
     public String getMember() {
         return member;
     }
@@ -82,5 +84,13 @@ public class FeeCertificate {
 
     public void setCodeContent(String codeContent) {
         this.codeContent = codeContent;
+    }
+
+    public String getBTW() {
+        return BTW;
+    }
+
+    public void setBTW(String BTW) {
+        this.BTW = BTW;
     }
 }

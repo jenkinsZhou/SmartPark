@@ -1,4 +1,4 @@
-package com.tourcoo.smartpark.bean;
+package com.tourcoo.smartpark.bean.park;
 
 /**
  * @author :JenkinsZhou

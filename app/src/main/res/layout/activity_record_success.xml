@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include layout="@layout/layout_title_bar" />
+
+    <LinearLayout
+        android:layout_margin="@dimen/dp_15"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_radius_15_white"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_marginTop="@dimen/dp_14"
+            android:id="@+id/ivPayStatus"
+            android:layout_width="@dimen/dp_95"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/ic_pay_success" />
+
+        <TextView
+            android:id="@+id/tvSignStatus"
+            style="@style/menuTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_18"
+            android:letterSpacing="0.2"
+            android:text="本次停车已登记成功"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvSignTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dp_18"
+            android:layout_marginBottom="@dimen/dp_24"
+            android:textColor="#A2A2A2"
+            android:text="2020-09-07  11:39:01"
+            android:textSize="@dimen/sp_13" />
+
+    </LinearLayout>
+
+
+
+    <TextView
+        android:id="@+id/tvPrintCertify"
+        style="@style/buttonMatchWidthBlue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_28"
+        android:layout_marginEnd="@dimen/dp_28"
+        android:layout_marginBottom="@dimen/dp_28"
+        android:letterSpacing="0.2"
+        android:background="@drawable/bg_select_primary"
+        android:text="打印凭条" />
+</LinearLayout>

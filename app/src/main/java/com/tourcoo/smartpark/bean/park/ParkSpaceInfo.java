@@ -1,4 +1,4 @@
-package com.tourcoo.smartpark.bean;
+package com.tourcoo.smartpark.bean.park;
 
 import android.os.Parcel;
 import android.os.Parcelable;

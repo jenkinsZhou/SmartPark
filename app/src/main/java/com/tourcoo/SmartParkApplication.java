@@ -8,6 +8,7 @@ import androidx.multidex.MultiDex;
 
 import com.apkfuns.log2file.LogFileEngineFactory;
 import com.apkfuns.logutils.LogUtils;
+import com.basewin.services.ServiceManager;
 import com.kingja.loadsir.core.LoadSir;
 import com.simple.spiderman.SpiderMan;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
@@ -120,7 +121,12 @@ public class SmartParkApplication extends Application {
                 //设置统一超时--也可单独调用read/write/connect超时(可以设置时间单位TimeUnit)
                 //默认20 s
                 .setTimeout(20);
-
+        /*ThreadPoolManager.getThreadPoolProxy().execute(new Runnable() {
+            @Override
+            public void run() {
+                ServiceManager.getInstence().init(context);
+            }
+        });*/
     }
 
     private void intiPlantOrcSdk() {
@@ -145,7 +151,7 @@ public class SmartParkApplication extends Application {
                 PredictorWrapper.initLicense(this);
                 // 初始化模型
                 PredictorWrapper.initModel(this);
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

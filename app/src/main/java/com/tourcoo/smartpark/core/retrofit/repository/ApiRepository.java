@@ -6,7 +6,8 @@ import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.bean.PageBean;
-import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.park.ParkRecordInfo;
+import com.tourcoo.smartpark.bean.park.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
@@ -129,12 +130,13 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestUpdatePass(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<Object>> requestAddParkingSpace(long parkingSpaceId, String plantNum, int carType, String[] photos) {
+    public Observable<BaseResult<ParkRecordInfo>> requestAddParkingSpace(long parkingSpaceId, String plantNum, int carType, String[] photos) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("parkingSpaceId", parkingSpaceId);
         params.put("number", plantNum);
         params.put("type", carType);
         params.put("photos", photos);
+        LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestAddParkingSpace(params).retryWhen(new RetryWhen()));
     }
 
@@ -295,7 +297,7 @@ public class ApiRepository extends BaseRepository {
 
     public Observable<BaseResult<List<ParkSpaceInfo>>> requestParkUnusedList(String keywords) {
         Map<String, Object> params = new HashMap<>(1);
-        if(!TextUtils.isEmpty(keywords)){
+        if (!TextUtils.isEmpty(keywords)) {
             params.put("keywords", keywords);
         }
         LogUtils.tag("提交到后台的参数").i(params);
@@ -304,10 +306,21 @@ public class ApiRepository extends BaseRepository {
 
     /**
      * 消息列表
+     *
      * @return
      */
     public Observable<BaseResult<List<MessageInfo>>> requestMessageList() {
         return ThreadTransformer.switchSchedulers(getApiService().requestMessageList().retryWhen(new RetryWhen()));
+    }
+
+    public Observable<BaseResult<Object>> requestMessageHandle(int type, Long[] ids) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("type", type);
+        if (ids != null) {
+            params.put("id", ids);
+        }
+        LogUtils.tag("提交到后台的参数").i(params);
+        return ThreadTransformer.switchSchedulers(getApiService().requestMessageHandle(params).retryWhen(new RetryWhen()));
     }
 
 }

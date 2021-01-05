@@ -17,6 +17,19 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+    <uses-permission android:name="com.pos.permission.ACCESSORY_DATETIME" />
+    <uses-permission android:name="com.pos.permission.ACCESSORY_LED" />
+    <uses-permission android:name="com.pos.permission.ACCESSORY_BEEP" />
+    <uses-permission android:name="com.pos.permission.ACCESSORY_RFREGISTER" />
+    <uses-permission android:name="com.pos.permission.CARD_READER_ICC" />
+    <uses-permission android:name="com.pos.permission.CARD_READER_PICC" />
+    <uses-permission android:name="com.pos.permission.CARD_READER_MAG" />
+    <uses-permission android:name="com.pos.permission.COMMUNICATION" />
+    <uses-permission android:name="com.pos.permission.PRINTER" />
+    <uses-permission android:name="com.pos.permission.SECURITY" />
+    <uses-permission android:name="com.pos.permission.EMVCORE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+
     <application
         android:name="com.tourcoo.SmartParkApplication"
         android:allowBackup="true"
@@ -84,6 +97,7 @@
         <activity android:name=".ui.fee.FeeDetailActivity" />
         <activity android:name=".ui.fee.ArrearsDetailActivity" />
         <activity android:name=".ui.message.MessageListActivity" />
+        <activity android:name=".ui.record.RecordSuccessActivity" />
     </application>
 
 </manifest>

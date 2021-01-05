@@ -70,6 +70,7 @@
                 android:background="@drawable/bg_radius_30_gray_a2a2a2"
                 android:paddingStart="@dimen/dp_11"
                 android:paddingTop="@dimen/dp_3_5"
+                android:minWidth="@dimen/dp_60"
                 android:paddingEnd="@dimen/dp_11"
                 android:paddingBottom="@dimen/dp_3_5"
                 android:textColor="@color/white"

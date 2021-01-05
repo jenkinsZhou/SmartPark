@@ -353,6 +353,10 @@ public final class ToastUtil {
         showCustomLayout(R.layout.toast_view_layout_failed, content);
     }
 
+    public static void showFailed(int stringResource) {
+        showFailed(mApp.getText(stringResource));
+    }
+
     public static void showFailedDebug(CharSequence content) {
         if (AppConfig.DEBUG_BODE) {
             showFailed(content);

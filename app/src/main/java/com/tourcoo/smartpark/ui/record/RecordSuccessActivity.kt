@@ -1,39 +1,28 @@
-package com.tourcoo.smartpark.ui.fee
+package com.tourcoo.smartpark.ui.record
 
 import android.Manifest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.RemoteException
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.widget.TextView
 import com.apkfuns.logutils.LogUtils
 import com.basewin.aidl.OnPrinterListener
 import com.basewin.define.GlobalDef
+import com.basewin.models.BitmapPrintLine
 import com.basewin.models.PrintLine
 import com.basewin.models.TextPrintLine
 import com.basewin.services.PrinterBinder
 import com.basewin.services.ServiceManager
-import com.newland.aidl.printer.AidlPrinter
-import com.newland.aidl.printer.AidlPrinterListener
-import com.newland.aidl.printer.PrinterCode
+import com.basewin.zxing.utils.QRUtil
 import com.pos.sdk.accessory.PosAccessoryManager
-import com.scwang.smartrefresh.layout.api.RefreshLayout
-import com.scwang.smartrefresh.layout.header.ClassicsHeader
-import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
-import com.tourcoo.smartpark.bean.account.UserInfo
 import com.tourcoo.smartpark.bean.fee.FeeCertificate
-import com.tourcoo.smartpark.bean.fee.FeeDetail
 import com.tourcoo.smartpark.bean.fee.PayCertificate
 import com.tourcoo.smartpark.config.AppConfig
 import com.tourcoo.smartpark.constant.ParkConstant
-import com.tourcoo.smartpark.constant.ParkConstant.EXTRA_RECORD_ID
 import com.tourcoo.smartpark.constant.PayConstant
-import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
@@ -42,24 +31,11 @@ import com.tourcoo.smartpark.core.utils.NetworkUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.print.PrintConfig
-import com.tourcoo.smartpark.print_old.DeviceConnectListener
-import com.tourcoo.smartpark.print_old.DeviceService
-import com.tourcoo.smartpark.print_old.PrintConstant
-import com.tourcoo.smartpark.ui.account.AccountHelper
-import com.tourcoo.smartpark.ui.pay.PayResultActivity
+import com.tourcoo.smartpark.print.PrintConfig.REQUEST_PERMISSION
+import com.tourcoo.smartpark.print.PrintConfig.printSdkInitStatus
 import com.tourcoo.smartpark.util.StringUtil
-import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
-import kotlinx.android.synthetic.main.activity_fee_detail.*
-import kotlinx.android.synthetic.main.activity_fee_detail.commonRefreshLayout
-import kotlinx.android.synthetic.main.activity_fee_detail.tvEnterTime
-import kotlinx.android.synthetic.main.activity_fee_detail.tvExitTime
-import kotlinx.android.synthetic.main.activity_fee_detail.tvFeeCurrent
-import kotlinx.android.synthetic.main.activity_fee_detail.tvFeeShould
-import kotlinx.android.synthetic.main.activity_fee_detail.tvParkingDuration
-import kotlinx.android.synthetic.main.activity_fee_detail.tvParkingName
-import kotlinx.android.synthetic.main.activity_fee_detail.tvPlantNum
-import kotlinx.android.synthetic.main.activity_fee_detail.tvSpaceNum
+import kotlinx.android.synthetic.main.activity_record_success.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -68,212 +44,52 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- *@description : 收费详情页面
+ *@description : 登记成功
  *@company :途酷科技
  * @author :JenkinsZhou
- * @date 2020年12月21日15:00
+ * @date 2021年01月05日16:27
  * @Email: 971613168@qq.com
  */
-class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshListener, EasyPermissions.PermissionCallbacks {
-    private var recordId: Long? = null
-    private var mNeedIgnore = false
+class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPermissions.PermissionCallbacks {
     private val handler = Handler(Looper.getMainLooper())
     private val printerCallback: PrinterListener = PrinterListener()
+    private var recordId: Long? = null
+
+
     override fun getContentLayout(): Int {
-        return R.layout.activity_fee_detail
+        return R.layout.activity_record_success
     }
 
     override fun initView(savedInstanceState: Bundle?) {
-        recordId = intent?.getLongExtra(EXTRA_RECORD_ID, -1)
+        tvPrintCertify.setOnClickListener(this)
+        recordId = intent?.getLongExtra(ParkConstant.EXTRA_RECORD_ID, -1)
         if (recordId == null || recordId!! < 0) {
             ToastUtil.showWarning("未获取到收费信息")
-            finish()
+//            finish()
         }
-        tvIgnoreHistoryFee.setOnClickListener(this)
-        initRefreshLayout()
-        initPrintClick()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
-        titleBar?.setTitleMainText("收费详情")
-    }
-
-    private fun requestFlagArrears(parkId: Long) {
-        ApiRepository.getInstance().requestFlagArrears(parkId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
-            override fun onRequestSuccess(entity: BaseResult<Any>?) {
-                if (entity == null) {
-                    return
-                }
-                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
-                    ToastUtil.showSuccess(entity.errMsg)
-                } else {
-                    ToastUtil.showFailed(entity.errMsg)
-                }
-            }
-        })
-    }
-
-    /**
-     * 标为欠费弹窗
-     */
-    private fun showSignConfirm() {
-        IosAlertDialog(mContext)
-                .init()
-                .setCancelable(false)
-                .setCanceledOnTouchOutside(false)
-                .setTitle("标为欠费")
-                .setMsg("确定要标为欠费吗?")
-                .setPositiveButton("确定", View.OnClickListener { requestFlagArrears(recordId!!) })
-                .setNegativeButton("取消", View.OnClickListener {
-                }).show()
-    }
-
-    private fun requestFeeDetail(needIgnore: Boolean) {
-        ApiRepository.getInstance().requestFeeDetail(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeDetail>>() {
-            override fun onRequestSuccess(entity: BaseResult<FeeDetail>?) {
-                commonRefreshLayout.finishRefresh(true)
-                if (entity == null) {
-                    return
-                }
-                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
-                    showFeeDetail(entity.data, needIgnore)
-                    mNeedIgnore = !mNeedIgnore
-                } else {
-                    ToastUtil.showFailed(entity.errMsg)
-                }
-            }
-
-            override fun onRequestError(throwable: Throwable?) {
-                commonRefreshLayout.finishRefresh(false)
-                super.onRequestError(throwable)
-            }
-        })
-    }
-
-    private fun showFeeDetail(data: FeeDetail?, ignore: Boolean) {
-        if (data == null) {
-            return
-        }
-
-        if (ignore) {
-            tvIgnoreHistoryFee.text = StringUtil.getNotNullValueLine("[已忽略]")
-        } else {
-            tvIgnoreHistoryFee.text = StringUtil.getNotNullValueLine("[忽略]")
-        }
-        setViewVisible(llFeeReal, true)
-        tvParkingName.text = StringUtil.getNotNullValueLine(data.parking)
-        tvEnterTime.text = StringUtil.getNotNullValueLine(data.createdAt)
-        tvExitTime.text = StringUtil.getNotNullValueLine(data.leaveAt)
-        tvParkingDuration.text = StringUtil.getNotNullValueLine(data.duration)
-        tvFeeCurrent.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
-        tvFeeHistory.text = StringUtil.getNotNullValueLine("¥ " + data.arrears)
-        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.theoreticalFee)
-        tvFeeReally.text = StringUtil.getNotNullValueLine("¥ " + data.totalFee)
-        showCarInfo(data)
-    }
-
-    private fun showCarInfo(detail: FeeDetail) {
-        tvSpaceNum.text = StringUtil.getNotNullValueLine(detail.number)
-        tvPlantNum.text = StringUtil.getNotNullValueLine(detail.carNumber)
-        when (detail.type) {
-            ParkConstant.CAR_TYPE_NORMAL -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff)
-            }
-            ParkConstant.CAR_TYPE_YELLOW -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
-            }
-            ParkConstant.CAR_TYPE_GREEN -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
-            }
-            else -> {
-            }
-        }
-    }
-
-    override fun loadData() {
-        super.loadData()
-        requestFeeDetail(mNeedIgnore)
+        titleBar?.setTitleMainText("登记结果")
     }
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.tvIgnoreHistoryFee -> {
-                requestFeeDetail(!mNeedIgnore)
+            R.id.tvPrintCertify -> {
+                requestPermissionAndPrint(recordId)
             }
             else -> {
             }
         }
-
-    }
-
-    override fun onRefresh(refreshLayout: RefreshLayout) {
-        requestFeeDetail(mNeedIgnore)
-    }
-
-    private fun initRefreshLayout() {
-        commonRefreshLayout.setEnableLoadMore(false)
-        commonRefreshLayout.setOnRefreshListener(this)
-        commonRefreshLayout.setRefreshHeader(ClassicsHeader(mContext))
-    }
-
-
-    private fun handleCertificateCallback(result: BaseResult<PayCertificate>?) {
-        if (result == null) {
-            ToastUtil.showFailed("服务器数据异常")
-            return
-        }
-        if (result.code != RequestConfig.REQUEST_CODE_SUCCESS) {
-            ToastUtil.showFailed(result.errMsg)
-            return
-        }
-        if (result.data == null) {
-            ToastUtil.showFailed("服务器数据异常")
-            return
-        }
-    requestPermissionAndPrint(result.data)
-    }
-
-
-    override fun onDestroy() {
-        handler.removeCallbacksAndMessages(null)
-        super.onDestroy()
-
     }
 
 
     private fun getCurrentTime(): String? {
         val time = System.currentTimeMillis() //long now = android.os.SystemClock.uptimeMillis();
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val d1 = Date(time)
         return format.format(d1)
     }
-
-
-    private fun initPrintClick() {
-        val rightLayout = mTitleBar?.getLinearLayout(Gravity.END) ?: return
-        rightLayout.removeAllViews()
-        val rightTextView = View.inflate(mContext, R.layout.view_right_title, null) as TextView
-        rightTextView.text = "打印凭条"
-        rightLayout.addView(rightTextView)
-        rightTextView.setOnClickListener {
-            doPrint()
-        }
-    }
-
-
-
-
-    /**
-     * 获取打印凭条内容
-     */
-    private fun requestPayCertificate() {
-        ApiRepository.getInstance().requestPayCertificate(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<PayCertificate>>() {
-            override fun onRequestSuccess(entity: BaseResult<PayCertificate>?) {
-                handleCertificateCallback(entity)
-            }
-        })
-    }
-
 
     private fun printContent(certificate: PayCertificate?) {
         if (certificate == null) {
@@ -342,13 +158,13 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = "到达时间:"+certificate.createdAt
+            textPrintLine.content = "到达时间:" + certificate.createdAt
             textPrintLine.size = TextPrintLine.FONT_NORMAL
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = "离开时间:"+certificate.leaveAt
+            textPrintLine.content = "离开时间:" + certificate.leaveAt
             textPrintLine.size = TextPrintLine.FONT_NORMAL
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -370,7 +186,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content ="  "
+            textPrintLine.content = "  "
             textPrintLine.size = 20
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -380,7 +196,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content =  "¥"+certificate.totalFee
+            textPrintLine.content = "¥" + certificate.totalFee
             textPrintLine.size = 44
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -404,7 +220,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content ="  "
+            textPrintLine.content = "  "
             textPrintLine.size = 20
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -455,7 +271,6 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         }
     }
 
-
     inner class PrinterListener : OnPrinterListener {
         private val TAG = "Print"
         override fun onStart() {
@@ -493,12 +308,69 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
                     }
                 }
             })
+
+
         }
     }
 
 
-    @AfterPermissionGranted(PrintConfig.REQUEST_PERMISSION)
-    private fun requestPermissionAndPrint(certificate: PayCertificate?) {
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this)
+                    .setTitle("提示")
+                    .setRationale("需要授予部分权限")
+                    .setNegativeButton("拒绝")
+                    .setPositiveButton("前往设置")
+                    .setRequestCode(0x001)
+                    .build()
+                    .show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+        }
+    }
+
+    private fun doPrint(recordId: Long?) {
+        if (recordId == null) {
+            ToastUtil.showWarning("未获取到收费员信息")
+            return
+        }
+        if (!NetworkUtil.isConnected(mContext)) {
+            ToastUtil.showFailed(R.string.exception_network_not_connected)
+            return
+        }
+        requestFeeCertificate(recordId)
+    }
+
+
+    private fun handleCertificateCallback(result: BaseResult<FeeCertificate>?) {
+        if (result == null) {
+            ToastUtil.showFailed("服务器数据异常")
+            return
+        }
+        if (result.code != RequestConfig.REQUEST_CODE_SUCCESS) {
+            ToastUtil.showFailed(result.errMsg)
+            return
+        }
+        if (result.data == null) {
+            ToastUtil.showFailed("服务器数据异常")
+            return
+        }
+        //真正执行打印的地方
+
+        printContent(result.data!!)
+    }
+
+
+    @AfterPermissionGranted(REQUEST_PERMISSION)
+    private fun requestPermissionAndPrint(recordId: Long?) {
         val perms = arrayOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -522,16 +394,16 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
                 ServiceManager.getInstence().init(applicationContext)
                 PrintConfig.printSdkInitStatus = true
                 LogUtils.d("打印机未初始化")
-                printContent(certificate)
+                doPrint(recordId)
             } else {
                 //如果有权限 并且初始化了 直接打印
                 LogUtils.i("打印机已经初始化")
-                printContent(certificate)
+                doPrint(recordId)
             }
         } else {
             // Do not have permissions, request them now
             EasyPermissions.requestPermissions(
-                    PermissionRequest.Builder(this, PrintConfig.REQUEST_PERMISSION, *perms)
+                    PermissionRequest.Builder(this, REQUEST_PERMISSION, *perms)
                             .setRationale("请授予存储权限")
                             .setNegativeButtonText("否")
                             .setPositiveButtonText("是")
@@ -540,36 +412,126 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         }
     }
 
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-    }
-
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            AppSettingsDialog.Builder(this)
-                    .setTitle("提示")
-                    .setRationale("需要授予部分权限")
-                    .setNegativeButton("拒绝")
-                    .setPositiveButton("前往设置")
-                    .setRequestCode(0x001)
-                    .build()
-                    .show()
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
-            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
-        }
+    /**
+     * 获取打印凭条内容
+     */
+    private fun requestFeeCertificate(recordId: Long?) {
+        ApiRepository.getInstance().requestFeeCertificate(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeCertificate>>() {
+            override fun onRequestSuccess(entity: BaseResult<FeeCertificate>?) {
+                handleCertificateCallback(entity)
+            }
+        })
     }
 
 
-    private fun doPrint() {
-        if (!NetworkUtil.isConnected(mContext)) {
-            ToastUtil.showFailed("网络未连接")
-            return
+    private fun printContent(certificate: FeeCertificate) {
+        try {
+            val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
+            var spState = spVersion.substring(spVersion.length - 2).trim { it <= ' ' }
+            when (spState) {
+                "1", "2" -> spState = "Normal"
+                "0" -> spState = "Locked"
+                "3" -> spState = "Sensor Broken"
+                else -> {
+                }
+            }
+            if (spState == "Locked") {
+                ToastUtil.showWarning("打印模块被锁定 无法打印")
+                return
+            }
+            if (spState == "Sensor Broken") {
+                ToastUtil.showWarning("打印模块传感器损坏或异常 无法打印")
+                return
+            }
+            ServiceManager.getInstence().printer.cleanCache()
+            ServiceManager.getInstence().printer.setPrintGray(PrintConfig.PRINT_GRAY_LEVEL)
+            ServiceManager.getInstence().printer.setLineSpace(1)
+            //set print type
+            ServiceManager.getInstence().printer.printTypesettingType = GlobalDef.ANDROID_TYPESETTING
+            val textPrintLine = TextPrintLine()
+            textPrintLine.type = PrintLine.TEXT
+            textPrintLine.position = TextPrintLine.CENTER
+            textPrintLine.size = 44
+            textPrintLine.content = certificate.title
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "收费单位:" + certificate.parking
+            textPrintLine.size = 30
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "操作员:" + certificate.member
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "泊位号:" + certificate.spaceNumber
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "车牌号:" + certificate.number
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "停车点:" + certificate.parking
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "到达时间:"
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.RIGHT
+            textPrintLine.content = certificate.createdAt
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "请使用微信扫码缴费"
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "二维码:"
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+            val ewm = QRUtil.getRQBMP(StringUtil.getNotNullValueLine(certificate.codeContent), 300)
+            val bitmapPrintLine = BitmapPrintLine()
+            bitmapPrintLine.type = PrintLine.BITMAP
+            bitmapPrintLine.position = PrintLine.CENTER
+            bitmapPrintLine.bitmap = ewm
+            ServiceManager.getInstence().printer.addPrintLine(bitmapPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.size = 20
+            textPrintLine.content = "凭条打印时间:" + getCurrentTime()
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.size = TextPrintLine.FONT_LARGE
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.STR_LINE_SHORT
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.size = 18
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = StringUtil.getNotNullValueLine(certificate.btw)
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED
+            textPrintLine.size = 36
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+            ServiceManager.getInstence().printer.beginPrint(printerCallback)
+        } catch (e: java.lang.Exception) {
+            handler.post {
+                if (AppConfig.DEBUG_BODE) {
+                    ToastUtil.showFailed("打印出错：$e")
+                } else {
+                    ToastUtil.showFailed("打印机出错")
+                }
+            }
         }
-        requestPayCertificate()
     }
 }

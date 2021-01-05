@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,11 +94,11 @@ public class StringUtil {
     }
 
     public static boolean judgeContainsLetter(String str) {
-        if(TextUtils.isEmpty(str)){
+        if (TextUtils.isEmpty(str)) {
             return false;
         }
-        String regex=".*[a-zA-Z]+.*";
-        Matcher m=Pattern.compile(regex).matcher(str);
+        String regex = ".*[a-zA-Z]+.*";
+        Matcher m = Pattern.compile(regex).matcher(str);
         return m.matches();
     }
 
@@ -130,8 +131,14 @@ public class StringUtil {
         return values.toArray(new Integer[0]);
     }
 
+    public static Long[] listParseLongArray(List<Long> values) {
+        if (values == null) {
+            return new Long[]{};
+        }
+        return values.toArray(new Long[0]);
+    }
 
-    public static   <T> T fromJson(String result, Class<T> classOfT) {
+    public static <T> T fromJson(String result, Class<T> classOfT) {
         if (result == null) {
             return null;
         }

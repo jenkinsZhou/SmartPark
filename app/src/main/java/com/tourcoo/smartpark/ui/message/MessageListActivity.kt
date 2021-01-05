@@ -18,13 +18,17 @@ import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.multi_status.MultiStatusErrorCallback
 import com.tourcoo.smartpark.core.multi_status.MultiStatusLoadingCallback
+import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.BaseObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
+import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
+import com.tourcoo.smartpark.util.StringUtil.listParseLongArray
 import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_message_record.*
+import java.util.ArrayList
 
 /**
  *@description : 消息列表
@@ -36,6 +40,7 @@ import kotlinx.android.synthetic.main.activity_message_record.*
 class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadListener {
     private var messageAdapter: MessageAdapter? = null
     private var loadService: LoadService<*>? = null
+    private val arrearsIdArray = ArrayList<Long>()
     override fun getContentLayout(): Int {
         return R.layout.activity_message_record
     }
@@ -43,6 +48,11 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
     override fun initView(savedInstanceState: Bundle?) {
         initRecyclerView()
         initStatusManager()
+    }
+
+    companion object {
+        const val HANDLE_TYPE_CONTINUE = 1
+        const val HANDLE_TYPE_END = 0
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -63,10 +73,12 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
         messageAdapter?.setOnItemChildClickListener { adapter, view, position ->
             when (view?.id) {
                 R.id.tvFeeCalculateEnd -> {
-                    showFeeEnd()
+                    val id = messageAdapter!!.data[position].id
+                    showFeeEnd(id)
                 }
                 R.id.tvFeeCalculateContinue -> {
-                    showFeeContinue()
+                    val id = messageAdapter!!.data[position].id
+                    showFeeContinue(id)
                 }
                 else -> {
                 }
@@ -90,9 +102,9 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
     }
 
     private fun doSelectAll(select: Boolean) {
-        var currentInfo: ArrearsHistoryRecord?
+        var currentInfo: MessageInfo?
         for (i in 0 until messageAdapter!!.data.size) {
-            currentInfo = messageAdapter!!.data[i] as ArrearsHistoryRecord
+            currentInfo = messageAdapter!!.data[i] as MessageInfo
             currentInfo.isSelect = select
         }
         messageAdapter!!.notifyDataSetChanged()
@@ -163,8 +175,7 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
             rightLayout.addView(rightTextView)
             rightTextView.text = "一键结束"
             rightTextView.setOnClickListener {
-//                showSignConfirm()
-                ToastUtil.showNormal("一键结束")
+                showAllEnd()
             }
             setViewGone(rightTextView, true)
         } else {
@@ -185,7 +196,7 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
     /**
      * 继续计费
      */
-    private fun showFeeContinue() {
+    private fun showFeeContinue(messageId: Long) {
         IosAlertDialog(mContext)
                 .init()
                 .setCancelable(false)
@@ -193,15 +204,16 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
                 .setTitle("继续计费")
                 .setMsg("确定要继续计费吗?")
                 .setPositiveButton("确定", View.OnClickListener {
-//                    requestFlagArrears(recordId)
-                    ToastUtil.showSuccess("执行计费")
+                    arrearsIdArray.clear()
+                    arrearsIdArray.add(messageId)
+                    doHandleMessage(HANDLE_TYPE_CONTINUE)
                 })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()
     }
 
 
-    private fun showFeeEnd() {
+    private fun showFeeEnd(messageId: Long) {
         IosAlertDialog(mContext)
                 .init()
                 .setCancelable(false)
@@ -209,8 +221,62 @@ class MessageListActivity : BaseTitleActivity(), View.OnClickListener, OnReloadL
                 .setTitle("确认结束")
                 .setMsg("确定结束当前计费?")
                 .setPositiveButton("确定", View.OnClickListener {
-//                    requestFlagArrears(recordId)
-                    ToastUtil.showSuccess("执行结束")
+                    arrearsIdArray.clear()
+                    arrearsIdArray.add(messageId)
+                    doHandleMessage(HANDLE_TYPE_END)
+                })
+                .setNegativeButton("取消", View.OnClickListener {
+                }).show()
+    }
+
+
+    private fun doHandleMessage(handleType: Int) {
+        if (arrearsIdArray.isEmpty()) {
+            ToastUtil.showWarning("请至少选择一条信息")
+            return
+        }
+        handleMessage(handleType)
+    }
+
+
+    private fun handleMessage(handleType: Int) {
+        ApiRepository.getInstance().requestMessageHandle(handleType, listParseLongArray(arrearsIdArray)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
+            override fun onRequestSuccess(entity: BaseResult<Any>?) {
+                if (entity == null) {
+                    return
+                }
+                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+                    ToastUtil.showSuccess(entity.errMsg)
+                    requestMessageList()
+                } else {
+                    ToastUtil.showFailed(entity.errMsg)
+                }
+            }
+
+        })
+    }
+
+    private fun doHandleAll() {
+        arrearsIdArray.clear()
+        for (arrearsRecord in messageAdapter!!.data) {
+            if (arrearsRecord.isSelect) {
+                arrearsIdArray.add(arrearsRecord.id)
+            }
+        }
+        doHandleMessage(HANDLE_TYPE_END)
+    }
+
+
+    private fun showAllEnd() {
+        IosAlertDialog(mContext)
+                .init()
+                .setCancelable(false)
+                .setCanceledOnTouchOutside(false)
+                .setTitle("一键结束")
+                .setMsg("确定要结束所有计费吗?")
+                .setPositiveButton("确定", View.OnClickListener {
+                    doSelectAll(true)
+                    doHandleAll()
                 })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()

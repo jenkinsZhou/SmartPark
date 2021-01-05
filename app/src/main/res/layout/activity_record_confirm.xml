@@ -199,10 +199,10 @@
 
                             <ImageView
                                 android:id="@+id/ivCarTypeBig"
-                                android:layout_centerVertical="true"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@mipmap/ic_car_type_small_gray" />
+                                android:layout_centerVertical="true"
+                                android:src="@mipmap/ic_car_type_big_gray" />
 
                             <TextView
                                 android:id="@+id/tvCarTypeBig"

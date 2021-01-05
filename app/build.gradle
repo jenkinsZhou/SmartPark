@@ -105,7 +105,7 @@ dependencies {
     implementation files('../ocrplatenumber-lib/output/libs/liantian.jar')
     implementation 'org.greenrobot:eventbus:3.2.0'
     implementation 'com.alibaba:fastjson:1.1.72.android'
-    implementation 'pub.devrel:easypermissions:2.0.0'
+    implementation 'pub.devrel:easypermissions:2.0.1'
     //Multidex 5.0以下
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation files('libs/commons-lang3-3.11.jar')
@@ -114,7 +114,9 @@ dependencies {
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     implementation project(':zxing')
     implementation files('libs/st-sdkserviceapi-4.00.07.jar')
-
+    compileOnly files('extern_libs/classes.jar')
+//    implementation files('libs/zxingcore.jar')
+    implementation files('libs/bw_pos_sdk.jar')
     implementation 'com.neovisionaries:nv-websocket-client:2.10'
 }
 repositories {

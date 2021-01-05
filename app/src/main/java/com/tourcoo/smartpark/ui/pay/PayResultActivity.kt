@@ -1,33 +1,45 @@
 package com.tourcoo.smartpark.ui.pay
 
+import android.Manifest
 import android.os.Bundle
-import android.os.RemoteException
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import com.apkfuns.logutils.LogUtils
-import com.newland.aidl.printer.AidlPrinter
-import com.newland.aidl.printer.AidlPrinterListener
-import com.newland.aidl.printer.PrinterCode
+import com.basewin.aidl.OnPrinterListener
+import com.basewin.define.GlobalDef
+import com.basewin.models.PrintLine
+import com.basewin.models.TextPrintLine
+import com.basewin.services.PrinterBinder
+import com.basewin.services.ServiceManager
+import com.pos.sdk.accessory.PosAccessoryManager
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
-import com.tourcoo.smartpark.bean.account.UserInfo
 import com.tourcoo.smartpark.bean.fee.PayCertificate
 import com.tourcoo.smartpark.bean.fee.PayResult
+import com.tourcoo.smartpark.config.AppConfig
 import com.tourcoo.smartpark.constant.PayConstant
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
 import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
+import com.tourcoo.smartpark.core.utils.NetworkUtil
 import com.tourcoo.smartpark.core.utils.StackUtil
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
-import com.tourcoo.smartpark.print.DeviceConnectListener
-import com.tourcoo.smartpark.print.DeviceService
-import com.tourcoo.smartpark.print.PrintConstant.*
+import com.tourcoo.smartpark.print.PrintConfig
+import com.tourcoo.smartpark.print.PrintConfig.*
 import com.tourcoo.smartpark.ui.account.AccountHelper
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity
 import com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.Companion.EXTRA_PARK_ID
 import com.tourcoo.smartpark.util.StringUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_pay_result.*
+import pub.devrel.easypermissions.AfterPermissionGranted
+import pub.devrel.easypermissions.AppSettingsDialog
+import pub.devrel.easypermissions.EasyPermissions
+import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
+import pub.devrel.easypermissions.PermissionRequest
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,13 +50,14 @@ import java.util.*
  * @date 2020年11月05日11:42
  * @Email: 971613168@qq.com
  */
-class PayResultActivity : BaseTitleActivity() {
+class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
     private var paySuccess: Boolean? = null
     private var payResult: PayResult? = null
-    private var iPrinter: AidlPrinter? = null
-    private var deviceService: DeviceService? = null
-    private var printEnable = false
     private var recordId: Long? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val printerCallback: PrinterListener = PrinterListener()
+
+    private var printSdkHasInit = false
     override fun getContentLayout(): Int {
         return R.layout.activity_pay_result
     }
@@ -64,40 +77,13 @@ class PayResultActivity : BaseTitleActivity() {
         showPayResult()
         tvConfirm.setOnClickListener {
             if (paySuccess!!) {
-                doPrint()
+                requestPermissionAndPrint()
             } else {
                 payRetry()
             }
         }
-        deviceService = DeviceService(mContext, object : DeviceConnectListener {
-            override fun deviceConnectSuccess() {
-                LogUtils.i("deviceConnectSuccess")
-                if (deviceService != null) {
-                    if (iPrinter == null) {
-                        iPrinter = DeviceService.getPrinter()
-                    }
-                    printEnable = true
-                }
-            }
-
-            override fun deviceDisConnected() {
-                printEnable = false
-                LogUtils.e("deviceDisConnected")
-            }
-
-            override fun deviceConnecting() {
-                printEnable = false
-                LogUtils.d("deviceConnecting")
-            }
-
-            override fun deviceNoConnect() {
-                printEnable = false
-                LogUtils.e("deviceNoConnect")
-            }
-
-        })
-        deviceService?.connect()
     }
+
 
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -140,59 +126,17 @@ class PayResultActivity : BaseTitleActivity() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
         super.onDestroy()
-        disconnectPrinter()
-    }
-
-    private fun disconnectPrinter() {
-        deviceService?.disconnect()
-        deviceService?.connectListener = null
-        iPrinter = null
-        printEnable = false
-        deviceService = null
     }
 
 
     private fun doPrint() {
-        if (AccountHelper.getInstance().userInfo == null) {
-            ToastUtil.showWarning("未获取到收费员信息")
+        if(!NetworkUtil.isConnected(mContext)){
+            ToastUtil.showFailed("网络未连接")
             return
         }
-        if (!printEnable) {
-            ToastUtil.showWarning("打印机繁忙或未连接")
-            return
-        }
-        if (iPrinter == null) {
-            ToastUtil.showWarning("打印机未连接")
-            return
-        }
-        when (iPrinter?.status) {
-            //正常
-            PrinterCode.PrinterState.PRINTER_NORMAL -> {
-                requestPayCertificate()
-            }
-            PrinterCode.PrinterState.PRINTER_OUTOF_PAPER -> {
-                //打印机缺纸
-                ToastUtil.showWarning("打印机缺纸")
-                return
-            }
-
-            PrinterCode.PrinterState.PRINTER_HEAT_LIMITED -> {
-                //打印机缺纸
-                ToastUtil.showWarning("打印机超温")
-                return
-            }
-
-            PrinterCode.PrinterState.PRINTER_BUSY -> {
-                //打印机缺纸
-                ToastUtil.showWarning("打印机繁忙")
-                return
-            }
-            else -> {
-                ToastUtil.showWarning("打印机不可用")
-                return
-            }
-        }
+        requestPayCertificate()
     }
 
     /**
@@ -204,215 +148,6 @@ class PayResultActivity : BaseTitleActivity() {
                 handleCertificateCallback(entity)
             }
         })
-//        printContent(AccountHelper.getInstance().userInfo,)
-    }
-
-    private fun printContent(userInfo: UserInfo, certificate: PayCertificate) {
-        showLoading("正在打印...")
-        try {
-            //设置纸张大小为两英寸（5.08cm）
-            iPrinter?.setPaperSize(0x00)
-            //设置间距 0-60 默认为6
-            iPrinter?.setPaperSize(6)
-            val format = Bundle()
-            format.putInt("zoom", 4)
-            format.putString("font", FONT_SIZE_SMALL)
-            format.putString("align", GRAVITY_CENTER)
-            iPrinter?.addText(format, certificate.title)
-
-            iPrinter?.addText(format, "\n")
-
-            format.putString("font", FONT_SIZE_NORMAL)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_CENTER)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "停车人存根")
-
-            iPrinter?.addText(format, "\n")
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "操作员:" + certificate.member)
-
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "泊位号:" + certificate.spaceNumber)
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "车牌号:" + certificate.number)
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "停车点:" + certificate.parking)
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            iPrinter?.addText(format, "到达时间:")
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_RIGHT)
-            iPrinter?.addText(format, certificate.createdAt)
-            iPrinter?.addText(format, "\n")
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "离开时间:")
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_RIGHT)
-            iPrinter?.addText(format, certificate.leaveAt)
-            iPrinter?.addText(format, "\n")
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "停车时长:" + certificate.duration)
-
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "本次费用:RMB(元)" + certificate.fee)
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "历史欠费:RMB(元)" + certificate.arrears)
-
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "应收费用:RMB(元)" + certificate.totalFee)
-
-            /*    format.putString("font", FONT_SIZE_LARGE)
-                format.putString("align", GRAVITY_LEFT)
-                format.putInt("zoom", 3)
-                format.putBoolean("linefeed", true)
-                iPrinter?.addText(format, "请使用微信扫码缴费")*/
-            format.putString("font", FONT_SIZE_SMALL)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            iPrinter?.addText(format, "\n")
-
-            format.putInt("zoom", 4)
-            format.putString("font", FONT_SIZE_SMALL)
-            format.putString("align", GRAVITY_CENTER)
-            iPrinter?.addText(format, "实收费用:RMB(元)" + "¥ " + certificate.totalFee)
-            iPrinter?.addText(format, "line")
-            format.putString("font", "normal")
-            var payType = ""
-            when (certificate.payType) {
-                PayConstant.PAY_TYPE_ALI -> payType = "支付宝支付"
-                PayConstant.PAY_TYPE_WEI_XIN -> payType = "微信支付"
-                PayConstant.PAY_TYPE_CASH -> payType = "现金支付"
-                else -> {
-                }
-            }
-            format.putString("font", FONT_SIZE_LARGE)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, payType + ":RMB(元)" + certificate.totalFee)
-
-            format.putInt("hzFont", 9)
-            format.putInt("zmFont", 38)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "\n")
-
-            format.putInt("hzFont", 9)
-            format.putInt("zmFont", 38)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "交易时间:" + certificate.leaveAt)
-
-            iPrinter?.addText(format, "\n")
-
-            format.putString("font", FONT_SIZE_NORMAL)
-            format.putInt("hzFont", 9)
-            format.putInt("zmFont", 38)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "订单编号:" + certificate.outTradeNo)
-
-
-            iPrinter?.addText(format, "\n")
-            /*   format.putString("align", "center")
-               format.putInt("height", 200)
-               iPrinter?.addQrCode(format, StringUtil.getNotNullValueLine(certificate.codeContent))
-               iPrinter?.addText(format, "\n")
-               iPrinter?.addText(format, "\n")*/
-
-            format.putString("font", FONT_SIZE_NORMAL)
-            format.putInt("hzFont", 9)
-            format.putInt("zmFont", 38)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, "凭条打印时间:" + getCurrentTime())
-
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "line")
-            format.putString("font", "normal")
-
-            iPrinter?.addText(format, "\n")
-            format.putString("font", FONT_SIZE_SMALL)
-            format.putInt("hzFont", 9)
-            format.putInt("zmFont", 38)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-            iPrinter?.addText(format, certificate.btw)
-            format.putString("font", FONT_SIZE_SMALL)
-            format.putInt("zoom", 3)
-            format.putString("align", GRAVITY_LEFT)
-            format.putBoolean("linefeed", true)
-
-
-
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "\n")
-            iPrinter?.addText(format, "\n")
-            iPrinter?.startPrinter(object : AidlPrinterListener.Stub() {
-                @Throws(RemoteException::class)
-                override fun onFinish() {
-                    closeLoading()
-                }
-
-                @Throws(RemoteException::class)
-                override fun onError(arg0: Int, arg1: String) {
-                    ToastUtil.showFailedDebug("打印出错:$arg1")
-                    closeLoading()
-                }
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ToastUtil.showFailedDebug("打印故障:$e")
-            closeLoading()
-        }
     }
 
 
@@ -430,14 +165,317 @@ class PayResultActivity : BaseTitleActivity() {
             return
         }
         //真正执行打印的地方
-        printContent(AccountHelper.getInstance().userInfo, result.data!!)
+//        printContentOld(AccountHelper.getInstance().userInfo, result.data!!)
+        printContent(result.data!!)
     }
 
 
     private fun getCurrentTime(): String? {
         val time = System.currentTimeMillis() //long now = android.os.SystemClock.uptimeMillis();
-        val format = SimpleDateFormat("yyyy.MM.dd HH:mm:ss")
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         val d1 = Date(time)
         return format.format(d1)
     }
+
+    private fun printContent(certificate: PayCertificate?) {
+        if (certificate == null) {
+            ToastUtil.showFailed("未获取到打印数据")
+            return
+        }
+        try {
+            val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
+            var spState = spVersion.substring(spVersion.length - 2).trim { it <= ' ' }
+            when (spState) {
+                "1", "2" -> spState = "Normal"
+                "0" -> spState = "Locked"
+                "3" -> spState = "Sensor Broken"
+                else -> {
+                }
+            }
+            if (spState == "Locked") {
+                ToastUtil.showWarning("打印模块被锁定 无法打印")
+                return
+            }
+            if (spState == "Sensor Broken") {
+                ToastUtil.showWarning("打印模块传感器损坏或异常 无法打印")
+                return
+            }
+            ServiceManager.getInstence().printer.cleanCache()
+            ServiceManager.getInstence().printer.setPrintGray(PrintConfig.PRINT_GRAY_LEVEL)
+            ServiceManager.getInstence().printer.setLineSpace(1)
+            //set print type
+            ServiceManager.getInstence().printer.printTypesettingType = GlobalDef.ANDROID_TYPESETTING
+            val textPrintLine = TextPrintLine()
+            textPrintLine.type = PrintLine.TEXT
+            textPrintLine.position = TextPrintLine.CENTER
+            textPrintLine.size = 40
+            textPrintLine.content = certificate.title
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = "停车人存根"
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = "  "
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "操作员:" + certificate.member
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "泊位号:" + certificate.spaceNumber
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "车牌号:" + certificate.number
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "停车点:" + certificate.parking
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "到达时间:"+certificate.createdAt
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "离开时间:"+certificate.leaveAt
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "停车时长:" + certificate.duration
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "历史欠费:RMB(元)" + certificate.arrears
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "应收费用:RMB(元)" + certificate.totalFee
+            textPrintLine.size = TextPrintLine.FONT_NORMAL
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content ="  "
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = "实收费用"
+            textPrintLine.size = 44
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content =  "¥"+certificate.totalFee
+            textPrintLine.size = 44
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.size = 36
+            textPrintLine.content = PrintConfig.STR_LINE_SHORT
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            var payType = ""
+            when (certificate.payType) {
+                PayConstant.PAY_TYPE_ALI -> payType = "支付宝支付"
+                PayConstant.PAY_TYPE_WEI_XIN -> payType = "微信支付"
+                PayConstant.PAY_TYPE_CASH -> payType = "现金支付"
+                else -> {
+                }
+            }
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = payType + ":RMB(元)" + certificate.totalFee
+            textPrintLine.size = 32
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content ="  "
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "订单编号:" + certificate.outTradeNo
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+
+
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "交易时间:" + certificate.leaveAt
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "凭条打印时间:" + getCurrentTime()
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.size = TextPrintLine.FONT_LARGE
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.STR_LINE_SHORT
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = certificate.btw
+            textPrintLine.size = 18
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED
+            textPrintLine.size = 36
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+            ServiceManager.getInstence().printer.beginPrint(printerCallback)
+        } catch (e: java.lang.Exception) {
+            handler.post {
+                if (AppConfig.DEBUG_BODE) {
+                    ToastUtil.showFailed("打印出错：$e")
+                } else {
+                    ToastUtil.showFailed("打印机出错")
+                }
+            }
+        }
+    }
+
+    inner class PrinterListener : OnPrinterListener {
+        private val TAG = "Print"
+        override fun onStart() {
+            handler.post {
+                showLoading("正在打印...")
+            }
+        }
+
+        override fun onFinish() {
+            // TODO 打印结束
+            // End of the print
+            Log.e(TAG, "onFinish")
+            handler.postDelayed(Runnable {
+                closeLoading()
+            }, 300)
+        }
+
+        override fun onError(errorCode: Int, detail: String) {
+            // TODO 打印出错
+            // print error
+            Log.e(TAG, "print error errorcode = $errorCode detail = $detail")
+            handler.post(Runnable {
+                when (errorCode) {
+                    PrinterBinder.PRINTER_ERROR_NO_PAPER -> {
+                        ToastUtil.showWarning("打印机缺纸")
+                    }
+                    PrinterBinder.PRINTER_ERROR_OVER_HEAT -> {
+                        ToastUtil.showWarning("打印机过热")
+                    }
+                    PrinterBinder.PRINTER_ERROR_OTHER -> {
+                        ToastUtil.showWarning("打印机繁忙或被占用")
+                    }
+                    else -> {
+                        ToastUtil.showWarning("打印机未知异常")
+                    }
+                }
+            })
+
+            /*  if (errorCode == PrinterBinder.PRINTER_ERROR_NO_PAPER) {
+                  //Toast.makeText(MainActivity.this, "paper runs out during printing", Toast.LENGTH_SHORT).show();
+              }
+              if (errorCode == PrinterBinder.PRINTER_ERROR_OVER_HEAT) {
+              }
+              if (errorCode == PrinterBinder.PRINTER_ERROR_OTHER) {
+              }*/
+
+            //handler.sendMessageDelayed(null, 1000);
+//            handler.sendEmptyMessageDelayed(1, 1000)
+        }
+    }
+
+
+    @AfterPermissionGranted(REQUEST_PERMISSION)
+    private fun requestPermissionAndPrint() {
+        val perms = arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.SEND_SMS,
+                "com.pos.permission.SECURITY",
+                "com.pos.permission.ACCESSORY_DATETIME",
+                "com.pos.permission.ACCESSORY_LED",
+                "com.pos.permission.ACCESSORY_BEEP",
+                "com.pos.permission.ACCESSORY_RFREGISTER",
+                "com.pos.permission.CARD_READER_ICC",
+                "com.pos.permission.CARD_READER_PICC",
+                "com.pos.permission.CARD_READER_MAG",
+                "com.pos.permission.COMMUNICATION",
+                "com.pos.permission.PRINTER",
+                "com.pos.permission.ACCESSORY_RFREGISTER",
+                "com.pos.permission.EMVCORE"
+        )
+        if (EasyPermissions.hasPermissions(this, *perms)) {
+            if (!printSdkInitStatus) {
+                ServiceManager.getInstence().init(applicationContext)
+                printSdkHasInit =true
+                PrintConfig.printSdkInitStatus = true
+                LogUtils.d("打印机未初始化")
+                doPrint()
+            } else {
+                //如果有权限 并且初始化了 直接打印
+                LogUtils.i("打印机已经初始化")
+                doPrint()
+            }
+        } else {
+            // Do not have permissions, request them now
+            EasyPermissions.requestPermissions(
+                    PermissionRequest.Builder(this, REQUEST_PERMISSION, *perms)
+                            .setRationale("请授予存储权限")
+                            .setNegativeButtonText("否")
+                            .setPositiveButtonText("是")
+                            .build()
+            )
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            AppSettingsDialog.Builder(this)
+                    .setTitle("提示")
+                    .setRationale("需要授予部分权限")
+                    .setNegativeButton("拒绝")
+                    .setPositiveButton("前往设置")
+                    .setRequestCode(0x001)
+                    .build()
+                    .show()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
+            doPrint()
+        }
+    }
+
+
 }

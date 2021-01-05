@@ -3,17 +3,14 @@ package com.tourcoo.smartpark.adapter.fee;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.tourcoo.smartpark.R;
-import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.park.ParkSpaceInfo;
 import com.tourcoo.smartpark.constant.ParkConstant;
 import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.util.StringUtil;
-
-import java.util.List;
 
 /**
  * @author :JenkinsZhou

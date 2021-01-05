@@ -30,7 +30,8 @@ import com.kaopiz.kprogresshud.KProgressHUD
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
-import com.tourcoo.smartpark.bean.ParkSpaceInfo
+import com.tourcoo.smartpark.bean.park.ParkRecordInfo
+import com.tourcoo.smartpark.bean.park.ParkSpaceInfo
 import com.tourcoo.smartpark.constant.ParkConstant.*
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
@@ -38,7 +39,6 @@ import com.tourcoo.smartpark.core.control.RequestConfig
 import com.tourcoo.smartpark.core.retrofit.BaseLoadingObserver
 import com.tourcoo.smartpark.core.retrofit.UploadProgressBody
 import com.tourcoo.smartpark.core.retrofit.UploadRequestListener
-import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository.*
 import com.tourcoo.smartpark.core.utils.FileUtil
 import com.tourcoo.smartpark.core.utils.SizeUtil
@@ -653,14 +653,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             ToastUtil.showWarning("未获取到车位信息")
             return
         }
-        getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, imageArray).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
-            override fun onRequestSuccess(entity: BaseResult<Any>?) {
+        getInstance().requestAddParkingSpace(parkInfo!!.id, plantInputLayout.text, carType, imageArray).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<ParkRecordInfo>>() {
+            override fun onRequestSuccess(entity: BaseResult<ParkRecordInfo>?) {
                 if (entity == null) {
                     return
                 }
-                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
+                if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS && entity.data != null) {
                     ToastUtil.showSuccess(entity.errMsg)
-                    handleSignSuccessCallback()
+                    handleSignSuccessCallback(entity.data)
                 } else {
                     ToastUtil.showNormal(entity.errMsg)
                 }
@@ -685,8 +685,6 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             }
             if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 carType = CAR_TYPE_GREEN
-            } else {
-                carType = CAR_TYPE_NORMAL
             }
             isOrcPhoto = false
             requestAddParkingSpace(photoAdapter!!.serviceUrlList)
@@ -707,10 +705,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                 ToastUtil.showNormal("请输入正确的车牌号")
                 return
             }
-            if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
-                carType = CAR_TYPE_GREEN
+            carType = if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
+                CAR_TYPE_GREEN
             } else {
-                carType = CAR_TYPE_NORMAL
+                CAR_TYPE_NORMAL
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
         }
@@ -730,8 +728,9 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         return imageList
     }
 
-    private fun handleSignSuccessCallback() {
+    private fun handleSignSuccessCallback(parkRecordInfo: ParkRecordInfo) {
         setResult(RESULT_OK)
+        skipSuccessPage(parkRecordInfo.id)
         finish()
     }
 
@@ -869,14 +868,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
     private fun listenCarTypeSelect() {
         rlCarTypeSmall.setOnClickListener {
-            showCarTypeSelect(true, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
-            showCarTypeSelect(false, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
-            carType = CAR_TYPE_NORMAL
+            setCarTypeSmall()
         }
         rlCarTypeBig.setOnClickListener {
-            showCarTypeSelect(false, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
-            showCarTypeSelect(true, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
-            carType = CAR_TYPE_YELLOW
+            setCarTypeLarge()
         }
 
     }
@@ -891,5 +886,31 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             relativeLayout.setBackgroundResource(R.drawable.bg_radius_10_gray_eeeeee)
             textView.setTextColor(CommonUtil.getColor(R.color.grayA2A2A2))
         }
+    }
+
+
+    private fun setCarTypeSmall() {
+        showCarTypeSelect(true, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
+        showCarTypeSelect(false, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+        carType = CAR_TYPE_NORMAL
+        ivCarTypeSmall.setImageResource(R.mipmap.ic_car_type_small_blue)
+        ivCarTypeBig.setImageResource(R.mipmap.ic_car_type_big_gray)
+    }
+
+    private fun setCarTypeLarge() {
+        showCarTypeSelect(false, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
+        showCarTypeSelect(true, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
+        carType = CAR_TYPE_YELLOW
+        ivCarTypeSmall.setImageResource(R.drawable.ic_car_type_small_gray)
+        ivCarTypeBig.setImageResource(R.drawable.ic_car_type_big_blue)
+    }
+
+
+    private fun skipSuccessPage(recordId: Long) {
+        val intent = Intent()
+        intent.setClass(this@RecordCarInfoConfirmActivity, RecordSuccessActivity::class.java)
+        intent.putExtra(EXTRA_RECORD_ID, recordId)
+//        startActivityForResult(intent, REQUEST_CODE_PAY_BY_SCAN)
+        startActivity(intent)
     }
 }

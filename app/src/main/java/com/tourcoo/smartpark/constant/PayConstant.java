@@ -15,4 +15,6 @@ public class PayConstant {
      * 小程序
      */
     public static final String PAY_TYPE_SMALL_PROGRAM= "mini";
+
+
 }

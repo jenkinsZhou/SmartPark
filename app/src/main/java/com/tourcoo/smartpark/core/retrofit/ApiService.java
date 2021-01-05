@@ -3,7 +3,8 @@ package com.tourcoo.smartpark.core.retrofit;
 import com.tourcoo.smartpark.bean.AppUpdateBean;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.bean.PageBean;
-import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.park.ParkRecordInfo;
+import com.tourcoo.smartpark.bean.park.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.ParkingInfo;
 import com.tourcoo.smartpark.bean.account.TokenInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
@@ -97,7 +98,7 @@ public interface ApiService {
      * @return
      */
     @POST("/handheld/parking/addparking")
-    Observable<BaseResult<Object>> requestAddParkingSpace(@Body Map<String, Object> map);
+    Observable<BaseResult<ParkRecordInfo>> requestAddParkingSpace(@Body Map<String, Object> map);
 
     /**
      * 获取待收取停车费的车位列表
@@ -208,5 +209,13 @@ public interface ApiService {
 
     @GET("/handheld/msg/list")
     Observable<BaseResult<List<MessageInfo>>> requestMessageList();
+
+    /**
+     * 处理未读消息接口
+     * @return
+     */
+    @PUT("/handheld/msg/handle")
+    Observable<BaseResult<Object>> requestMessageHandle(@Body Map<String, Object> map);
+
 
 }

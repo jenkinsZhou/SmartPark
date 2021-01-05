@@ -42,7 +42,7 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.GridParkAdapter;
 import com.tourcoo.smartpark.bean.BaseResult;
-import com.tourcoo.smartpark.bean.ParkSpaceInfo;
+import com.tourcoo.smartpark.bean.park.ParkSpaceInfo;
 import com.tourcoo.smartpark.bean.account.UserInfo;
 import com.tourcoo.smartpark.bean.system.AppVersion;
 import com.tourcoo.smartpark.core.CommonUtil;

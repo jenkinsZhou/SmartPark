@@ -18,7 +18,6 @@ import com.tourcoo.smartpark.core.control.QuitAppControl;
 import com.tourcoo.smartpark.core.manager.RxJavaManager;
 import com.tourcoo.smartpark.core.retrofit.BaseObserver;
 import com.tourcoo.smartpark.core.utils.StackUtil;
-import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.core.widget.dialog.loading.IosLoadingDialog;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
