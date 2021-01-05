@@ -129,7 +129,7 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff)
             }
             ParkConstant.CAR_TYPE_YELLOW -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
+                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_yellow_fbc95f)
             }
             ParkConstant.CAR_TYPE_GREEN -> {
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)

@@ -138,7 +138,7 @@
 
             <TextView
                 style="@style/textBlackStyle14"
-                android:text=" 总应收（元）"
+                android:text="总应收（元）"
                 android:textStyle="bold" />
 
             <!--<TextView

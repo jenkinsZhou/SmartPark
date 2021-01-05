@@ -180,6 +180,14 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:src="@mipmap/ic_car_type_checked" />
+
+                            <CheckBox
+                                android:id="@+id/cBoxSmall"
+                                android:checked="true"
+                                android:visibility="gone"
+                                android:enabled="false"
+                                android:layout_width="@dimen/dp_5"
+                                android:layout_height="@dimen/dp_5"/>
                         </RelativeLayout>
 
 
@@ -221,6 +229,14 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerVertical="true"
                                 android:src="@mipmap/ic_car_type_un_checked" />
+
+                            <CheckBox
+                                android:id="@+id/cBoxBig"
+                                android:checked="false"
+                                android:enabled="false"
+                                android:visibility="gone"
+                                android:layout_width="@dimen/dp_5"
+                                android:layout_height="@dimen/dp_5"/>
                         </RelativeLayout>
                     </LinearLayout>
                 </LinearLayout>

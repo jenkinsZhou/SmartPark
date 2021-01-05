@@ -683,8 +683,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
                 ToastUtil.showNormal("请输入正确的车牌号")
                 return
             }
-            if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
-                carType = CAR_TYPE_GREEN
+            carType = if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
+                CAR_TYPE_GREEN
+            } else {
+                checkCarType()
             }
             isOrcPhoto = false
             requestAddParkingSpace(photoAdapter!!.serviceUrlList)
@@ -708,7 +710,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             carType = if (plantNum.length == LENGTH_CAR_TYPE_GREEN) {
                 CAR_TYPE_GREEN
             } else {
-                CAR_TYPE_NORMAL
+                checkCarType()
             }
             compressImagesAndUpload(parseFileList(mSelectLocalImagePathList))
         }
@@ -893,6 +895,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         showCarTypeSelect(true, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
         showCarTypeSelect(false, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
         carType = CAR_TYPE_NORMAL
+        cBoxSmall.isChecked = true
+        cBoxBig.isChecked = false
         ivCarTypeSmall.setImageResource(R.mipmap.ic_car_type_small_blue)
         ivCarTypeBig.setImageResource(R.mipmap.ic_car_type_big_gray)
     }
@@ -901,6 +905,8 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         showCarTypeSelect(false, ivCarCheckSmall, rlCarTypeSmall, tvCarTypeSmall)
         showCarTypeSelect(true, ivCarCheckBig, rlCarTypeBig, tvCarTypeBig)
         carType = CAR_TYPE_YELLOW
+        cBoxSmall.isChecked = false
+        cBoxBig.isChecked = true
         ivCarTypeSmall.setImageResource(R.drawable.ic_car_type_small_gray)
         ivCarTypeBig.setImageResource(R.drawable.ic_car_type_big_blue)
     }
@@ -913,4 +919,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 //        startActivityForResult(intent, REQUEST_CODE_PAY_BY_SCAN)
         startActivity(intent)
     }
+
+    private fun checkCarType() : Int{
+    return if (cBoxBig.isChecked) {
+            CAR_TYPE_YELLOW
+        } else {
+            CAR_TYPE_NORMAL
+        }
+    }
+
+
 }

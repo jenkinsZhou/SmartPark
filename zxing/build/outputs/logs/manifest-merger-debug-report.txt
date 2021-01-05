@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml:1:1-53
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml:1:1-53
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml:1:1-53
+	package
+		ADDED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml:1:11-51
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml:1:1-53
+uses-sdk
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+		ADDED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+		ADDED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml
+		INJECTED from E:\JenkinsZhou\SmartPark\zxing\src\main\AndroidManifest.xml

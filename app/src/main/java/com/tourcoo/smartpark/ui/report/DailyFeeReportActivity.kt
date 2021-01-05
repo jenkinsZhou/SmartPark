@@ -350,17 +350,6 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
                     }
                 }
             })
-
-            /*  if (errorCode == PrinterBinder.PRINTER_ERROR_NO_PAPER) {
-                  //Toast.makeText(MainActivity.this, "paper runs out during printing", Toast.LENGTH_SHORT).show();
-              }
-              if (errorCode == PrinterBinder.PRINTER_ERROR_OVER_HEAT) {
-              }
-              if (errorCode == PrinterBinder.PRINTER_ERROR_OTHER) {
-              }*/
-
-            //handler.sendMessageDelayed(null, 1000);
-//            handler.sendEmptyMessageDelayed(1, 1000)
         }
     }
 }
