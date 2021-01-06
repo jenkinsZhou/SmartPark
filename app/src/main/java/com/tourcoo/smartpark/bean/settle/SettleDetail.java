@@ -36,7 +36,7 @@ public class SettleDetail implements Serializable {
     private String leaveAt;
     private double count;
     private long carId;
-    private List<Integer> arrearsId = new ArrayList<>();
+    private List<Long> arrearsId = new ArrayList<>();
 
 
     public double getArrears() {
@@ -119,11 +119,11 @@ public class SettleDetail implements Serializable {
         this.carId = carId;
     }
 
-    public List<Integer> getArrearsId() {
+    public List<Long> getArrearsId() {
         return arrearsId;
     }
 
-    public void setArrearsId(List<Integer> arrearsId) {
+    public void setArrearsId(List<Long> arrearsId) {
         this.arrearsId = arrearsId;
     }
 

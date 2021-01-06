@@ -212,6 +212,7 @@
                     android:paddingEnd="@dimen/dp_10"
                     android:paddingBottom="@dimen/dp_8"
                     android:text="[忽略]"
+                    android:visibility="invisible"
                     android:textColor="@color/colorGraySmallText"
                     android:textSize="@dimen/sp_12"
                     android:textStyle="bold" />

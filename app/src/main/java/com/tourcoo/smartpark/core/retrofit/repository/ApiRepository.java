@@ -196,7 +196,7 @@ public class ApiRepository extends BaseRepository {
         return ThreadTransformer.switchSchedulers(getApiService().requestArrearsHistoryList(params).retryWhen(new RetryWhen()));
     }
 
-    public Observable<BaseResult<PayResult>> requestPay(long recordId, int type, String code, Integer[] arrearsId) {
+    public Observable<BaseResult<PayResult>> requestPay(long recordId, int type, String code, Long[] arrearsId) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("id", recordId);
         params.put("type", type);

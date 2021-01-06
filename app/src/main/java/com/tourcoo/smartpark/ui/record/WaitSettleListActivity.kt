@@ -112,7 +112,19 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
                         ToastUtil.showWarning("未获取到对应记录")
                         return@setOnItemChildClickListener
                     }
-                    requestPermissionAndPrint(info.recordId)
+
+                    try {
+                        requestPermissionAndPrint(info.recordId)
+                    } catch (e: Throwable) {
+                        e.printStackTrace()
+                        if (AppConfig.DEBUG_BODE) {
+                            ToastUtil.showFailed(e.toString())
+                        } else {
+                            ToastUtil.showFailed("未找到打印机或当前设备不支持打印功能")
+                        }
+                    }
+
+
                 }
                 R.id.tvSettle -> {
                     skipSettle(info!!.recordId, info.id)
@@ -215,7 +227,6 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
     }
 
 
-
     private fun printContent(certificate: FeeCertificate) {
         try {
             val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
@@ -307,7 +318,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
 
             textPrintLine.size = 18
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content =StringUtil.getNotNullValueLine(certificate.btw)
+            textPrintLine.content = StringUtil.getNotNullValueLine(certificate.btw)
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
 
@@ -316,12 +327,12 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed(R.string.tips_print_error)
                 }
             }
         }
@@ -341,7 +352,10 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
             return
         }
         //真正执行打印的地方
-
+        if (!PrintConfig.printSdkInitStatus) {
+            ToastUtil.showFailed("未找到打印机或当前设备不支持打印功能")
+            return
+        }
         printContent(result.data!!)
     }
 
@@ -493,7 +507,12 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
         )
         if (EasyPermissions.hasPermissions(this, *perms)) {
             if (!PrintConfig.printSdkInitStatus) {
-                ServiceManager.getInstence().init(applicationContext)
+                try {
+                    ServiceManager.getInstence().init(applicationContext)
+                } catch (e: Throwable) {
+                    PrintConfig.printSdkInitStatus = false
+                }
+
                 PrintConfig.printSdkInitStatus = true
                 LogUtils.d("打印机未初始化")
                 doPrint(recordId)

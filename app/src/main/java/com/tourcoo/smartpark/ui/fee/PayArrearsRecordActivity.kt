@@ -34,7 +34,7 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
     private var historyAdapter: ArrearsRecordHistoryAdapter? = null
     private val arrearsIdArray = ArrayList<Long>()
     private var receiveIdArray: ArrayList<Long>? = null
-    private val arrearsIds: String? = null
+    private var firstLoad = true
     override fun getContentLayout(): Int {
         return R.layout.activity_arrears_record
     }
@@ -90,6 +90,13 @@ class PayArrearsRecordActivity : BaseTitleActivity(), View.OnClickListener {
         }
         if (entity.code == RequestConfig.REQUEST_CODE_SUCCESS) {
             loadRecord(entity.data)
+          /*  if (firstLoad) {
+                if (receiveIdArray.isNullOrEmpty()) {
+                    //只有在未传忽略记录数组的情况下才全选
+                    doSelectAll(true)
+                }
+                firstLoad = false
+            }*/
         } else {
             ToastUtil.showFailed(entity.errMsg)
         }

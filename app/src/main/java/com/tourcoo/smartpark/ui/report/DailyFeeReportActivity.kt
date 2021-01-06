@@ -62,8 +62,16 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
         }
 
         llPayPrintCode.setOnClickListener {
-            requestPermissionAndPrint()
-
+            try {
+                requestPermissionAndPrint()
+            } catch (e: Throwable) {
+                e.printStackTrace()
+                if (AppConfig.DEBUG_BODE) {
+                    ToastUtil.showFailed(e.toString())
+                } else {
+                    ToastUtil.showFailed(R.string.tips_print_error)
+                }
+            }
         }
     }
 
@@ -113,8 +121,6 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
         intent.setClass(this@DailyFeeReportActivity, DailyFeeRecordListActivity::class.java)
         startActivity(intent)
     }
-
-
 
 
     private fun doPrintDailyReport(dailyReport: DailyReport?) {
@@ -186,7 +192,7 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
             textPrintLine.content = "收费员编号:" + certificate.number
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
-            textPrintLine.size =  TextPrintLine.FONT_LARGE
+            textPrintLine.size = TextPrintLine.FONT_LARGE
             textPrintLine.position = PrintLine.CENTER
             textPrintLine.content = PrintConfig.STR_LINE_SHORT
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
@@ -233,12 +239,12 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed("未匹配到对应打印模块或当前设备不支持打印")
                 }
             }
         }
@@ -309,7 +315,7 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
-         doPrintDailyReport(dailyReport)
+            doPrintDailyReport(dailyReport)
         }
     }
 

@@ -76,7 +76,17 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.tvPrintCertify -> {
-                requestPermissionAndPrint(recordId)
+                try {
+                    requestPermissionAndPrint(recordId)
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    if (AppConfig.DEBUG_BODE) {
+                        ToastUtil.showFailed(e.toString())
+                    } else {
+                        ToastUtil.showFailed(R.string.tips_print_error)
+                    }
+                }
+
             }
             else -> {
             }
@@ -260,12 +270,12 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed(R.string.tips_print_error)
                 }
             }
         }
@@ -524,7 +534,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")

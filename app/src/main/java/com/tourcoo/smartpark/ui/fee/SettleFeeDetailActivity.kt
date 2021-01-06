@@ -31,6 +31,7 @@ import com.tourcoo.smartpark.ui.pay.PayResultActivity
 import com.tourcoo.smartpark.ui.pay.ScanCodePayActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.util.StringUtil.listParseIntArray
+import com.tourcoo.smartpark.util.StringUtil.listParseLongArray
 import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
@@ -58,12 +59,11 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private var mNeedIgnore = false
     private var mArrearsIds: String? = null
     private var mPayType: Int? = null
-    private val arrearsIdList: MutableList<Int> = ArrayList()
+    private val arrearsIdList: MutableList<Long> = ArrayList()
     private var payResult: PayResult? = null
     private val timer = Timer()
     private var timerTask: TimerTask? = null
     private val mHandler = Handler()
-    private var ignoreTemp = false
     private var refreshEnable = false
     private val arrearsIdArray = java.util.ArrayList<Long>()
     companion object {
@@ -117,7 +117,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
 
     override fun handleNetSuccessCallback(data: BaseResult<*>?) {
         val entity = data as BaseResult<SettleDetail>?
-        handleRequestSuccess(entity, ignoreTemp)
+        handleRequestSuccess(entity)
     }
 
     override fun loadData() {
@@ -199,7 +199,6 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         }
         ApiRepository.getInstance().requestSpaceSettleDetail(recordId, needIgnore, mArrearsIds).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SettleDetail>>(httpRequestControl) {
             override fun onRequestSuccess(entity: BaseResult<SettleDetail>?) {
-                ignoreTemp = needIgnore
                 UiManager.getInstance().requestControl.httpRequestSuccess(httpRequestControl, entity)
                 scheduleRequestTask()
             }
@@ -213,7 +212,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     }
 
 
-    private fun handleRequestSuccess(entity: BaseResult<SettleDetail>?, ignore: Boolean) {
+    private fun handleRequestSuccess(entity: BaseResult<SettleDetail>?) {
         if (entity == null) {
             settleRefreshLayout.finishRefresh(false)
             return
@@ -223,10 +222,12 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             carId = entity.data.carId
             settleId = entity.data.id
             arrearsIdList.clear()
+            arrearsIdArray.clear()
             if (entity.data.arrearsId != null) {
                 arrearsIdList.addAll(entity.data.arrearsId)
+                arrearsIdArray.addAll(entity.data.arrearsId)
             }
-            showSettleInfo(entity.data, ignore)
+            showSettleInfo(entity.data, entity.data.arrearsId.isEmpty())
         } else {
             ToastUtil.showFailed(entity.errMsg)
         }
@@ -301,6 +302,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                     if (arrearsIds != null) {
                         arrearsIdArray.clear()
                         arrearsIdArray.addAll(arrearsIds)
+                       mNeedIgnore = arrearsIdArray.isNullOrEmpty()
                         mArrearsIds = StringUtils.join(arrearsIds, ",")
                     }
                 }
@@ -340,7 +342,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     }
     private fun requestPay(scanCode: String?) {
         showLoading("正在支付...")
-        ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseIntArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<PayResult?>>() {
+        ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseLongArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<PayResult?>>() {
             override fun onRequestSuccess(entity: BaseResult<PayResult?>?) {
                 handlePaySuccess(entity)
             }

@@ -230,7 +230,17 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ToastUtil.showFailed("服务器数据异常")
             return
         }
-    requestPermissionAndPrint(result.data)
+        try {
+            requestPermissionAndPrint(result.data)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            if (AppConfig.DEBUG_BODE) {
+                ToastUtil.showFailed(e.toString())
+            } else {
+                ToastUtil.showFailed(R.string.tips_print_error)
+            }
+        }
+
     }
 
 
@@ -259,8 +269,6 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             doPrint()
         }
     }
-
-
 
 
     /**
@@ -342,13 +350,13 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = "到达时间:"+certificate.createdAt
+            textPrintLine.content = "到达时间:" + certificate.createdAt
             textPrintLine.size = TextPrintLine.FONT_NORMAL
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = "离开时间:"+certificate.leaveAt
+            textPrintLine.content = "离开时间:" + certificate.leaveAt
             textPrintLine.size = TextPrintLine.FONT_NORMAL
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -370,7 +378,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content ="  "
+            textPrintLine.content = "  "
             textPrintLine.size = 20
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -380,7 +388,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content =  "¥"+certificate.totalFee
+            textPrintLine.content = "¥" + certificate.totalFee
             textPrintLine.size = 44
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -404,7 +412,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.CENTER
-            textPrintLine.content ="  "
+            textPrintLine.content = "  "
             textPrintLine.size = 20
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -444,12 +452,12 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed(R.string.tips_print_error)
                 }
             }
         }

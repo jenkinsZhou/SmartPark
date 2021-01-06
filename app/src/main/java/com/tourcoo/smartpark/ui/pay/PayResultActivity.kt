@@ -77,7 +77,16 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
         showPayResult()
         tvConfirm.setOnClickListener {
             if (paySuccess!!) {
-                requestPermissionAndPrint()
+                try {
+                    requestPermissionAndPrint()
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    if (AppConfig.DEBUG_BODE) {
+                        ToastUtil.showFailed(e.toString())
+                    } else {
+                        ToastUtil.showFailed(R.string.tips_print_error)
+                    }
+                }
             } else {
                 payRetry()
             }
@@ -346,12 +355,12 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed(R.string.tips_print_error)
                 }
             }
         }

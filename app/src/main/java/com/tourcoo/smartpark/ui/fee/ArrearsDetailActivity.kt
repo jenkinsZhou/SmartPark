@@ -212,7 +212,17 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
             ToastUtil.showFailed("服务器数据异常")
             return
         }
-        requestPermissionAndPrint(result)
+        try {
+            requestPermissionAndPrint(result)
+        }catch (e : Throwable){
+            if (AppConfig.DEBUG_BODE) {
+                ToastUtil.showFailed("打印出错：$e")
+            } else {
+                ToastUtil.showFailed(R.string.tips_print_error)
+            }
+        }
+
+
     }
 
 
@@ -435,12 +445,12 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
             textPrintLine.size = 36
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
             ServiceManager.getInstence().printer.beginPrint(printerCallback)
-        } catch (e: java.lang.Exception) {
+        } catch (e: Throwable) {
             handler.post {
                 if (AppConfig.DEBUG_BODE) {
                     ToastUtil.showFailed("打印出错：$e")
                 } else {
-                    ToastUtil.showFailed("打印机出错")
+                    ToastUtil.showFailed("未匹配到对应打印模块或当前设备不支持打印")
                 }
             }
         }
