@@ -384,10 +384,10 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
         }
 
         override fun onError(errorCode: Int, detail: String) {
-            // TODO 打印出错
             // print error
             Log.e(TAG, "print error errorcode = $errorCode detail = $detail")
             handler.post(Runnable {
+                closeLoading()
                 when (errorCode) {
                     PrinterBinder.PRINTER_ERROR_NO_PAPER -> {
                         ToastUtil.showWarning("打印机缺纸")
@@ -404,16 +404,7 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
                 }
             })
 
-            /*  if (errorCode == PrinterBinder.PRINTER_ERROR_NO_PAPER) {
-                  //Toast.makeText(MainActivity.this, "paper runs out during printing", Toast.LENGTH_SHORT).show();
-              }
-              if (errorCode == PrinterBinder.PRINTER_ERROR_OVER_HEAT) {
-              }
-              if (errorCode == PrinterBinder.PRINTER_ERROR_OTHER) {
-              }*/
 
-            //handler.sendMessageDelayed(null, 1000);
-//            handler.sendEmptyMessageDelayed(1, 1000)
         }
     }
 

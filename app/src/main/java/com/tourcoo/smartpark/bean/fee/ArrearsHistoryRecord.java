@@ -25,6 +25,11 @@ public class ArrearsHistoryRecord {
     private String leaveAt;
     private String duration;
     private boolean select;
+    private String arrearsType;
+
+
+
+
 
     public String getCreatedAt() {
         return createdAt;
@@ -80,5 +85,13 @@ public class ArrearsHistoryRecord {
 
     public void setSelect(boolean select) {
         this.select = select;
+    }
+
+    public String getArrearsType() {
+        return arrearsType;
+    }
+
+    public void setArrearsType(String arrearsType) {
+        this.arrearsType = arrearsType;
     }
 }

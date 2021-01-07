@@ -40,11 +40,6 @@ import com.tourcoo.smartpark.core.retrofit.repository.ApiRepository
 import com.tourcoo.smartpark.core.utils.ToastUtil
 import com.tourcoo.smartpark.core.widget.view.titlebar.TitleBarView
 import com.tourcoo.smartpark.print.PrintConfig
-import com.tourcoo.smartpark.print_old.DeviceConnectListener
-import com.tourcoo.smartpark.print_old.DeviceService
-import com.tourcoo.smartpark.print_old.PrintConstant
-import com.tourcoo.smartpark.ui.account.AccountHelper
-import com.tourcoo.smartpark.ui.record.WaitSettleListActivity
 import com.tourcoo.smartpark.util.StringUtil
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_arrears_detail.*
@@ -322,10 +317,10 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
         }
 
         override fun onError(errorCode: Int, detail: String) {
-            // TODO 打印出错
             // print error
             Log.e(TAG, "print error errorcode = $errorCode detail = $detail")
             handler.post(Runnable {
+                closeLoading()
                 when (errorCode) {
                     PrinterBinder.PRINTER_ERROR_NO_PAPER -> {
                         ToastUtil.showWarning("打印机缺纸")

@@ -115,9 +115,9 @@ dependencies {
     implementation project(':zxing')
     implementation files('libs/st-sdkserviceapi-4.00.07.jar')
     compileOnly files('extern_libs/classes.jar')
-//    implementation files('libs/zxingcore.jar')
     implementation files('libs/bw_pos_sdk.jar')
     implementation 'com.neovisionaries:nv-websocket-client:2.10'
+    implementation 'com.blankj:utilcodex:1.28.4'
 }
 repositories {
     mavenCentral()

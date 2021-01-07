@@ -28,6 +28,8 @@ public class ArrearsRecordHistoryAdapter extends BaseQuickAdapter<ArrearsHistory
         helper.setText(R.id.tvCarEnterTime, StringUtil.getNotNullValue(item.getCreatedAt()));
         helper.setText(R.id.tvCarExitTime, StringUtil.getNotNullValue(item.getLeaveAt()));
         helper.setText(R.id.tvParkingTime, StringUtil.getNotNullValue(item.getDuration()));
+        helper.setText(R.id.tvArrearsType, StringUtil.getNotNullValue(item.getArrearsType()));
+
         helper.setText(R.id.tvParkingFee, StringUtil.getNotNullValue("¥ " + item.getFee()));
         ImageView ivCheck = helper.getView(R.id.ivSelect);
         if (item.isSelect()) {

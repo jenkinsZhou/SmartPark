@@ -48,7 +48,6 @@
                     android:id="@+id/etUserName"
                     style="@style/textBlackLittle15Style"
                     android:layout_width="0dp"
-                    android:text="800001"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/dp_8"
@@ -140,6 +139,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="请输入密码"
+                    android:digits="@string/register_name_digits"
                     android:padding="@dimen/dp_5"
                     android:textColorHint="@color/colorTextLittleGray" />
 

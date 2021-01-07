@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.apkfuns.logutils.LogUtils;
+import com.blankj.utilcode.util.SpanUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -82,6 +84,8 @@ import com.tourcoo.smartpark.util.StringUtil;
 import com.tourcoo.smartpark.widget.dialog.AppUpdateDialog;
 import com.tourcoo.smartpark.widget.dialog.BottomSheetDialog;
 import com.tourcoo.smartpark.widget.dialog.CommonInputDialog;
+import com.tourcoo.smartpark.widget.dialog.NotificationDialog;
+import com.tourcoo.smartpark.widget.sound.SoundPoolUtil;
 import com.trello.rxlifecycle3.android.ActivityEvent;
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
@@ -140,6 +144,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private ImageView ivAvatar;
     private ImageView ivMessage;
     public static final int DELAY_TIME = 600;
+    private NotificationDialog mNotificationDialog;
+    private SoundPoolUtil ringPlayer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -152,6 +158,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         initSpaceRecyclerView();
         initAdapterClick();
         setImmersionBar(true);
+        ringPlayer = SoundPoolUtil.getInstance(getApplicationContext());
+        ringPlayer.init();
     }
 
     private void initView() {
@@ -343,7 +351,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         tvTotalCarCount.setText(getNotNullStr(userInfo.getCarNum() + ""));
         tvTheoreticalIncome.setText(getNotNullStr(userInfo.getTheoreticalIncome() + ""));
         tvActualIncome.setText(getNotNullStr(userInfo.getActualIncome() + ""));
-        GlideManager.loadCircleImgCenterAuto(getNotNullStr(userInfo.getAvatar() ),ivAvatar,R.drawable.ic_avatar_default);
+        GlideManager.loadCircleImgCenterAuto(getNotNullStr(userInfo.getAvatar()), ivAvatar, R.drawable.ic_avatar_default);
         showResetPassByCondition();
     }
 
@@ -427,11 +435,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     @Override
     protected void onDestroy() {
         closeLoading();
-        releaseService();
-        if (timer != null) {
-            timer.cancel();
-        }
-        cancelTask();
+        socketDisConnect();
+        ringPlayer.release();
+        ringPlayer = null;
         super.onDestroy();
     }
 
@@ -576,6 +582,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onResume() {
         super.onResume();
         initSocket();
+        if (mNotificationDialog == null) {
+            mNotificationDialog = new NotificationDialog(mContext).init().setTitle("通知消息").setPositiveClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
+                    mNotificationDialog.dismiss();
+                }
+            });
+        }
         requestUserInfoAndParkList();
         requestAppVersion();
     }
@@ -591,6 +606,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(int which) {
                 AccountHelper.getInstance().logout();
+                socketDisConnect();
             }
         });
 
@@ -793,6 +809,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
                 @Override
                 public void onTextMessage(String text) {
+                    LogUtils.i("OS. WebSocket onTextMessage:" + text);
                     if (TextUtils.isEmpty(text)) {
                         return;
                     }
@@ -805,7 +822,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                             LogUtils.e("result==null || result.getData() =null");
                             return;
                         }
-                        LogUtils.i("result=" + result.getData().getMsgNum());
+                        showNotifyDialog(result.getData());
                     } catch (Exception e) {
                         e.printStackTrace();
                         LogUtils.e("e=" + e.toString());
@@ -844,7 +861,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     timer = new Timer();
                     FloatTask floatTask = new FloatTask();
                     timerTaskList.add(floatTask);
-                    timer.schedule(floatTask,DELAY_TIME );
+                    timer.schedule(floatTask, DELAY_TIME);
                 }
                 break;
         }
@@ -907,4 +924,31 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void showNotifyDialog(SocketData socketData) {
+        if (socketData == null) {
+            return;
+        }
+        ringPlayer.playSound(1);
+        mHandler.post(() -> {
+            if (mNotificationDialog == null) {
+                mNotificationDialog = new NotificationDialog(mContext).init().setTitle("通知消息");
+            }
+            mNotificationDialog.setMessage(new SpanUtils().append("车辆")
+                    .append(" " + socketData.getCarNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))//resources.getColor(R.color.colorAccent)
+                    .append("已缴费离场\n请前往车位").setForegroundColor(CommonUtil.getColor(R.color.gray999999)).append(" " + socketData.getNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))
+                    .append(" 进行确认").setForegroundColor(CommonUtil.getColor(R.color.gray999999))
+                    .create());
+            mNotificationDialog.show();
+        });
+
+    }
+
+    private void socketDisConnect() {
+        releaseService();
+        if (timer != null) {
+            timer.cancel();
+        }
+        cancelTask();
+        socketManager = null;
+    }
 }

@@ -58,7 +58,6 @@ import com.tourcoo.smartpark.widget.selecter.PhotoAdapter
 import com.trello.rxlifecycle3.android.ActivityEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_record_confirm.*
-import kotlinx.android.synthetic.main.activity_report_fee_common.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -788,7 +787,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
             override fun onRequestError(throwable: Throwable?) {
                 super.onRequestError(throwable)
-                feeRecordRefreshLayout.finishRefresh(false)
+
             }
 
         })

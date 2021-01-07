@@ -16,6 +16,7 @@ import com.baidu.vis.ocrplatenumber.Predictor;
 import com.baidu.vis.ocrplatenumber.Response;
 import com.baidu.vis.ocrplatenumber.SDKExceptions;
 import com.baidu.vis.unified.license.AndroidLicenser;
+import com.baidu.vis.unified.license.BDLicenseActivator;
 import com.baidu.vis.unified.license.BDLicenseLocalInfo;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
@@ -44,9 +45,12 @@ public class PredictorWrapper {
                 "idl-license.ocrplatenumberdemo_test_license", true, Predictor.getAlgorithmId());*/
      /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "yixing_platenumber_7_B2ECF",
                 "yixing_platenumber_7_B2ECF", true, Predictor.getAlgorithmId());*/
-            AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "TUKU_TEST",
-                    "idl_license_ocr_platenumber", true, Predictor.getAlgorithmId());
-            if (ret != AndroidLicenser.ErrorCode.SUCCESS) {
+         /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "ZPQG-GYCJ-CPCC-MKJL",
+                    "", true, Predictor.getAlgorithmId());*/
+            // 在线自动激活
+            int ret = BDLicenseActivator.initLicenseOnLine(context, "ZPQG-GYCJ-CPCC-MKJL",
+                    "", Predictor.getAlgorithmId());
+            if (ret != 0) {
                 LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
                 return false;
             }

@@ -27,14 +27,17 @@
                 android:id="@+id/tvParkingName"
                 style="@style/textBlackStyle14"
                 android:textColor="@color/blue629BFF"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvDate"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/dp_10"
-                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
                 android:gravity="end"
                 android:textColor="@color/colorGraySmallText" />
         </LinearLayout>

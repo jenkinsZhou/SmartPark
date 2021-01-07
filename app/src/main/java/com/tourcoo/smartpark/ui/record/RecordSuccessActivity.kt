@@ -67,6 +67,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             ToastUtil.showWarning("未获取到收费信息")
 //            finish()
         }
+        tvSignTime.text = getCurrentTime()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -299,10 +300,10 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
         }
 
         override fun onError(errorCode: Int, detail: String) {
-            // TODO 打印出错
             // print error
             Log.e(TAG, "print error errorcode = $errorCode detail = $detail")
             handler.post(Runnable {
+                closeLoading()
                 when (errorCode) {
                     PrinterBinder.PRINTER_ERROR_NO_PAPER -> {
                         ToastUtil.showWarning("打印机缺纸")

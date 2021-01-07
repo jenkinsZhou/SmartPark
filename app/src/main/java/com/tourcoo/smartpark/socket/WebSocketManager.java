@@ -176,7 +176,6 @@ public class WebSocketManager {
         @Override
         public void onTextMessage(WebSocket websocket, String text) throws Exception {
             super.onTextMessage(websocket, text);
-            LogUtils.d("---->OS. WebSocket onTextMessage :" + text);
             if (mWebSocketListener != null) {
                 mWebSocketListener.onTextMessage(text);
             }

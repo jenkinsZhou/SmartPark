@@ -11,6 +11,7 @@ import com.apkfuns.logutils.LogUtils;
 import com.basewin.services.ServiceManager;
 import com.kingja.loadsir.core.LoadSir;
 import com.simple.spiderman.SpiderMan;
+import com.tourcoo.smartpark.config.AppConfig;
 import com.tourcoo.smartpark.core.ActivityControlImpl;
 import com.tourcoo.smartpark.core.AppImpl;
 import com.tourcoo.smartpark.core.UiManager;
@@ -27,6 +28,7 @@ import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.event.EventConstant;
 import com.tourcoo.smartpark.event.OrcInitEvent;
 import com.tourcoo.smartpark.threadpool.ThreadPoolManager;
+import com.tourcoo.smartpark.widget.GlobalClickCallbacks;
 import com.tourcoo.smartpark.widget.orc.OrcPlantInitListener;
 import com.tourcoo.smartpark.widget.orc.PredictorWrapper;
 
@@ -54,10 +56,11 @@ public class SmartParkApplication extends Application {
         initLog();
         initConfig();
         initLoadSir();
+        GlobalClickCallbacks.init(this);
         // 以下用来捕获程序崩溃异常
         // 程序崩溃时触发线程
 //        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
-//        intiPlantOrcSdk();
+        intiPlantOrcSdk();
 
     }
 
@@ -66,7 +69,7 @@ public class SmartParkApplication extends Application {
         LogUtils.getLog2FileConfig().configLogFileEngine(new LogFileEngineFactory(context));
         //不写入文件
         LogUtils.getLog2FileConfig().configLog2FileEnable(false);
-        LogUtils.getLogConfig().configShowBorders(false);
+        LogUtils.getLogConfig().configAllowLog(AppConfig.DEBUG_BODE).configShowBorders(false);
     }
 
     public static Application getContext() {
@@ -151,7 +154,7 @@ public class SmartParkApplication extends Application {
                 PredictorWrapper.initLicense(this);
                 // 初始化模型
                 PredictorWrapper.initModel(this);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
             }
 

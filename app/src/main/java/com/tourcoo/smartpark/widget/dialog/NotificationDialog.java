@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.widget.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -29,10 +30,9 @@ import com.tourcoo.smartpark.R;
 public class NotificationDialog {
     private Context context;
     private Dialog dialog;
-    private int width = 0;
-    private RelativeLayout container;
     private Display display;
     private TextView tvMessage;
+    private TextView tvTitle, tvConfirm;
 
     public NotificationDialog(Context context) {
         this.context = context;
@@ -46,11 +46,14 @@ public class NotificationDialog {
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_notification, null);
 
         // 获取自定义Dialog布局中的控件
-        container = view.findViewById(R.id.container);
+        RelativeLayout container = view.findViewById(R.id.container);
 
         tvMessage = container.findViewById(R.id.tvMessage);
+        tvTitle = container.findViewById(R.id.tvTitle);
+        tvConfirm = container.findViewById(R.id.tvConfirm);
         // 定义Dialog布局和参数
         dialog = new Dialog(context, R.style.AlertDialogStyle);
+        dialog.setCanceledOnTouchOutside(false);
         dialog.setContentView(view);
         view.findViewById(R.id.ivClosed).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,14 +64,16 @@ public class NotificationDialog {
         // 调整dialog背景大小
         container.setLayoutParams(
                 new FrameLayout.LayoutParams(
-                        (int) (display.getWidth() * 0.85),
+                        (int) (display.getWidth() * 0.62),
                         LinearLayout.LayoutParams.WRAP_CONTENT));
 
         return this;
     }
 
-    public NotificationDialog setTitle(String title) {
-
+    public NotificationDialog setTitle(CharSequence title) {
+        if (tvTitle != null) {
+            tvTitle.setText(title);
+        }
         return this;
     }
 
@@ -78,4 +83,33 @@ public class NotificationDialog {
         }
     }
 
+
+    public NotificationDialog setMessage(CharSequence message) {
+        if (tvMessage != null) {
+            tvMessage.setText(message);
+        }
+        return this;
+    }
+
+    public NotificationDialog setPositiveClickListener(View.OnClickListener onClickListener) {
+        if (onClickListener == null) {
+            return this;
+        }
+        if (tvConfirm != null) {
+            tvConfirm.setOnClickListener(onClickListener);
+        }
+        return this;
+    }
+
+    public void setOnDismissListener(DialogInterface.OnDismissListener dismissListener) {
+        if (dialog != null && dismissListener != null) {
+            dialog.setOnDismissListener(dismissListener);
+        }
+    }
+
+    public void dismiss() {
+        if (dialog != null) {
+            dialog.dismiss();
+        }
+    }
 }

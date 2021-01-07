@@ -9,6 +9,8 @@ package com.tourcoo.smartpark.socket;
  */
 public class SocketData {
     private int msgNum;
+    private String carNumber;
+    private String number;
 
     public int getMsgNum() {
         return msgNum;
@@ -16,5 +18,21 @@ public class SocketData {
 
     public void setMsgNum(int msgNum) {
         this.msgNum = msgNum;
+    }
+
+    public String getCarNumber() {
+        return carNumber;
+    }
+
+    public void setCarNumber(String carNumber) {
+        this.carNumber = carNumber;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 }

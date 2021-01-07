@@ -302,7 +302,7 @@
                             android:includeFontPadding="false"
                             android:paddingTop="@dimen/dp_15"
                             android:paddingBottom="@dimen/dp_8"
-                            android:text=" 历史欠费"
+                            android:text="历史欠费"
                             android:textStyle="bold" />
 
                         <TextView

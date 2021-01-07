@@ -1,5 +1,9 @@
 package com.tourcoo.smartpark.socket;
 
+import com.tourcoo.smartpark.core.control.RequestConfig;
+
+import static com.tourcoo.smartpark.core.control.RequestConfig.SERVICE_PORT;
+
 /**
  * @author :JenkinsZhou
  * @description : socket相关配置
@@ -9,5 +13,6 @@ package com.tourcoo.smartpark.socket;
  */
 public class WebSocketConfig {
     public static final int TIME_OUT = 10000;
-    public static final String SOCKET_URL = "ws://192.168.0.113:8007/push";
+
+    public static final String SOCKET_URL = "ws://"+ RequestConfig.SERVICE_IP+SERVICE_PORT+"/push";
 }
