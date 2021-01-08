@@ -118,6 +118,8 @@ dependencies {
     implementation files('libs/bw_pos_sdk.jar')
     implementation 'com.neovisionaries:nv-websocket-client:2.10'
     implementation 'com.blankj:utilcodex:1.28.4'
+    // 查看大图
+    implementation 'com.github.SherlockGougou:BigImageViewPager:androidx-6.1.3'
 }
 repositories {
     mavenCentral()

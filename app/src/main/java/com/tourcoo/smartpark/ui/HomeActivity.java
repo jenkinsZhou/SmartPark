@@ -582,15 +582,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     protected void onResume() {
         super.onResume();
         initSocket();
-        if (mNotificationDialog == null) {
-            mNotificationDialog = new NotificationDialog(mContext).init().setTitle("通知消息").setPositiveClickListener(new View.OnClickListener() {
+      /*  if (mNotificationDialog == null) {
+            mNotificationDialog = new NotificationDialog().init().setTitle("通知消息").setPositiveClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
                     mNotificationDialog.dismiss();
                 }
             });
-        }
+        }*/
         requestUserInfoAndParkList();
         requestAppVersion();
     }
@@ -822,7 +822,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                             LogUtils.e("result==null || result.getData() =null");
                             return;
                         }
-                        showNotifyDialog(result.getData());
+                        doShowNotify(result.getData());
                     } catch (Exception e) {
                         e.printStackTrace();
                         LogUtils.e("e=" + e.toString());
@@ -924,21 +924,13 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
     }
 
-    private void showNotifyDialog(SocketData socketData) {
+    private void doShowNotify(SocketData socketData) {
         if (socketData == null) {
             return;
         }
         ringPlayer.playSound(1);
         mHandler.post(() -> {
-            if (mNotificationDialog == null) {
-                mNotificationDialog = new NotificationDialog(mContext).init().setTitle("通知消息");
-            }
-            mNotificationDialog.setMessage(new SpanUtils().append("车辆")
-                    .append(" " + socketData.getCarNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))//resources.getColor(R.color.colorAccent)
-                    .append("已缴费离场\n请前往车位").setForegroundColor(CommonUtil.getColor(R.color.gray999999)).append(" " + socketData.getNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))
-                    .append(" 进行确认").setForegroundColor(CommonUtil.getColor(R.color.gray999999))
-                    .create());
-            mNotificationDialog.show();
+            showNotifyDialog(socketData);
         });
 
     }
@@ -950,5 +942,34 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         }
         cancelTask();
         socketManager = null;
+    }
+
+    private void showNotifyDialog(SocketData socketData) {
+        boolean needInit = mNotificationDialog == null || StackUtil.getInstance().getCurrent() != mNotificationDialog.getActivity();
+        NotificationDialog finalNotificationDialog;
+        if (needInit) {
+            if(mNotificationDialog != null){
+                LogUtils.tag("嘿嘿嘿").d(mNotificationDialog.getActivity().getClass());
+            }
+            mNotificationDialog = new NotificationDialog().init().setTitle("通知消息");
+            finalNotificationDialog = mNotificationDialog;
+            mNotificationDialog.setPositiveClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
+                    finalNotificationDialog.dismiss();
+                }
+            });
+        } else {
+            //说明当前不需要重新创建
+            finalNotificationDialog = mNotificationDialog;
+            LogUtils.tag("嘿嘿嘿").i("不需要重新创建");
+        }
+        finalNotificationDialog.setMessage(new SpanUtils().append("车辆")
+                .append(" " + socketData.getCarNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))//resources.getColor(R.color.colorAccent)
+                .append("已缴费离场\n请前往车位").setForegroundColor(CommonUtil.getColor(R.color.gray999999)).append(" " + socketData.getNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))
+                .append(" 进行确认").setForegroundColor(CommonUtil.getColor(R.color.gray999999))
+                .create());
+        finalNotificationDialog.show();
     }
 }

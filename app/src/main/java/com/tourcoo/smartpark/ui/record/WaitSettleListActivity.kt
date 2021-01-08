@@ -104,6 +104,10 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
         feeRecordRecyclerView.layoutManager = LinearLayoutManager(mContext)
         adapter = WaitSettleAdapter()
         adapter!!.bindToRecyclerView(feeRecordRecyclerView)
+        adapter!!.setOnItemClickListener { adapter, view, position ->
+            val info = adapter!!.data[position] as ParkSpaceInfo?
+            skipSettle(info!!.recordId, info.id)
+        }
         adapter!!.setOnItemChildClickListener { adapter, view, position ->
             val info = adapter!!.data[position] as ParkSpaceInfo?
             when (view?.id) {

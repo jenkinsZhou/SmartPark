@@ -96,7 +96,9 @@
             />
         <activity android:name=".ui.fee.FeeDetailActivity" />
         <activity android:name=".ui.fee.ArrearsDetailActivity" />
-        <activity android:name=".ui.message.MessageListActivity" />
+        <activity android:name=".ui.message.MessageListActivity"
+            android:launchMode="singleTask"
+            />
         <activity android:name=".ui.record.RecordSuccessActivity" />
     </application>
 

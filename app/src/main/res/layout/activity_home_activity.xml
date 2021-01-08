@@ -125,7 +125,7 @@
 
             <RelativeLayout
                 android:id="@+id/rlMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/dp_50"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/llBottomLayout"
                 android:layout_alignParentEnd="true"
@@ -137,15 +137,16 @@
                     android:layout_alignParentEnd="true"
                     android:layout_width="@dimen/dp_50"
                     android:layout_height="@dimen/dp_50"
-                    android:src="@drawable/ic_message" />
+                    android:src="@drawable/ic_home_message" />
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/tvMessageTag"
+                    android:layout_width="@dimen/dp_10"
+                    android:layout_height="@dimen/dp_10"
                     android:layout_alignParentEnd="true"
+                    android:visibility="visible"
                     android:background="@drawable/shape_msg_circle_blue"
                     android:gravity="center"
-                    android:text="21"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sp_11" />
             </RelativeLayout>

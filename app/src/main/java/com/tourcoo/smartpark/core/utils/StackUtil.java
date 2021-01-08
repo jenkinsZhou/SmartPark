@@ -3,6 +3,8 @@ package com.tourcoo.smartpark.core.utils;
 import android.app.Activity;
 import android.util.Log;
 
+import com.apkfuns.logutils.LogUtils;
+
 import java.util.Stack;
 
 /**
@@ -52,7 +54,7 @@ public class StackUtil {
     public Activity getCurrent() {
         if (mActivityStack != null && mActivityStack.size() != 0) {
             Activity activity = mActivityStack.lastElement();
-            Log.i(TAG, "get current activity:" + activity.getClass().getSimpleName());
+            LogUtils.i(TAG, "get current activity:" + activity.getClass().getSimpleName());
             return activity;
         } else {
             return null;

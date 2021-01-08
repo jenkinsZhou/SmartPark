@@ -23,10 +23,12 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import cc.shinichi.library.ImagePreview
 import com.alibaba.fastjson.JSON
 import com.apkfuns.logutils.LogUtils
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.kaopiz.kprogresshud.KProgressHUD
+import com.tourcoo.smartpark.MainActivity
 import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
@@ -184,6 +186,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         photoAdapter = PhotoAdapter(this, onAddPicClickListener)
         photoAdapter!!.list = ArrayList()
         photoAdapter!!.setSelectMax(6)
+        photoAdapter!!.setOnItemClickListener { position, v ->
+            skipImageDetail(position)
+        }
+
         photoAdapter!!.setOnItemDeleteClickListener { position, v ->
             if (position < 0) {
                 return@setOnItemDeleteClickListener
@@ -919,13 +925,41 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         startActivity(intent)
     }
 
-    private fun checkCarType() : Int{
-    return if (cBoxBig.isChecked) {
+    private fun checkCarType(): Int {
+        return if (cBoxBig.isChecked) {
             CAR_TYPE_YELLOW
         } else {
             CAR_TYPE_NORMAL
         }
     }
 
+
+    private fun skipImageDetail(position: Int) {
+        val imagePathList = ArrayList<String>()
+        for (localImage in photoAdapter!!.list) {
+            if(localImage != null && !TextUtils.isEmpty(localImage.localImagePath)){
+                imagePathList.add(localImage.localImagePath)
+            }
+        }
+        // 最简单的调用，即可实现大部分需求，如需定制，可参考下一步的自定义代码：
+        ImagePreview
+                .getInstance()
+                // 上下文，必须是activity，不需要担心内存泄漏，本框架已经处理好；
+                .setContext(mContext)
+                // 设置从第几张开始看（索引从0开始）
+                .setIndex(position)
+                .setShowDownButton(false)
+                //=================================================================================================
+                // 有三种设置数据集合的方式，根据自己的需求进行三选一：
+                // 1：第一步生成的imageInfo List
+                .setImageList(imagePathList)
+                // 2：直接传url List
+                //.setImageList(List<String> imageList)
+                // 3：只有一张图片的情况，可以直接传入这张图片的url
+                //.setImage(String image)
+                //=================================================================================================
+                // 开启预览
+                .start();
+    }
 
 }

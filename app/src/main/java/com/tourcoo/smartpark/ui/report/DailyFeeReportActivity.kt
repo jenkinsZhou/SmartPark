@@ -177,7 +177,10 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
             textPrintLine.content = "收费日报"
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
-
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 36
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = "收费单位:" + certificate.parking
