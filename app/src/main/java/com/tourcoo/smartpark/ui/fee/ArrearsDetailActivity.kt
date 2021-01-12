@@ -294,7 +294,7 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
         if (requestCode == 1) {
             Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
 //            doPrint(recordId)
-            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+            requestFeeCertificate(recordId)
         }
     }
 
@@ -411,12 +411,23 @@ class ArrearsDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefre
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = "二维码:"
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
             val ewm = QRUtil.getRQBMP(StringUtil.getNotNullValueLine(certificate.codeContent), 300)
             val bitmapPrintLine = BitmapPrintLine()
             bitmapPrintLine.type = PrintLine.BITMAP
             bitmapPrintLine.position = PrintLine.CENTER
             bitmapPrintLine.bitmap = ewm
             ServiceManager.getInstence().printer.addPrintLine(bitmapPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.size = 20

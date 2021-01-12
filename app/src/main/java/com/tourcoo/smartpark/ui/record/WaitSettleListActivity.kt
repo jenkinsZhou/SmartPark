@@ -72,7 +72,7 @@ import java.util.concurrent.TimeUnit
 class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermissions.PermissionCallbacks {
     private var adapter: WaitSettleAdapter? = null
     private var keyboardView: PlateKeyboardView? = null
-
+    private var parkSpaceInfo: ParkSpaceInfo? = null
     private val handler = Handler(Looper.getMainLooper())
 
     private val printerCallback: PrinterListener = PrinterListener()
@@ -110,6 +110,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
         }
         adapter!!.setOnItemChildClickListener { adapter, view, position ->
             val info = adapter!!.data[position] as ParkSpaceInfo?
+            parkSpaceInfo = info
             when (view?.id) {
                 R.id.tvPrintCertify -> {
                     if (info == null || info.recordId < 0) {
@@ -302,12 +303,24 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = "二维码:"
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
             val ewm = QRUtil.getRQBMP(StringUtil.getNotNullValueLine(certificate.codeContent), 300)
             val bitmapPrintLine = BitmapPrintLine()
             bitmapPrintLine.type = PrintLine.BITMAP
             bitmapPrintLine.position = PrintLine.CENTER
             bitmapPrintLine.bitmap = ewm
             ServiceManager.getInstence().printer.addPrintLine(bitmapPrintLine)
+
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.size = 20
@@ -558,8 +571,14 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
-//            doPrint(recordId)
-            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+
+            if(parkSpaceInfo == null){
+                ToastUtil.showFailed("未获取到打印信息")
+              return
+            }
+            doPrint(parkSpaceInfo!!.recordId)
+//            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+
         }
     }
 }

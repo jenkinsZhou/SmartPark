@@ -122,8 +122,8 @@ public class SmartParkApplication extends Application {
                 .setLogEnable(true)
 //                .setLogEnable(BuildConfig.DEBUG, TAG, HttpLoggingInterceptor.Level.BODY)
                 //设置统一超时--也可单独调用read/write/connect超时(可以设置时间单位TimeUnit)
-                //默认20 s
-                .setTimeout(20);
+                //默认10 s
+                .setTimeout(10);
         /*ThreadPoolManager.getThreadPoolProxy().execute(new Runnable() {
             @Override
             public void run() {

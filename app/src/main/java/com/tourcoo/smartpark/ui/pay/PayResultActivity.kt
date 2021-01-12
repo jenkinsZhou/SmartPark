@@ -145,6 +145,11 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
             ToastUtil.showFailed("网络未连接")
             return
         }
+        //真正执行打印的地方
+        if (!printSdkInitStatus) {
+            ToastUtil.showFailed(R.string.tips_print_error)
+            return
+        }
         requestPayCertificate()
     }
 
@@ -174,7 +179,6 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
             return
         }
         //真正执行打印的地方
-//        printContentOld(AccountHelper.getInstance().userInfo, result.data!!)
         printContent(result.data!!)
     }
 
@@ -431,9 +435,12 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
         )
         if (EasyPermissions.hasPermissions(this, *perms)) {
             if (!printSdkInitStatus) {
-                ServiceManager.getInstence().init(applicationContext)
-                printSdkHasInit =true
-                PrintConfig.printSdkInitStatus = true
+                printSdkInitStatus = try {
+                    ServiceManager.getInstence().init(applicationContext)
+                    true
+                }catch (th : Throwable){
+                    false
+                }
                 LogUtils.d("打印机未初始化")
                 doPrint()
             } else {

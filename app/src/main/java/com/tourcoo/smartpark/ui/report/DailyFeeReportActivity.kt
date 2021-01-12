@@ -47,7 +47,6 @@ import java.util.*
  */
 class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCallbacks {
     private var dailyReport: DailyReport? = null
-    private var printSdkHasInit = false
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -81,10 +80,12 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
 
     override fun loadData() {
         super.loadData()
+        LogUtils.i("执行了loadData")
         requestDailyReport()
     }
 
     private fun requestDailyReport() {
+
         ApiRepository.getInstance().requestDailyReport().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<DailyReport>>() {
             override fun onRequestSuccess(entity: BaseResult<DailyReport>?) {
                 handleRequestSuccess(entity)
@@ -126,6 +127,10 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
     private fun doPrintDailyReport(dailyReport: DailyReport?) {
         if (dailyReport == null) {
             ToastUtil.showWarning("未获取到日报数据")
+            return
+        }
+        if (!printSdkInitStatus) {
+            ToastUtil.showFailed(R.string.tips_print_error)
             return
         }
         printContent(dailyReport)
@@ -276,10 +281,12 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
         )
         if (EasyPermissions.hasPermissions(this, *perms)) {
             if (!printSdkInitStatus) {
-                ServiceManager.getInstence().init(applicationContext)
-                printSdkHasInit = true
-                printSdkInitStatus = true
-                LogUtils.d("打印机未初始化")
+                printSdkInitStatus = try {
+                    ServiceManager.getInstence().init(applicationContext)
+                    true
+                } catch (th: Throwable) {
+                    false
+                }
                 doPrintDailyReport(dailyReport)
             } else {
                 //如果有权限 并且初始化了 直接打印

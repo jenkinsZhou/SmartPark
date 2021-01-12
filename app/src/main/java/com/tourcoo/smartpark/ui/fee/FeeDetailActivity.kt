@@ -288,6 +288,10 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ToastUtil.showFailed("未获取到打印数据")
             return
         }
+        if(!PrintConfig.printSdkInitStatus){
+            ToastUtil.showFailed(R.string.tips_print_error)
+            return
+        }
         try {
             val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
             var spState = spVersion.substring(spVersion.length - 2).trim { it <= ' ' }
@@ -527,9 +531,14 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         )
         if (EasyPermissions.hasPermissions(this, *perms)) {
             if (!PrintConfig.printSdkInitStatus) {
-                ServiceManager.getInstence().init(applicationContext)
-                PrintConfig.printSdkInitStatus = true
-                LogUtils.d("打印机未初始化")
+                try {
+                    ServiceManager.getInstence().init(applicationContext)
+                    PrintConfig.printSdkInitStatus = true
+                    LogUtils.d("打印机未初始化")
+
+                } catch (th: Throwable) {
+                    PrintConfig.printSdkInitStatus = false
+                }
                 printContent(certificate)
             } else {
                 //如果有权限 并且初始化了 直接打印
@@ -568,7 +577,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
             Log.i("Granted", "onRequestPermissionsResult:" + requestCode)
-            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+            doPrint()
         }
     }
 

@@ -77,17 +77,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.tvPrintCertify -> {
-                try {
-                    requestPermissionAndPrint(recordId)
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    if (AppConfig.DEBUG_BODE) {
-                        ToastUtil.showFailed(e.toString())
-                    } else {
-                        ToastUtil.showFailed(R.string.tips_print_error)
-                    }
-                }
-
+                doPrint()
             }
             else -> {
             }
@@ -255,6 +245,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             textPrintLine.size = 20
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
+
             textPrintLine.size = TextPrintLine.FONT_LARGE
             textPrintLine.position = PrintLine.CENTER
             textPrintLine.content = PrintConfig.STR_LINE_SHORT
@@ -344,13 +335,17 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1) {
-            ToastUtil.showSuccess("授权成功，请重新点击打印按钮进行打印")
+            doPrint(recordId)
         }
     }
 
     private fun doPrint(recordId: Long?) {
         if (recordId == null) {
             ToastUtil.showWarning("未获取到收费员信息")
+            return
+        }
+        if (!printSdkInitStatus) {
+            ToastUtil.showFailed(R.string.tips_print_error)
             return
         }
         if (!NetworkUtil.isConnected(mContext)) {
@@ -401,10 +396,14 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
                 "com.pos.permission.EMVCORE"
         )
         if (EasyPermissions.hasPermissions(this, *perms)) {
-            if (!PrintConfig.printSdkInitStatus) {
-                ServiceManager.getInstence().init(applicationContext)
-                PrintConfig.printSdkInitStatus = true
-                LogUtils.d("打印机未初始化")
+            if (!printSdkInitStatus) {
+                try {
+                    ServiceManager.getInstence().init(applicationContext)
+                    printSdkInitStatus = true
+                    LogUtils.d("打印机未初始化")
+                } catch (th: Throwable) {
+                    printSdkInitStatus = false
+                }
                 doPrint(recordId)
             } else {
                 //如果有权限 并且初始化了 直接打印
@@ -506,12 +505,23 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = "二维码:"
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
             val ewm = QRUtil.getRQBMP(StringUtil.getNotNullValueLine(certificate.codeContent), 300)
             val bitmapPrintLine = BitmapPrintLine()
             bitmapPrintLine.type = PrintLine.BITMAP
             bitmapPrintLine.position = PrintLine.CENTER
             bitmapPrintLine.bitmap = ewm
             ServiceManager.getInstence().printer.addPrintLine(bitmapPrintLine)
+
+            textPrintLine.position = PrintLine.CENTER
+            textPrintLine.content = PrintConfig.LINE_FEED_SHORT
+            textPrintLine.size = 20
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.size = 20
@@ -542,6 +552,20 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
                 } else {
                     ToastUtil.showFailed("打印机出错")
                 }
+            }
+        }
+    }
+
+
+    private fun doPrint() {
+        try {
+            requestPermissionAndPrint(recordId)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            if (AppConfig.DEBUG_BODE) {
+                ToastUtil.showFailed(e.toString())
+            } else {
+                ToastUtil.showFailed(R.string.tips_print_error)
             }
         }
     }

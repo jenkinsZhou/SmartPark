@@ -144,7 +144,7 @@
                     android:layout_width="@dimen/dp_10"
                     android:layout_height="@dimen/dp_10"
                     android:layout_alignParentEnd="true"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     android:background="@drawable/shape_msg_circle_blue"
                     android:gravity="center"
                     android:textColor="@color/white"
