@@ -160,6 +160,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         setImmersionBar(true);
         ringPlayer = SoundPoolUtil.getInstance(getApplicationContext());
         ringPlayer.init();
+//        LogUtils.i("getDeviceSN="+StringUtil.getDeviceSN());
     }
 
     private void initView() {

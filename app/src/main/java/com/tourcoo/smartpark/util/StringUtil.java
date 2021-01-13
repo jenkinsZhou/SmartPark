@@ -145,4 +145,12 @@ public class StringUtil {
         Gson gson = new Gson();
         return gson.fromJson(result, classOfT);
     }
+
+
+    public static String getDeviceSN(){
+
+        String serialNumber = android.os.Build.SERIAL;
+
+        return serialNumber;
+    }
 }

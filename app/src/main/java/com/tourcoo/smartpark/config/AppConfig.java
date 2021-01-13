@@ -8,5 +8,5 @@ package com.tourcoo.smartpark.config;
  * @Email: 971613168@qq.com
  */
 public class AppConfig {
-    public static final boolean DEBUG_BODE = false;
+    public static final boolean DEBUG_BODE = true;
 }

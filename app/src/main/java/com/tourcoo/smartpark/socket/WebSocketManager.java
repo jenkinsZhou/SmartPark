@@ -7,6 +7,8 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 import com.neovisionaries.ws.client.WebSocketFrame;
+import com.tourcoo.SmartParkApplication;
+import com.tourcoo.smartpark.core.CommonUtil;
 import com.tourcoo.smartpark.util.StringUtil;
 
 import org.json.JSONException;
@@ -75,6 +77,8 @@ public class WebSocketManager {
                     .setMissingCloseFrameAllowed(false)//设置不允许服务端关闭连接却未发送关闭帧
                     .addListener(new NVWebSocketListener())
                     .addHeader("Authorization", mToken)
+                    .addHeader("X-SN",StringUtil.getNotNullValueLine(StringUtil.getDeviceSN()))
+                    .addHeader("X-VERSION",StringUtil.getNotNullValueLine(CommonUtil.getVersionName(SmartParkApplication.getContext())))
                     .connectAsynchronously();  // 同步调用请使用connect()
             setConnectStatus(ConnectStatus.CONNECTING);
         } catch (IOException e) {
