@@ -569,4 +569,11 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             }
         }
     }
+
+
+    override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        super.onDestroy()
+
+    }
 }

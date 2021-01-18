@@ -3,8 +3,10 @@ package com.tourcoo.smartpark.widget.keyboard;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
+import android.media.MediaScannerConnection;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -16,10 +18,16 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
 import com.tourcoo.smartpark.R;
+import com.tourcoo.smartpark.core.utils.FileUtil;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 
 public class PlateKeyboardView implements View.OnClickListener {
@@ -484,6 +492,9 @@ public class PlateKeyboardView implements View.OnClickListener {
         popWindow.setCanceledOnTouchOutside(true);
         Window mWindow = popWindow.getWindow();
         if (mWindow != null) {
+            //必须加这两句代码
+            mWindow.getDecorView().setDrawingCacheEnabled(true);
+            mWindow.getDecorView().buildDrawingCache();
             mWindow.setWindowAnimations(R.style.keyboard_popupAnimation);
             mWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
             mWindow.setGravity(Gravity.BOTTOM | Gravity.FILL_HORIZONTAL);
@@ -559,5 +570,41 @@ public class PlateKeyboardView implements View.OnClickListener {
 
     public void setAutoShowProvince(boolean autoShowProvince) {
         this.autoShowProvince = autoShowProvince;
+    }
+
+
+    //将图像保存到SD卡中
+    public String saveMyBitmap(){
+        String currentPath= FileUtil.getExternalFilesDir() +"/" +System.currentTimeMillis() + ".jpg";
+        File f = new File(currentPath);
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            LogUtils.e("saveMyBitmap："+e.toString());
+        }
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(f);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtils.e("saveMyBitmap："+e.toString());
+        }
+        //获取bitmap关键代码
+        View dialogView = popWindow.getWindow().getDecorView();
+        Bitmap dialogBitmap=dialogView.getDrawingCache();
+        dialogBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fOut);
+        try {
+            fOut.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            LogUtils.e("saveMyBitmap："+e.toString());
+        }
+        MediaScannerConnection.scanFile(mContext, new String[]{currentPath}, null, null);
+        return currentPath;
     }
 }
