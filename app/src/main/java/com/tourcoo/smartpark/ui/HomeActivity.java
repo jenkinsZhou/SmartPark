@@ -691,7 +691,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
             return;
         }
-        appUpdateDialog = new AppUpdateDialog(mContext).create(true);
+        appUpdateDialog = new AppUpdateDialog(mContext).create(false);
         appUpdateDialog.setTitle("发现新版本").
                 setDesc(StringUtil.getNotNullValueLine(appVersion.getDescription())).
                 setContent("v" + appVersion.getVersion()).

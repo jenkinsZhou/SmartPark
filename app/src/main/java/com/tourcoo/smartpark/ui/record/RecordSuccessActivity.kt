@@ -98,6 +98,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             return
         }
         try {
+            certificate.payType = StringUtil.getNotNullValue(certificate.payType)
             val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
             var spState = spVersion.substring(spVersion.length - 2).trim { it <= ' ' }
             when (spState) {
@@ -207,11 +208,14 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             var payType = ""
-            when (certificate.payType) {
-                PayConstant.PAY_TYPE_ALI -> payType = "支付宝支付"
-                PayConstant.PAY_TYPE_WEI_XIN -> payType = "微信支付"
-                PayConstant.PAY_TYPE_CASH -> payType = "现金支付"
+            payType = when (certificate.payType) {
+                PayConstant.PAY_TYPE_ALI -> "支付宝支付"
+                PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
+                PayConstant.PAY_TYPE_CASH -> "现金支付"
+                PayConstant.PAY_TYPE_MINI-> "小程序支付"
+                PayConstant.PAY_TYPE_FREE-> "免费"
                 else -> {
+                    "其他支付"
                 }
             }
 

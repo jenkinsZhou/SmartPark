@@ -180,7 +180,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_blue_5087ff)
             }
             ParkConstant.CAR_TYPE_YELLOW -> {
-                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
+                tvPlantNum.background = CommonUtil.getDrawable(R.drawable.bg_radius_30_yellow_fbc95f)
             }
             ParkConstant.CAR_TYPE_GREEN -> {
                 tvPlantNum.background = CommonUtil.getDrawable(R.drawable.shape_gradient_radius_30_green_4ebf8b)
@@ -293,6 +293,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             return
         }
         try {
+            certificate.payType = StringUtil.getNotNullValue(certificate.payType)
             val spVersion = PosAccessoryManager.getDefault().getVersion(PosAccessoryManager.VERSION_TYPE_SP)
             var spState = spVersion.substring(spVersion.length - 2).trim { it <= ' ' }
             when (spState) {
@@ -402,11 +403,14 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             var payType = ""
-            when (certificate.payType) {
-                PayConstant.PAY_TYPE_ALI -> payType = "支付宝支付"
-                PayConstant.PAY_TYPE_WEI_XIN -> payType = "微信支付"
-                PayConstant.PAY_TYPE_CASH -> payType = "现金支付"
+            payType = when (certificate.payType) {
+                PayConstant.PAY_TYPE_ALI -> "支付宝支付"
+                PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
+                PayConstant.PAY_TYPE_CASH -> "现金支付"
+                PayConstant.PAY_TYPE_MINI-> "小程序支付"
+                PayConstant.PAY_TYPE_FREE-> "免费"
                 else -> {
+                    "其他支付"
                 }
             }
 
