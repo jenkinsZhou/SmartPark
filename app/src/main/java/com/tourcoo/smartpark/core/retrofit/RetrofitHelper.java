@@ -12,6 +12,7 @@ import com.tourcoo.smartpark.ui.account.AccountHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -89,9 +90,12 @@ public class RetrofitHelper {
             Request.Builder request = chain.request().newBuilder();
             //避免某些服务器配置攻击,请求返回403 forbidden 问题
             addHeader("User-Agent", "Mozilla/5.0 (Android)");
+              addHeader("Content-Type", "application/json");
+            addHeader("Accept-Language","zh-CN,zh;q=0.9");
             String token = AccountHelper.getInstance().getAccessToken();
             LogUtils.tag(mLogTag).d("token=" + token);
             addHeader("Authorization", token);
+
             if (mHeaderMap.size() > 0) {
                 for (Map.Entry<String, Object> entry : mHeaderMap.entrySet()) {
                     request.addHeader(entry.getKey(), String.valueOf(entry.getValue()));
@@ -102,7 +106,7 @@ public class RetrofitHelper {
     };
 
     private RetrofitHelper() {
-        sClientBuilder = new OkHttpClient.Builder();
+                sClientBuilder = new OkHttpClient.Builder();
         sClientBuilder.addInterceptor(mHeaderInterceptor);
         sClientBuilder.addInterceptor(new ResponseInterceptor());
         sRetrofitBuilder = new Retrofit.Builder()

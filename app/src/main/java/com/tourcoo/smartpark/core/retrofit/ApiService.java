@@ -191,7 +191,7 @@ public interface ApiService {
      * @param map
      * @return
      */
-    @GET("/handheld/member/dailyrecordinfo")
+    @POST("/handheld/member/dailyrecordinfo")
     Observable<BaseResult<FeeDetail>> requestFeeDetail(@QueryMap Map<String, Object> map);
 
 

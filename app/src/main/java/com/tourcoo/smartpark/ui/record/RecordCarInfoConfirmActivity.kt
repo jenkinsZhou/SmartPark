@@ -282,6 +282,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
             override fun onFail(e: Throwable) {
                 LogUtils.e("异常：$e")
+                ToastUtil.showFailed(e.toString(),resources.getString(R.string.tips_request_error))
                 closeHudProgressDialog()
             }
         })
@@ -490,6 +491,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         if (result == null) {
             return
         }
+        plantInputLayout?.clearInput()
         plantInputLayout?.text = result.plate_number
     }
 
@@ -752,11 +754,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             tvParkNumber.setText(text!!)
             if (position < parkingList.size) {
                 parkInfo = parkingList[position]
+            }else{
+                ToastUtil.showNormal("选择被拦截")
             }
             try {
                 tvParkNumber.setSelection(text.length)
             } catch (e: Exception) {
                 e.printStackTrace()
+                ToastUtil.showFailedDebug("出错="+e.toString())
             }
         }
         bSearchEdit!!.setOnClickListener {
@@ -774,8 +779,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             parkingStrList.add(StringUtil.getNotNullValue(it.number))
             parkingList.add(it)
         }
-        bSearchEdit!!.setSearchList(parkingStrList)
-        bSearchEdit!!.showPopup()
+        if(parkingInfoList.isEmpty()){
+            bSearchEdit!!.clear()
+            bSearchEdit!!.dismiss()
+        }else{
+            bSearchEdit!!.setSearchList(parkingStrList)
+            bSearchEdit!!.showPopup()
+        }
+
     }
 
     private fun requestParkUnusedList() {

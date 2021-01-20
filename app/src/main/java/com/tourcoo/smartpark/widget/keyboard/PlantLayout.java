@@ -211,7 +211,12 @@ public class PlantLayout extends LinearLayout {
 
     private void setGreenCarBackground(int index) {
         if (index == TextViews.length - 1) {
-            TextViews[index].setBackgroundResource(R.drawable.ic_bg_car_green);
+            if( TextUtils.isEmpty( TextViews[index].getText().toString())){
+                TextViews[index].setBackgroundResource(R.drawable.ic_bg_car_green);
+            }else {
+                TextViews[index].setBackgroundResource(R.drawable.license_plate_first_view_all_gray);
+            }
+
         }
     }
 }

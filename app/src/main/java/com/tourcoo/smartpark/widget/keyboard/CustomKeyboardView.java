@@ -35,11 +35,11 @@ public class CustomKeyboardView extends KeyboardView {
             List<Keyboard.Key> keys = getKeyboard().getKeys();
             for (Keyboard.Key key : keys) {
                 if (key.codes[0] == -5) {
-                    Drawable dr = (Drawable) context.getResources().getDrawable(R.drawable.keyboard_word_del_layerlist);
+                    Drawable dr = (Drawable) context.getResources().getDrawable(R.drawable.s);
                     dr.setBounds(key.x, key.y, key.x + key.width, key.y + key.height);
                     dr.draw(canvas);
                 } else if (key.codes[0] == -35) {
-                    Drawable dr = (Drawable) context.getResources().getDrawable(R.drawable.keyboard_word_del_layerlist2);
+                    Drawable dr = (Drawable) context.getResources().getDrawable(R.drawable.s);
                     dr.setBounds(key.x, key.y, key.x + key.width, key.y + key.height);
                     dr.draw(canvas);
                 } else if (key.codes[0] == -2 || key.codes[0] == 90001) {

@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.InputType
+import android.text.InputType.TYPE_CLASS_PHONE
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
@@ -429,7 +430,7 @@ class WaitSettleListActivity : BaseTitleActivity(), OnRefreshListener, EasyPermi
         keyboardView = PlateKeyboardView(mContext)
         disableShowSoftInput(etPlantNum)
         etPlantNum.setOnClickListener(View.OnClickListener {
-            keyboardView?.showKeyboard(etPlantNum, InputType.TYPE_CLASS_PHONE)
+            keyboardView?.showKeyboard(etPlantNum,TYPE_CLASS_PHONE)
         })
         keyboardView?.setOnKeyboardFinishListener(object : PlateKeyboardView.OnKeyboardFinishListener {
             override fun onFinish(input: String?) {

@@ -126,4 +126,7 @@ public class NotificationDialog {
         }
         return null;
     }
+    public void releaseContext(){
+        context = null;
+    }
 }

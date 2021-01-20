@@ -37,7 +37,7 @@ public class SettleDetail implements Serializable {
     private double count;
     private long carId;
     private List<Long> arrearsId = new ArrayList<>();
-
+    private String vipDeadline;
 
     public double getArrears() {
         return arrears;
@@ -127,7 +127,11 @@ public class SettleDetail implements Serializable {
         this.arrearsId = arrearsId;
     }
 
+    public String getVipDeadline() {
+        return vipDeadline;
+    }
 
-
-
+    public void setVipDeadline(String vipDeadline) {
+        this.vipDeadline = vipDeadline;
+    }
 }

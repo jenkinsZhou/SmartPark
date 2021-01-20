@@ -353,6 +353,25 @@ public final class ToastUtil {
         showCustomLayout(R.layout.toast_view_layout_failed, content);
     }
 
+    public static void showFailed(CharSequence debugContent,CharSequence releaseContent) {
+       if(AppConfig.DEBUG_BODE){
+           if (TextUtils.isEmpty(debugContent)) {
+               return;
+           }
+           showCustomLayout(R.layout.toast_view_layout_failed, debugContent);
+       }else {
+           if (TextUtils.isEmpty(releaseContent)) {
+               return;
+           }
+           showCustomLayout(R.layout.toast_view_layout_failed, releaseContent);
+       }
+
+    }
+
+
+
+
+
     public static void showFailed(int stringResource) {
         showFailed(mApp.getText(stringResource));
     }

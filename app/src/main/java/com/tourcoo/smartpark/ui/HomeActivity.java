@@ -3,6 +3,7 @@ package com.tourcoo.smartpark.ui;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -949,7 +950,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         boolean needInit = mNotificationDialog == null || StackUtil.getInstance().getCurrent() != mNotificationDialog.getActivity();
         NotificationDialog finalNotificationDialog;
         if (needInit) {
-            if(mNotificationDialog != null){
+            if (mNotificationDialog != null) {
                 LogUtils.tag("嘿嘿嘿").d(mNotificationDialog.getActivity().getClass());
             }
             mNotificationDialog = new NotificationDialog().init().setTitle("通知消息");
@@ -966,6 +967,15 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             finalNotificationDialog = mNotificationDialog;
             LogUtils.tag("嘿嘿嘿").i("不需要重新创建");
         }
+        mNotificationDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if(!(mNotificationDialog.getActivity() instanceof HomeActivity)){
+                    mNotificationDialog.releaseContext();
+                    mNotificationDialog=null;
+                }
+            }
+        });
         finalNotificationDialog.setMessage(new SpanUtils().append("车辆")
                 .append(" " + socketData.getCarNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))//resources.getColor(R.color.colorAccent)
                 .append("已缴费离场\n请前往车位").setForegroundColor(CommonUtil.getColor(R.color.gray999999)).append(" " + socketData.getNumber()).setForegroundColor(CommonUtil.getColor(R.color.colorPrimary))

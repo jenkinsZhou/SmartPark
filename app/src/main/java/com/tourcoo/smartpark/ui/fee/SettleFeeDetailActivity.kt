@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
 import com.apkfuns.logutils.LogUtils
@@ -177,6 +178,14 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         tvFeeHistory.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.arrears)
         tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.count)
         tvFeeReally.text = StringUtil.getNotNullValueLine("")
+        if(TextUtils.isEmpty(settleDetail.vipDeadline)){
+            setViewGone(tvVipDeadLine,false)
+            setViewGone(vipTag,false)
+        }else{
+            tvVipDeadLine.text =  StringUtil.getNotNullValue(settleDetail.vipDeadline)
+            setViewGone(tvVipDeadLine,true)
+            setViewGone(vipTag,true)
+        }
         showCarInfo(settleDetail)
         if (settleDetail.count <= 0) {
             setViewGone(llPayByCash, false)

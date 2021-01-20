@@ -33,12 +33,12 @@ public class BSearchEdit extends View {
     private SearchPopupWindow searchPopupWindow;
     private View editText;
     private int widthPopup;
-    private int textWidth = ViewGroup.LayoutParams.MATCH_PARENT,textHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
-    private int textSize=14;
+    private int textWidth = ViewGroup.LayoutParams.MATCH_PARENT, textHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
+    private int textSize = 14;
     private int textColor;
     private int line_color;
-    private int line_height=1;
-    private int line_width= ViewGroup.LayoutParams.MATCH_PARENT;
+    private int line_height = 1;
+    private int line_width = ViewGroup.LayoutParams.MATCH_PARENT;
     private boolean isLine = true;
     private int popup_bg;
     private BSearchEdit.TextClickListener textClickListener;
@@ -54,14 +54,14 @@ public class BSearchEdit extends View {
         this.activity = activity;
         this.editText = editText;
         this.widthPopup = widthPopup;
-        textColor  = activity.getResources().getColor(R.color.grayA2A2A2);
-        line_color  = activity.getResources().getColor(R.color.grayE0E0E0);
+        textColor = activity.getResources().getColor(R.color.grayA2A2A2);
+        line_color = activity.getResources().getColor(R.color.grayE0E0E0);
         popup_bg = R.drawable.bs_popup_bg;
     }
 
     @SuppressLint("CheckResult")
-    private void init(){
-        searchPopupWindow = new SearchPopupWindow(activity,widthPopup);
+    private void init() {
+        searchPopupWindow = new SearchPopupWindow(activity, widthPopup);
         searchPopupWindow.setTextSize(textSize);
         searchPopupWindow.setTextColor(textColor);
         searchPopupWindow.setTextHeight(textHeight);
@@ -75,14 +75,14 @@ public class BSearchEdit extends View {
         searchPopupWindow.setTextClickListener(new SearchPopupWindow.TextClickListener() {
             @Override
             public void onTextClick(int position, String text) {
-                if(textClickListener!=null){
-                    textClickListener.onTextClick(position,text);
+                if (textClickListener != null) {
+                    textClickListener.onTextClick(position, text);
                     searchPopupWindow.dismiss();
                 }
             }
         });
-        if(isTimely) {
-            if(editText instanceof TextView){
+        if (isTimely) {
+            if (editText instanceof TextView) {
                 RxTextView.textChanges((TextView) editText)
                         .debounce(500, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
@@ -106,7 +106,7 @@ public class BSearchEdit extends View {
     }
 
     //参数设置完毕，一定要build一下
-    public BSearchEdit build(){
+    public BSearchEdit build() {
         init();
         return this;
     }
@@ -170,9 +170,13 @@ public class BSearchEdit extends View {
     }
 
     public void showPopup() {
-        if(!isTimely) {
+        if (!isTimely) {
             searchPopupWindow.showAsDropDown(editText);
         }
+    }
+
+    public void dismiss() {
+        searchPopupWindow.dismiss();
     }
 
     //点击监听器

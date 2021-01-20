@@ -159,6 +159,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                     } else if (primaryCode == 90001) {
 //                  字母与中文切换
                         if (isSymbol) {
+//                            showLetterView();
                             showLetterView2();
                         } else {
                             showSymbolView();
@@ -219,7 +220,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                     } else if (primaryCode == Keyboard.KEYCODE_MODE_CHANGE) {
                         // 数字与字母键盘互换
                         if (isNumber) {
-                            showLetterView();
+//                            showLetterView();
                             showLetterView2();
                         } else {
                             showNumberView();
@@ -227,6 +228,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                     } else if (primaryCode == 90001) {
 //                  字母与中文切换
                         if (isSymbol) {
+//                            showLetterView();
                             showLetterView2();
                         } else {
                             showSymbolView();
@@ -241,6 +243,7 @@ public class PlateKeyboardView implements View.OnClickListener {
                         insideEditText.setText(editable.toString());
                         if (editable.toString().length() >= 1) {
                             if (isSymbol) {
+                                showLetterView();
                                 showLetterView2();
                             }
                         }
@@ -420,10 +423,9 @@ public class PlateKeyboardView implements View.OnClickListener {
                     break;
                 case InputType.TYPE_CLASS_PHONE:
                 case InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS:
-                    showLetterView2();
-                    break;
                 case InputType.TYPE_NUMBER_FLAG_DECIMAL:
-                    showLetterView();
+//                    showLetterView();
+                    showLetterView2();
                     break;
                 default:
                     showSymbolView();
@@ -560,6 +562,7 @@ public class PlateKeyboardView implements View.OnClickListener {
         if (currentEditTextPosition == 0 && autoShowProvince) {
             showSymbolView();
         } else {
+            showLetterView();
             showLetterView2();
         }
     }
