@@ -24,6 +24,8 @@ public class RequestConfig {
 
 //    public static final String SERVICE_PORT = ":8007";
 public static final String SERVICE_PORT = ":8002";
+    public static final String SOCKET_URL = "ws://192.168.0.238:8007/push";
+
     public static final String BASE_URL = "http://" + SERVICE_IP + SERVICE_PORT + "/";
 
 

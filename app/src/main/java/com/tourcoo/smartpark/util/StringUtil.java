@@ -52,6 +52,14 @@ public class StringUtil {
     }
 
 
+    public static String getNotNullValue(String number,String placeHolder) {
+        if (TextUtils.isEmpty(number)) {
+            return getNotNullValue(placeHolder);
+        }
+        return number;
+    }
+
+
     public static boolean isCarNumberNo(String carNumber) {
         if (TextUtils.isEmpty(carNumber)) {
             return false;

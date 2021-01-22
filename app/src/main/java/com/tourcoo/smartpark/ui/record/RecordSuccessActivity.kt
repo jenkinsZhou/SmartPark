@@ -207,7 +207,8 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             textPrintLine.content = PrintConfig.STR_LINE_SHORT
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
-            var payType = ""
+            val payType = StringUtil.getNotNullValue(certificate.payType,"其他")
+           /* var payType = ""
             payType = when (certificate.payType) {
                 PayConstant.PAY_TYPE_ALI -> "支付宝支付"
                 PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
@@ -217,7 +218,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
                 else -> {
                     "其他支付"
                 }
-            }
+            }*/
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = payType + ":RMB(元)" + certificate.totalFee

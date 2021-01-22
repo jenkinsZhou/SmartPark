@@ -18,6 +18,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -100,7 +101,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.tourcoo.smartpark.constant.ParkConstant.PARK_STATUS_USED;
-import static com.tourcoo.smartpark.socket.WebSocketConfig.SOCKET_URL;
+import static com.tourcoo.smartpark.core.control.RequestConfig.SOCKET_URL;
 import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_RECORD_ID;
 
 
@@ -114,7 +115,7 @@ import static com.tourcoo.smartpark.ui.fee.SettleFeeDetailActivity.EXTRA_SETTLE_
 public class HomeActivity extends RxAppCompatActivity implements View.OnClickListener, Application.ActivityLifecycleCallbacks, OnRefreshListener, Callback.OnReloadListener {
     private Toolbar homeToolBar;
     private String mFilePath;
-    private ImageView ivMenu;
+    private ImageView ivMenu, ivRedDotVersion;
     private DrawerLayout drawerLayout;
     private boolean drawerOpenStatus = false;
     private RecyclerView parkingRecyclerView;
@@ -123,7 +124,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private TextView tvCarRecord;
     private IosLoadingDialog loadingDialog;
     private Context mContext;
-    private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome;
+    private TextView tvUserName, tvUserLocation, tvUserWorkTime, tvTotalCarCount, tvActualIncome, tvTheoreticalIncome, tvVersionName;
     public static final String EXTRA_SPACE_INFO = "EXTRA_SPACE_INFO";
     public static final int REQUEST_CODE_SIGN = 1002;
     private SmartRefreshLayout homeRefreshLayout;
@@ -147,6 +148,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     public static final int DELAY_TIME = 600;
     private NotificationDialog mNotificationDialog;
     private SoundPoolUtil ringPlayer;
+    private LinearLayout llVersion;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -167,6 +169,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private void initView() {
         homeToolBar = findViewById(R.id.homeToolBar);
         ivMenu = findViewById(R.id.ivMenu);
+        llVersion = findViewById(R.id.llVersion);
+        ivRedDotVersion = findViewById(R.id.ivRedDotVersion);
         drawerLayout = findViewById(R.id.drawerLayout);
         findViewById(R.id.tvPay).setOnClickListener(this);
         tvUserName = findViewById(R.id.tvUserName);
@@ -175,6 +179,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         parkingRecyclerView = findViewById(R.id.parkingRecyclerView);
         tvCarRecord = findViewById(R.id.tvCarRecord);
         tvUserLocation = findViewById(R.id.tvUserLocation);
+        tvVersionName = findViewById(R.id.tvVersionName);
         tvTotalCarCount = findViewById(R.id.tvTotalCarCount);
         tvActualIncome = findViewById(R.id.tvActualIncome);
         tvTheoreticalIncome = findViewById(R.id.tvTheoreticalIncome);
@@ -186,7 +191,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         homeRefreshLayout.setEnableLoadMore(false);
         findViewById(R.id.tvSignIn).setOnClickListener(this);
         findViewById(R.id.tvSignOut).setOnClickListener(this);
-
+        llVersion.setOnClickListener(this);
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
         findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
@@ -283,6 +288,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 break;
             case R.id.rlMessage:
                 CommonUtil.startActivity(HomeActivity.this, MessageListActivity.class);
+                break;
+            case R.id.llVersion:
+                checkAppVersion();
                 break;
             default:
                 break;
@@ -594,7 +602,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             });
         }*/
         requestUserInfoAndParkList();
-        requestAppVersion();
+        checkAppVersionDelay();
     }
 
 
@@ -660,7 +668,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     }
 
 
-    private void requestAppVersion() {
+    private void checkAppVersionDelay() {
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
             return;
         }
@@ -674,7 +682,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                             return;
                         }
                         if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
-                            handleUpdateCallback(entity.getData());
+                            handleUpdateCallback(entity.getData(),false);
                         }
                     }
                 });
@@ -683,15 +691,25 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
 
     }
 
-
-    private void handleUpdateCallback(AppVersion appVersion) {
-        if (appVersion == null || !appVersion.isForce() || isInstalling) {
+    /**
+     * 版本更新回调
+     * @param appVersion
+     */
+    private void handleUpdateCallback(AppVersion appVersion,boolean needToast) {
+        showVersionInfo(appVersion);
+        if (appVersion == null || isInstalling) {
+            return;
+        }
+        if (appVersion.getVersionCode() <= CommonUtil.getVersionCode(mContext)) {
+            if(needToast){
+                ToastUtil.showNormal("当前已是最新版本");
+            }
             return;
         }
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
             return;
         }
-        appUpdateDialog = new AppUpdateDialog(mContext).create(false);
+        appUpdateDialog = new AppUpdateDialog(mContext).create(!appVersion.isForce());
         appUpdateDialog.setTitle("发现新版本").
                 setDesc(StringUtil.getNotNullValueLine(appVersion.getDescription())).
                 setContent("v" + appVersion.getVersion()).
@@ -970,9 +988,9 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         mNotificationDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                if(!(mNotificationDialog.getActivity() instanceof HomeActivity)){
+                if (!(mNotificationDialog.getActivity() instanceof HomeActivity)) {
                     mNotificationDialog.releaseContext();
-                    mNotificationDialog=null;
+                    mNotificationDialog = null;
                 }
             }
         });
@@ -982,5 +1000,34 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 .append(" 进行确认").setForegroundColor(CommonUtil.getColor(R.color.gray999999))
                 .create());
         finalNotificationDialog.show();
+    }
+
+
+    private void showVersionInfo(AppVersion appVersion) {
+        if (appVersion == null) {
+            ivRedDotVersion.setVisibility(View.INVISIBLE);
+            tvVersionName.setVisibility(View.INVISIBLE);
+            return;
+        }
+        if (appVersion.getVersionCode() <= CommonUtil.getVersionCode(mContext)) {
+            ivRedDotVersion.setVisibility(View.INVISIBLE);
+        } else {
+            ivRedDotVersion.setVisibility(View.VISIBLE);
+        }
+        tvVersionName.setText(StringUtil.getNotNullValueLine(appVersion.getVersion()));
+    }
+
+    private void checkAppVersion(){
+        ApiRepository.getInstance().requestAppVersion(CommonUtil.getVersionName(mContext)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(new BaseLoadingObserver<BaseResult<AppVersion>>("正在获取最新版本") {
+            @Override
+            public void onRequestSuccess(BaseResult<AppVersion> entity) {
+                if (entity == null) {
+                    return;
+                }
+                if (entity.getCode() == RequestConfig.REQUEST_CODE_SUCCESS && entity.getData() != null) {
+                    handleUpdateCallback(entity.getData(),true);
+                }
+            }
+        });
     }
 }

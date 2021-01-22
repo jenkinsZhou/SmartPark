@@ -304,8 +304,8 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
             textPrintLine.content = PrintConfig.STR_LINE_SHORT
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
-            var payType = ""
-            payType = when (certificate.payType) {
+            val payType = StringUtil.getNotNullValue(certificate.payType,"其他")
+          /*  payType = when (certificate.payType) {
                 PayConstant.PAY_TYPE_ALI -> "支付宝支付"
                 PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
                 PayConstant.PAY_TYPE_CASH -> "现金支付"
@@ -314,7 +314,7 @@ class PayResultActivity : BaseTitleActivity(), PermissionCallbacks {
                 else -> {
                     "其他支付"
                 }
-            }
+            }*/
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = payType + ":RMB(元)" + certificate.totalFee
