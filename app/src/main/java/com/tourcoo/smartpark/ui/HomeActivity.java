@@ -1,15 +1,20 @@
 package com.tourcoo.smartpark.ui;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
+import android.app.TaskInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
@@ -43,6 +48,7 @@ import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
+import com.tourcoo.smartpark.MainActivity;
 import com.tourcoo.smartpark.R;
 import com.tourcoo.smartpark.adapter.home.GridParkAdapter;
 import com.tourcoo.smartpark.bean.BaseResult;
@@ -149,6 +155,8 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
     private NotificationDialog mNotificationDialog;
     private SoundPoolUtil ringPlayer;
     private LinearLayout llVersion;
+    private Timer mInstallTimer;
+    private AppVersion mVersion;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -194,11 +202,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         llVersion.setOnClickListener(this);
         tvCarRecord.setOnClickListener(this);
         findViewById(R.id.tvPayExit).setOnClickListener(this);
-        findViewById(R.id.tvHomeReportFee).setOnClickListener(this);
-        findViewById(R.id.tvHomeArrears).setOnClickListener(this);
+        findViewById(R.id.llHomeReportFee).setOnClickListener(this);
+        findViewById(R.id.llHomeArrears).setOnClickListener(this);
 
         findViewById(R.id.tvLogout).setOnClickListener(this);
-        findViewById(R.id.tvHomeEditPass).setOnClickListener(this);
+        findViewById(R.id.llHomeEditPass).setOnClickListener(this);
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
@@ -262,17 +270,17 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             case R.id.tvPayExit:
                 skipExitPayEnter();
                 break;
-            case R.id.tvHomeReportFee:
+            case R.id.llHomeReportFee:
                 Intent intent3 = new Intent();
                 intent3.setClass(HomeActivity.this, DailyFeeReportActivity.class);
                 startActivity(intent3);
                 closeDrawerLayout();
                 break;
-            case R.id.tvHomeArrears:
+            case R.id.llHomeArrears:
                 CommonUtil.startActivity(HomeActivity.this, ArrearsRecordListActivity.class);
                 closeDrawerLayout();
                 break;
-            case R.id.tvHomeEditPass:
+            case R.id.llHomeEditPass:
                 CommonUtil.startActivity(HomeActivity.this, EditPassActivity.class);
                 closeDrawerLayout();
                 break;
@@ -448,6 +456,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         socketDisConnect();
         ringPlayer.release();
         ringPlayer = null;
+        stopInstallTimer();
         super.onDestroy();
     }
 
@@ -700,6 +709,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         if (appVersion == null || isInstalling) {
             return;
         }
+        mVersion = appVersion;
         if (appVersion.getVersionCode() <= CommonUtil.getVersionCode(mContext)) {
             if(needToast){
                 ToastUtil.showNormal("当前已是最新版本");
@@ -707,6 +717,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             return;
         }
         if (appUpdateDialog != null && appUpdateDialog.isShowing()) {
+            ToastUtil.showWarning("已被拦截");
             return;
         }
         appUpdateDialog = new AppUpdateDialog(mContext).create(!appVersion.isForce());
@@ -745,6 +756,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                         isInstalling = true;
                         LogUtils.i("文件路径:" + file.getPath());
                         RetrofitHelper.getInstance().setLogEnable(true);
+                        startInstallTimer();
                         doInstallApk(file);
                     }
 
@@ -881,7 +893,11 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                     timer = new Timer();
                     FloatTask floatTask = new FloatTask();
                     timerTaskList.add(floatTask);
-                    timer.schedule(floatTask, DELAY_TIME);
+                    try {
+                        timer.schedule(floatTask, DELAY_TIME);
+                    }catch (IllegalArgumentException e){
+                        e.printStackTrace();
+                    }
                 }
                 break;
         }
@@ -1009,12 +1025,13 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             tvVersionName.setVisibility(View.INVISIBLE);
             return;
         }
+        String localVersionName = CommonUtil.getVersionName(mContext);
         if (appVersion.getVersionCode() <= CommonUtil.getVersionCode(mContext)) {
             ivRedDotVersion.setVisibility(View.INVISIBLE);
         } else {
             ivRedDotVersion.setVisibility(View.VISIBLE);
         }
-        tvVersionName.setText(StringUtil.getNotNullValueLine(appVersion.getVersion()));
+        tvVersionName.setText(localVersionName);
     }
 
     private void checkAppVersion(){
@@ -1029,5 +1046,49 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
                 }
             }
         });
+    }
+
+
+
+    /**
+     * 关于唤起系统安装界面的代码就不贴。。
+     * 唤起系统安装界面的同时调用这个方法 启动计时器
+     * 回到前台，也就是安装页面消失后发送msg
+     */
+    private void startInstallTimer() {
+        mInstallTimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (isForeground()) {
+                    // 結束了安裝，發送到主線程做自己的逻辑  例如判断 本地packageinfo是否有要安装的apk信息，有的话 安装成功，没有就是用户取消了安装或者直接关闭了安装界面
+                    if(mVersion.getVersionCode() > CommonUtil.getVersionCode(mContext)){
+                          //说明没有安装最新版本
+                        isInstalling = false;
+                        LogUtils.i("执行了isInstalling");
+                    }
+                    stopInstallTimer();
+                }
+            }
+        };
+        mInstallTimer.schedule(timerTask, 1000, 1000);
+    }
+
+    // 停止定时器
+    private void stopInstallTimer() {
+        if (mInstallTimer != null) {
+            mInstallTimer.cancel();
+            mInstallTimer = null;
+        }
+    }
+
+    private boolean isForeground() {
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        ComponentName cn = am.getRunningTasks(1).get(0).topActivity;
+        String currentPackageName = cn.getPackageName();
+        if (!TextUtils.isEmpty(currentPackageName) && currentPackageName.equals(getPackageName())) {
+            return true;
+        }
+        return false;
     }
 }

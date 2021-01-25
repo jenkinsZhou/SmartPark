@@ -457,13 +457,16 @@ public class RetrofitHelper {
                     boolean isJson = message.startsWith("[") || message.startsWith("{");
                     isJson = isJson && mLogJsonEnable;
                     if (isJson) {
-                        if(message.length()>1000){
+                        if(message.length()>500){
                             return;
                         }
                         LogUtils.tag(mLogTag).json(message);
                         return;
                     }
                     if(AppConfig.DEBUG_BODE){
+                        if(message.length()>500){
+                            return;
+                        }
                         Log.d(mLogTag, message);
                     }
 

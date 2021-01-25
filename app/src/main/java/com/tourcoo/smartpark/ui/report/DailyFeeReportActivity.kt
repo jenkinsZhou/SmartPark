@@ -351,6 +351,7 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
             // print error
             Log.e(TAG, "print error errorcode = $errorCode detail = $detail")
             handler.post(Runnable {
+                closeLoading()
                 when (errorCode) {
                     PrinterBinder.PRINTER_ERROR_NO_PAPER -> {
                         ToastUtil.showWarning("打印机缺纸")

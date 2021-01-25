@@ -6,6 +6,7 @@ import android.text.InputType
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.widget.EditText
 import android.widget.ImageView
 import com.tourcoo.smartpark.R
@@ -49,6 +50,7 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
             initSearchView(llSelectParking.width.toFloat())
         }
         listenInput(etUserName, ivClearUser)
+
         listenInput(etPass, ivClearPass)
     }
 
@@ -186,24 +188,11 @@ class LoginActivity : BaseMvpTitleActivity<LoginPresenter>(), LoginContract.Logi
             }
 
         })
-        /*  //默认不可见
-          imageView.setImageResource(R.mipmap.ic_eye_blue_open)
-          editText.transformationMethod = PasswordTransformationMethod.getInstance()
-          imageView.setOnClickListener {
-              if (imageView.getTag(EditPassActivity.VISIBLE_STATUS) != null) {
-                  val isVisible = imageView.getTag(EditPassActivity.VISIBLE_STATUS) as Boolean
-                  if (isVisible) {
-                      imageView.setImageResource(R.mipmap.ic_eye_blue_open)
-                      editText.transformationMethod = PasswordTransformationMethod.getInstance()
-                      imageView.setTag(EditPassActivity.VISIBLE_STATUS, !isVisible)
-                  } else {
-                      imageView.setImageResource(R.mipmap.ic_eye_blue_closed)
-                      editText.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                      imageView.setTag(EditPassActivity.VISIBLE_STATUS, !isVisible)
-
-                  }
-                  editText.setSelection(editText.text.toString().length)
-              }
-          }*/
+        editText.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                // 此处为得到焦点时的处理内容
+                bSearchEdit?.dismiss()
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
     <!--8.0开启安装应用权限-->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -29,15 +29,19 @@
     <uses-permission android:name="com.pos.permission.SECURITY" />
     <uses-permission android:name="com.pos.permission.EMVCORE" />
     <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name="com.tourcoo.SmartParkApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:maxAspectRatio="2.4"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="o">
@@ -70,10 +74,10 @@
         <activity android:name=".ui.account.EditPassActivity" />
         <activity android:name=".ui.pay.PayResultActivity" />
         <activity android:name=".ui.fee.SettleFeeDetailActivity" />
-        <activity android:name=".ui.record.RecordCarInfoConfirmActivity"
+        <activity
+            android:name=".ui.record.RecordCarInfoConfirmActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity android:name=".ui.account.login.LoginActivity" />
         <activity
             android:name=".ui.fee.ExitPayFeeEnterActivity"
@@ -90,15 +94,15 @@
         <activity android:name=".ui.report.DailyFeeReportActivity" />
         <activity android:name=".ui.report.DailyFeeRecordListActivity" />
         <activity android:name=".ui.record.ArrearsRecordListActivity" />
-        <activity android:name=".ui.record.WaitSettleListActivity"
+        <activity
+            android:name=".ui.record.WaitSettleListActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            />
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity android:name=".ui.fee.FeeDetailActivity" />
         <activity android:name=".ui.fee.ArrearsDetailActivity" />
-        <activity android:name=".ui.message.MessageListActivity"
-            android:launchMode="singleTask"
-            />
+        <activity
+            android:name=".ui.message.MessageListActivity"
+            android:launchMode="singleTask" />
         <activity android:name=".ui.record.RecordSuccessActivity" />
     </application>
 

@@ -4,6 +4,6 @@
     android:useLevel="false">
     <solid android:color="@color/actionsheet_red" />
     <size
-        android:width="@dimen/dp_10"
-        android:height="@dimen/dp_10" />
+        android:width="@dimen/dp_8"
+        android:height="@dimen/dp_8" />
 </shape>
