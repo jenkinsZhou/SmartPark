@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+    <!--.接收启动完成的广播权限-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.pos.permission.ACCESSORY_DATETIME" />
     <uses-permission android:name="com.pos.permission.ACCESSORY_LED" />
     <uses-permission android:name="com.pos.permission.ACCESSORY_BEEP" />
@@ -42,6 +44,7 @@
         android:largeHeap="true"
         android:maxAspectRatio="2.4"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:installLocation="internalOnly"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:targetApi="o">
@@ -104,6 +107,18 @@
             android:name=".ui.message.MessageListActivity"
             android:launchMode="singleTask" />
         <activity android:name=".ui.record.RecordSuccessActivity" />
+
+        <receiver
+            android:name=".util.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="1000">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+
     </application>
+
 
 </manifest>

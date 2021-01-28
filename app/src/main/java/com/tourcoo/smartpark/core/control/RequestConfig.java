@@ -11,7 +11,7 @@ public class RequestConfig {
     /**
      * 第一页（有的为0有的为1）
      */
-    public static final int FIRST_PAGE = 0;
+    public static final int FIRST_PAGE = 1;
 
     public static final int RESPONSE_CODE_SUCCESS = 200;
     public static final int REQUEST_CODE_SUCCESS = 1;

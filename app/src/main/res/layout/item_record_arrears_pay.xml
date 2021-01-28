@@ -84,7 +84,7 @@
                 android:layout_weight="0"
                 android:drawableStart="@mipmap/ic_money_small_yellow"
                 android:drawablePadding="@dimen/dp_5"
-                android:text="应收费用"
+                android:text="实收费用"
                 android:textStyle="bold" />
             <TextView
                 android:layout_width="0dp"
