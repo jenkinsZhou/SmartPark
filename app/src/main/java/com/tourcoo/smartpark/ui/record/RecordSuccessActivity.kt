@@ -221,7 +221,7 @@ class RecordSuccessActivity : BaseTitleActivity(), View.OnClickListener, EasyPer
             }*/
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = payType + ":RMB(元)" + certificate.totalFee
+            textPrintLine.content = payType + "¥" + certificate.totalFee
             textPrintLine.size = 32
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 

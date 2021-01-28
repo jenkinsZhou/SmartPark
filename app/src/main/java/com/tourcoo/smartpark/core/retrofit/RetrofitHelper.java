@@ -49,6 +49,11 @@ public class RetrofitHelper {
     private static OkHttpClient sClient;
     private static String TAG = "RetrofitHelper";
     /**
+     * 允许打印的日志最大长度
+     */
+    public static final int LOG_LENGTH_MAX = 5000;
+    public static final int LOG_LENGTH_JSON_MAX = 1000;
+    /**
      * 重定向访问Url--通过设置header模式
      */
     public static final String BASE_URL_NAME_HEADER = CommonMultiUrl.BASE_URL_NAME_HEADER;
@@ -457,14 +462,14 @@ public class RetrofitHelper {
                     boolean isJson = message.startsWith("[") || message.startsWith("{");
                     isJson = isJson && mLogJsonEnable;
                     if (isJson) {
-                        if(message.length()>500){
+                        if(message.length()>LOG_LENGTH_JSON_MAX){
                             return;
                         }
                         LogUtils.tag(mLogTag).json(message);
                         return;
                     }
                     if(AppConfig.DEBUG_BODE){
-                        if(message.length()>500){
+                        if(message.length()>LOG_LENGTH_MAX){
                             return;
                         }
                         Log.d(mLogTag, message);

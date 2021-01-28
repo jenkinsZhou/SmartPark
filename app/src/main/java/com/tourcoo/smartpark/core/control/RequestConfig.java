@@ -17,16 +17,14 @@ public class RequestConfig {
     public static final int REQUEST_CODE_SUCCESS = 1;
     public static final int REQUEST_CODE_TOKEN_INVALID = 401;
 
-    public static final String SERVICE_IP = "192.168.0.238";
-
-//    public static final String SERVICE_IP = "park.tklvyou.cn";
-   /* http://park.tklvyou.cn:8002/*/
-
-    public static final String SERVICE_PORT = ":8007";
+//    public static final String SERVICE_IP = "192.168.0.238";
+public static final String SERVICE_IP = "park.tklvyou.cn";
+//    public static final String SERVICE_IP = "https://park.tklvyou.cn";
+    public static final String SERVICE_PORT = ":8001";
 //public static final String SERVICE_PORT = ":8002";
-    public static final String SOCKET_URL = "ws://192.168.0.238:8007/push";
-
-    public static final String BASE_URL = "http://" + SERVICE_IP + SERVICE_PORT + "/";
+//    public static final String SOCKET_URL = "ws://192.168.0.238:8007/push";
+public static final String SOCKET_URL = "wss://park.tklvyou.cn:8001/push";
+    public static final String BASE_URL = "https://" + SERVICE_IP + SERVICE_PORT + "/";
 
 
 //192.168.0.200:8007

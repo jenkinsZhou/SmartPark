@@ -15,7 +15,9 @@ import com.tourcoo.smartpark.util.StringUtil;
 
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_ALI;
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_CASH;
+import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_FREE;
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_SMALL_PROGRAM;
+import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_VIP;
 import static com.tourcoo.smartpark.constant.PayConstant.PAY_TYPE_WEI_XIN;
 
 /**
@@ -64,7 +66,16 @@ public class FeeRecordAdapter extends BaseQuickAdapter<DailyFeeRecord, BaseViewH
                 //小程序支付
                 ivParkingType.setImageResource(R.mipmap.ic_pay_type_small_program);
                 break;
+            case PAY_TYPE_FREE:
+                //免费
+                ivParkingType.setImageResource(R.drawable.ic_pay_type_free);
+                break;
+            case PAY_TYPE_VIP:
+                ivParkingType.setImageResource(R.drawable.ic_pay_type_vip);
+                break;
             default:
+                //小程序支付
+                ivParkingType.setImageResource(R.mipmap.ic_pay_type_small_program);
                 break;
         }
     }

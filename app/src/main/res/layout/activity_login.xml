@@ -146,6 +146,7 @@
                     android:maxLines="1"
                     android:background="@null"
                     android:hint="请输入密码"
+                    android:inputType="textPassword"
                     android:digits="@string/register_name_digits"
                     android:padding="@dimen/dp_5"
                     android:textColorHint="@color/colorTextLittleGray" />

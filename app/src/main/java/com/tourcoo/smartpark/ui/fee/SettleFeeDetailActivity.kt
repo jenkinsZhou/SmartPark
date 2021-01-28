@@ -379,6 +379,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             payResult = entity.data
             ToastUtil.showSuccess(entity.errMsg)
             skipPayResult(true)
+            finish()
         } else {
             ToastUtil.showFailed(entity.errMsg)
             skipPayResult(false)

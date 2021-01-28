@@ -34,6 +34,7 @@ import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.LocalImage
 import com.tourcoo.smartpark.bean.park.ParkRecordInfo
 import com.tourcoo.smartpark.bean.park.ParkSpaceInfo
+import com.tourcoo.smartpark.config.AppConfig
 import com.tourcoo.smartpark.constant.ParkConstant.*
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.base.activity.BaseTitleActivity
@@ -282,7 +283,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
 
             override fun onFail(e: Throwable) {
                 LogUtils.e("异常：$e")
-                ToastUtil.showFailed(e.toString(),resources.getString(R.string.tips_request_error))
+                ToastUtil.showFailed(e.toString(), resources.getString(R.string.tips_request_error))
                 closeHudProgressDialog()
             }
         })
@@ -446,9 +447,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         LogUtils.i("是否删除了图片数据:$success" + "文件路径:" + path)
         EventBus.getDefault().unregister(this)
         PredictorWrapper.release()
-        mHandler.removeCallbacksAndMessages(null)
         spaceKeyboardView = null
+        keyboardView?.release()
         keyboardView = null
+        mHandler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
@@ -754,14 +756,14 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             tvParkNumber.setText(text!!)
             if (position < parkingList.size) {
                 parkInfo = parkingList[position]
-            }else{
+            } else {
                 ToastUtil.showNormal("选择被拦截")
             }
             try {
                 tvParkNumber.setSelection(text.length)
             } catch (e: Exception) {
                 e.printStackTrace()
-                ToastUtil.showFailedDebug("出错="+e.toString())
+                ToastUtil.showFailedDebug("出错=" + e.toString())
             }
         }
         bSearchEdit!!.setOnClickListener {
@@ -779,10 +781,10 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
             parkingStrList.add(StringUtil.getNotNullValue(it.number))
             parkingList.add(it)
         }
-        if(parkingInfoList.isEmpty()){
+        if (parkingInfoList.isEmpty()) {
             bSearchEdit!!.clear()
             bSearchEdit!!.dismiss()
-        }else{
+        } else {
             bSearchEdit!!.setSearchList(parkingStrList)
             bSearchEdit!!.showPopup()
         }
@@ -948,7 +950,7 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
     private fun skipImageDetail(position: Int) {
         val imagePathList = ArrayList<String>()
         for (localImage in photoAdapter!!.list) {
-            if(localImage != null && !TextUtils.isEmpty(localImage.localImagePath)){
+            if (localImage != null && !TextUtils.isEmpty(localImage.localImagePath)) {
                 imagePathList.add(localImage.localImagePath)
             }
         }

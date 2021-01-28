@@ -836,7 +836,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
             socketManager.setWebSocketListener(new WebSocketManager.WebSocketListener() {
                 @Override
                 public void onConnected(Map<String, List<String>> headers) {
-                    LogUtils.d("---->OS. WebSocket onConnected:" + headers.size());
+                    LogUtils.i("---->OS. WebSocket onConnected:" + headers.size());
                 }
 
                 @Override

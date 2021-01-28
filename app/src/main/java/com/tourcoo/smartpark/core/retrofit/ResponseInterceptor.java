@@ -2,6 +2,7 @@ package com.tourcoo.smartpark.core.retrofit;
 
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.tourcoo.smartpark.bean.BaseResult;
 import com.tourcoo.smartpark.core.utils.ToastUtil;
 import com.tourcoo.smartpark.ui.account.AccountHelper;
@@ -39,7 +40,13 @@ public class ResponseInterceptor implements Interceptor {
         BufferedSource source = responseBody.source();
         source.request(Long.MAX_VALUE);
         String respString = source.getBuffer().clone().readString(Charset.defaultCharset());
-        BaseResult result = new Gson().fromJson(respString, BaseResult.class);
+        BaseResult result;
+        try {
+            result = new Gson().fromJson(respString, BaseResult.class);
+        } catch (JsonSyntaxException | ClassCastException e) {
+            result = null;
+            e.printStackTrace();
+        }
         if (result != null && result.getCode() == 401) {
             ToastUtil.showNormal(result.getErrMsg());
             AccountHelper.getInstance().logout();

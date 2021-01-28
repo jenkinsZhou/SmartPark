@@ -610,4 +610,9 @@ public class PlateKeyboardView implements View.OnClickListener {
         MediaScannerConnection.scanFile(mContext, new String[]{currentPath}, null, null);
         return currentPath;
     }
+
+    public void release(){
+        mContext =null;
+        popWindow = null;
+    }
 }
