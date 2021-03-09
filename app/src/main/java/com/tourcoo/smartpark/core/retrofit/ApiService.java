@@ -19,6 +19,7 @@ import com.tourcoo.smartpark.bean.message.MessageInfo;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 import com.tourcoo.smartpark.bean.system.AppVersion;
+import com.tourcoo.smartpark.bean.system.SystemSetting;
 
 import java.util.List;
 import java.util.Map;
@@ -216,6 +217,12 @@ public interface ApiService {
      */
     @PUT("/handheld/msg/handle")
     Observable<BaseResult<Object>> requestMessageHandle(@Body Map<String, Object> map);
+
+
+    @GET("/handheld/appconfig")
+    Observable<BaseResult<SystemSetting>> requestAppConfig();
+
+
 
 
 }

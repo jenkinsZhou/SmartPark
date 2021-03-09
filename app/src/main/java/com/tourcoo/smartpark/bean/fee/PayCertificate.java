@@ -42,7 +42,7 @@ public class PayCertificate {
     private String leaveAt;
     private String duration;
     private String chargedAt;
-
+    private String theoreticalFee;
 
     public String getMember() {
         return member;
@@ -162,5 +162,13 @@ public class PayCertificate {
 
     public void setChargedAt(String chargedAt) {
         this.chargedAt = chargedAt;
+    }
+
+    public String getTheoreticalFee() {
+        return theoreticalFee;
+    }
+
+    public void setTheoreticalFee(String theoreticalFee) {
+        this.theoreticalFee = theoreticalFee;
     }
 }

@@ -9,7 +9,7 @@
 
     <ImageView
         android:layout_gravity="center_horizontal"
-        android:src="@mipmap/ic_launcher"
+        android:src="@mipmap/ic_bg_reset_pass"
         android:layout_marginTop="@dimen/dp_210"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

@@ -31,7 +31,7 @@ public class SettleDetail implements Serializable {
     private String number;
     private long id;
     private int type;
-    private double fee;
+    private String fee;
     private String createdAt;
     private String leaveAt;
     private double count;
@@ -79,11 +79,11 @@ public class SettleDetail implements Serializable {
         this.type = type;
     }
 
-    public double getFee() {
+    public String getFee() {
         return fee;
     }
 
-    public void setFee(double fee) {
+    public void setFee(String fee) {
         this.fee = fee;
     }
 

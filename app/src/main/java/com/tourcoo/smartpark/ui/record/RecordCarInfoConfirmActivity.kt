@@ -495,6 +495,17 @@ class RecordCarInfoConfirmActivity : BaseTitleActivity(), View.OnClickListener, 
         }
         plantInputLayout?.clearInput()
         plantInputLayout?.text = result.plate_number
+        when (result.type) {
+            0 -> {
+                setCarTypeSmall()
+            }
+            1 -> {
+                setCarTypeLarge()
+            }
+
+            else -> {
+            }
+        }
     }
 
     private fun fillBluePlant(number: String) {

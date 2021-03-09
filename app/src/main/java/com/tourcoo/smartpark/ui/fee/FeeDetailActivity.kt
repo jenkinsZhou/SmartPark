@@ -47,6 +47,7 @@ import com.tourcoo.smartpark.print_old.DeviceService
 import com.tourcoo.smartpark.print_old.PrintConstant
 import com.tourcoo.smartpark.ui.account.AccountHelper
 import com.tourcoo.smartpark.ui.pay.PayResultActivity
+import com.tourcoo.smartpark.util.ClickUtils
 import com.tourcoo.smartpark.util.StringUtil
 import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
@@ -98,8 +99,8 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         titleBar?.setTitleMainText("收费详情")
     }
 
-    private fun requestFlagArrears(parkId: Long) {
-        ApiRepository.getInstance().requestFlagArrears(parkId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
+    private fun requestFlagArrears(parkId: Long, reason: String) {
+        ApiRepository.getInstance().requestFlagArrears(parkId, reason).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
             override fun onRequestSuccess(entity: BaseResult<Any>?) {
                 if (entity == null) {
                     return
@@ -116,7 +117,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
     /**
      * 标为欠费弹窗
      */
-    private fun showSignConfirm() {
+/*    private fun showSignConfirm() {
         IosAlertDialog(mContext)
                 .init()
                 .setCancelable(false)
@@ -126,7 +127,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
                 .setPositiveButton("确定", View.OnClickListener { requestFlagArrears(recordId!!) })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()
-    }
+    }*/
 
     private fun requestFeeDetail(needIgnore: Boolean) {
         ApiRepository.getInstance().requestFeeDetail(recordId!!).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<FeeDetail>>() {
@@ -165,10 +166,10 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
         tvEnterTime.text = StringUtil.getNotNullValueLine(data.createdAt)
         tvExitTime.text = StringUtil.getNotNullValueLine(data.leaveAt)
         tvParkingDuration.text = StringUtil.getNotNullValueLine(data.duration)
-        tvFeeCurrent.text = StringUtil.getNotNullValueLine("¥ " + data.fee)
-        tvFeeHistory.text = StringUtil.getNotNullValueLine("¥ " + data.arrears)
-        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + data.theoreticalFee)
-        tvFeeReally.text = StringUtil.getNotNullValueLine("¥ " + data.totalFee)
+        tvFeeCurrent.text = StringUtil.getNotNullValue("¥ " + data.fee)
+        tvFeeHistory.text = StringUtil.getNotNullValue("¥ " + data.arrears)
+        tvFeeShould.text = StringUtil.getNotNullValue("¥ " + data.theoreticalFee)
+        tvFeeReally.text = StringUtil.getNotNullValue("¥ " + data.totalFee)
         showCarInfo(data)
     }
 
@@ -198,6 +199,9 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.tvIgnoreHistoryFee -> {
+                if (ClickUtils.isFastClick()) {
+                 return
+                }
                 requestFeeDetail(!mNeedIgnore)
             }
             else -> {
@@ -288,7 +292,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ToastUtil.showFailed("未获取到打印数据")
             return
         }
-        if(!PrintConfig.printSdkInitStatus){
+        if (!PrintConfig.printSdkInitStatus) {
             ToastUtil.showFailed(R.string.tips_print_error)
             return
         }
@@ -378,7 +382,7 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content = "应收费用:RMB(元)" + certificate.totalFee
+            textPrintLine.content = "应收费用:RMB(元)" + StringUtil.getNotNullValue(certificate.theoreticalFee)
             textPrintLine.size = TextPrintLine.FONT_NORMAL
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
@@ -402,20 +406,20 @@ class FeeDetailActivity : BaseTitleActivity(), View.OnClickListener, OnRefreshLi
             textPrintLine.content = PrintConfig.STR_LINE_SHORT
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
-            val payType = StringUtil.getNotNullValue(certificate.payType,"其他")
-          /*  payType = when (certificate.payType) {
-                PayConstant.PAY_TYPE_ALI -> "支付宝支付"
-                PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
-                PayConstant.PAY_TYPE_CASH -> "现金支付"
-                PayConstant.PAY_TYPE_MINI-> "小程序支付"
-                PayConstant.PAY_TYPE_FREE-> "免费"
-                else -> {
-                    "其他支付"
-                }
-            }*/
+            val payType = StringUtil.getNotNullValue(certificate.payType, "其他")
+            /*  payType = when (certificate.payType) {
+                  PayConstant.PAY_TYPE_ALI -> "支付宝支付"
+                  PayConstant.PAY_TYPE_WEI_XIN -> "微信支付"
+                  PayConstant.PAY_TYPE_CASH -> "现金支付"
+                  PayConstant.PAY_TYPE_MINI-> "小程序支付"
+                  PayConstant.PAY_TYPE_FREE-> "免费"
+                  else -> {
+                      "其他支付"
+                  }
+              }*/
 
             textPrintLine.position = PrintLine.LEFT
-            textPrintLine.content =  payType + "¥" + certificate.totalFee
+            textPrintLine.content = payType + "¥" + certificate.totalFee
             textPrintLine.size = 32
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 

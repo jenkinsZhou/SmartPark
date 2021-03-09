@@ -48,7 +48,7 @@ public class PredictorWrapper {
          /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "ZPQG-GYCJ-CPCC-MKJL",
                     "", true, Predictor.getAlgorithmId());*/
             // 在线自动激活
-            int ret = BDLicenseActivator.initLicenseOnLine(context, "ZPQG-GYCJ-CPCC-MKJL",
+            int ret = BDLicenseActivator.initLicenseOnLine(context, "PUBR-EDDF-PXFY-QXVX",
                     "", Predictor.getAlgorithmId());
             if (ret != 0) {
                 LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));

@@ -28,9 +28,10 @@ public class DailyReport {
     private String parking;
     private double actualIncome;
     private String carNum;
-    private double theoreticalIncome;
-    private double onlineIncome;
-    private double offlineIncome;
+    private String theoreticalIncome;
+    private String onlineIncome;
+    private String offlineIncome;
+    private String discountedPrice;
 
     public String getNumber() {
         return number;
@@ -80,27 +81,35 @@ public class DailyReport {
         this.carNum = carNum;
     }
 
-    public double getTheoreticalIncome() {
+    public String getTheoreticalIncome() {
         return theoreticalIncome;
     }
 
-    public void setTheoreticalIncome(double theoreticalIncome) {
+    public void setTheoreticalIncome(String theoreticalIncome) {
         this.theoreticalIncome = theoreticalIncome;
     }
 
-    public double getOnlineIncome() {
+    public String getOnlineIncome() {
         return onlineIncome;
     }
 
-    public void setOnlineIncome(double onlineIncome) {
+    public void setOnlineIncome(String onlineIncome) {
         this.onlineIncome = onlineIncome;
     }
 
-    public double getOfflineIncome() {
+    public String getOfflineIncome() {
         return offlineIncome;
     }
 
-    public void setOfflineIncome(double offlineIncome) {
+    public void setOfflineIncome(String offlineIncome) {
         this.offlineIncome = offlineIncome;
+    }
+
+    public String getDiscountedPrice() {
+        return discountedPrice;
+    }
+
+    public void setDiscountedPrice(String discountedPrice) {
+        this.discountedPrice = discountedPrice;
     }
 }

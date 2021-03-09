@@ -22,6 +22,7 @@ import com.tourcoo.smartpark.bean.message.MessageInfo;
 import com.tourcoo.smartpark.bean.report.DailyReport;
 import com.tourcoo.smartpark.bean.settle.SettleDetail;
 import com.tourcoo.smartpark.bean.system.AppVersion;
+import com.tourcoo.smartpark.bean.system.SystemSetting;
 import com.tourcoo.smartpark.core.retrofit.ApiService;
 import com.tourcoo.smartpark.core.retrofit.RetrofitHelper;
 import com.tourcoo.smartpark.core.retrofit.RetryWhen;
@@ -182,9 +183,10 @@ public class ApiRepository extends BaseRepository {
      * @param parkId
      * @return
      */
-    public Observable<BaseResult<Object>> requestFlagArrears(long parkId) {
+    public Observable<BaseResult<Object>> requestFlagArrears(long parkId,String reason) {
         Map<String, Object> params = new HashMap<>(1);
         params.put("id", parkId);
+        params.put("reason",reason);
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestFlagArrears(params).retryWhen(new RetryWhen()));
     }
@@ -322,5 +324,15 @@ public class ApiRepository extends BaseRepository {
         LogUtils.tag("提交到后台的参数").i(params);
         return ThreadTransformer.switchSchedulers(getApiService().requestMessageHandle(params).retryWhen(new RetryWhen()));
     }
+
+
+    /**
+     * 系统配置
+     * @return
+     */
+    public Observable<BaseResult<SystemSetting>> requestAppConfig() {
+        return ThreadTransformer.switchSchedulers(getApiService().requestAppConfig().retryWhen(new RetryWhen()));
+    }
+
 
 }

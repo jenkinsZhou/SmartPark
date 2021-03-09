@@ -1031,7 +1031,7 @@ public class HomeActivity extends RxAppCompatActivity implements View.OnClickLis
         } else {
             ivRedDotVersion.setVisibility(View.VISIBLE);
         }
-        tvVersionName.setText(localVersionName);
+        tvVersionName.setText("v "+localVersionName);
     }
 
     private void checkAppVersion(){

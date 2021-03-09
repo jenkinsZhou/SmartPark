@@ -7,7 +7,11 @@ import android.os.Handler
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.apkfuns.logutils.LogUtils
+import com.bigkoo.pickerview.builder.OptionsPickerBuilder
+import com.bigkoo.pickerview.view.OptionsPickerView
 import com.scwang.smartrefresh.layout.api.RefreshLayout
 import com.scwang.smartrefresh.layout.header.ClassicsHeader
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener
@@ -15,6 +19,7 @@ import com.tourcoo.smartpark.R
 import com.tourcoo.smartpark.bean.BaseResult
 import com.tourcoo.smartpark.bean.fee.PayResult
 import com.tourcoo.smartpark.bean.settle.SettleDetail
+import com.tourcoo.smartpark.bean.system.SystemSetting
 import com.tourcoo.smartpark.constant.ParkConstant
 import com.tourcoo.smartpark.core.CommonUtil
 import com.tourcoo.smartpark.core.UiManager
@@ -37,12 +42,13 @@ import com.tourcoo.smartpark.widget.dialog.IosAlertDialog
 import com.trello.rxlifecycle3.android.ActivityEvent
 import kotlinx.android.synthetic.main.activity_exit_pay_fee_settle_detail.*
 import org.apache.commons.lang3.StringUtils
+import java.lang.NumberFormatException
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 /**
- *@description :离场收费详情(离场结算页面)
+ *@description :离场收费详情(离场结算页面)标为欠费页面
  *@company :途酷科技
  * @author :JenkinsZhou
  * @date 2020年11月09日9:12
@@ -54,7 +60,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
      */
     private var recordId = -1L
     private var parkId = -1L
-
+    private var pvReasonOptions: OptionsPickerView<String>? = null
     private var carId = -1L
     private var settleId = -1L
     private var mNeedIgnore = false
@@ -63,10 +69,14 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private val arrearsIdList: MutableList<Long> = ArrayList()
     private var payResult: PayResult? = null
     private val timer = Timer()
+    private var rightTextView: TextView? = null
     private var timerTask: TimerTask? = null
     private val mHandler = Handler()
     private var refreshEnable = false
     private val arrearsIdArray = java.util.ArrayList<Long>()
+    private val reasonList: MutableList<String> = ArrayList()
+    private var rightLayout: LinearLayout? = null
+
     companion object {
         const val EXTRA_SETTLE_RECORD_ID = "EXTRA_SETTLE_RECORD_ID"
         const val EXTRA_PARK_ID = "EXTRA_PARK_ID"
@@ -101,6 +111,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         tvIgnoreHistoryFee.setOnClickListener(this)
         llExitConfirm.setOnClickListener(this)
         initRefreshLayout()
+        initReasonSelect()
     }
 
     override fun setTitleBar(titleBar: TitleBarView?) {
@@ -143,7 +154,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
             R.id.tvFeeHistory -> {
                 skipArrearsRecord()
             }
-            R.id.llExitConfirm->{
+            R.id.llExitConfirm -> {
                 showExitConfirm()
             }
 
@@ -174,17 +185,17 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         }
         tvEnterTime.text = StringUtil.getNotNullValueLine(settleDetail.createdAt)
         tvExitTime.text = StringUtil.getNotNullValueLine(settleDetail.leaveAt)
-        tvFeeCurrent.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.fee)
-        tvFeeHistory.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.arrears)
-        tvFeeShould.text = StringUtil.getNotNullValueLine("¥ " + settleDetail.count)
+        tvFeeCurrent.text = StringUtil.getNotNullValue("¥ " + settleDetail.fee)
+        tvFeeHistory.text = StringUtil.getNotNullValue("¥ " + settleDetail.arrears)
+        tvFeeShould.text = StringUtil.getNotNullValue("¥ " + settleDetail.count)
         tvFeeReally.text = StringUtil.getNotNullValueLine("")
-        if(TextUtils.isEmpty(settleDetail.vipDeadline)){
-            setViewGone(tvVipDeadLine,false)
-            setViewGone(vipTag,false)
-        }else{
-            tvVipDeadLine.text =  StringUtil.getNotNullValue(settleDetail.vipDeadline)
-            setViewGone(tvVipDeadLine,true)
-            setViewGone(vipTag,true)
+        if (TextUtils.isEmpty(settleDetail.vipDeadline)) {
+            setViewGone(tvVipDeadLine, false)
+            setViewGone(vipTag, false)
+        } else {
+            tvVipDeadLine.text = StringUtil.getNotNullValue(settleDetail.vipDeadline)
+            setViewGone(tvVipDeadLine, true)
+            setViewGone(vipTag, true)
         }
         showCarInfo(settleDetail)
         if (settleDetail.count <= 0) {
@@ -261,23 +272,36 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     }
 
     private fun showTitleInfoByCondition(detail: SettleDetail) {
-        val rightLayout = mTitleBar?.getLinearLayout(Gravity.END) ?: return
-        val rightTextView = View.inflate(mContext, R.layout.view_right_title, null)
-        rightLayout.removeAllViews()
+
+        if (rightTextView == null) {
+            rightLayout = mTitleBar?.getLinearLayout(Gravity.END) ?: return
+            rightTextView = View.inflate(mContext, R.layout.view_right_title, null) as TextView
+        }
+        rightLayout?.removeAllViews()
         if (detail.count > 0) {
-            rightLayout.addView(rightTextView)
-            rightTextView.setOnClickListener {
-                showSignConfirm()
+            rightLayout?.addView(rightTextView)
+            rightTextView?.setOnClickListener {
+                requestReasonAndShow()
             }
             setViewGone(rightTextView, true)
         } else {
             setViewGone(rightTextView, false)
         }
+        try {
+            if (detail.fee != null) {
+                val amount = detail.fee.toDouble()
+                setViewGone(rightLayout, amount > 0)
+            } else {
+                setViewGone(rightLayout, false)
+            }
+        } catch (e: NumberFormatException) {
+            setViewGone(rightLayout, false)
+        }
     }
 
 
-    private fun requestFlagArrears(parkId: Long) {
-        ApiRepository.getInstance().requestFlagArrears(parkId).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
+    private fun requestFlagArrears(parkId: Long, reason: String) {
+        ApiRepository.getInstance().requestFlagArrears(parkId, reason).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<Any>>() {
             override fun onRequestSuccess(entity: BaseResult<Any>?) {
                 if (entity == null) {
                     return
@@ -297,7 +321,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     private fun skipArrearsRecord() {
         val intent = Intent()
         intent.putExtra(EXTRA_CAR_ID, carId)
-        intent.putExtra(EXTRA_ARREARS_IDS,arrearsIdArray)
+        intent.putExtra(EXTRA_ARREARS_IDS, arrearsIdArray)
         intent.setClass(this@SettleFeeDetailActivity, PayArrearsRecordActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE_FEE_RECORD)
     }
@@ -311,7 +335,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                     if (arrearsIds != null) {
                         arrearsIdArray.clear()
                         arrearsIdArray.addAll(arrearsIds)
-                       mNeedIgnore = arrearsIdArray.isNullOrEmpty()
+                        mNeedIgnore = arrearsIdArray.isNullOrEmpty()
                         mArrearsIds = StringUtils.join(arrearsIds, ",")
                     }
                 }
@@ -349,6 +373,7 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
         mPayType = PAY_TYPE_FREE
         requestPay(null)
     }
+
     private fun requestPay(scanCode: String?) {
         showLoading("正在支付...")
         ApiRepository.getInstance().requestPay(settleId, mPayType!!, scanCode, listParseLongArray(arrearsIdList)).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseObserver<BaseResult<PayResult?>>() {
@@ -430,7 +455,9 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
                 .setCanceledOnTouchOutside(false)
                 .setTitle("标为欠费")
                 .setMsg("标记后本次停车将不再收费，且本页面会自动关闭，确定要标为欠费吗?")
-                .setPositiveButton("确定", View.OnClickListener { requestFlagArrears(recordId) })
+                .setPositiveButton("确定", View.OnClickListener {
+//                    requestFlagArrears(recordId)
+                })
                 .setNegativeButton("取消", View.OnClickListener {
                 }).show()
     }
@@ -476,5 +503,46 @@ class SettleFeeDetailActivity : BaseTitleMultiStatusActivity(), View.OnClickList
     override fun onResume() {
         refreshEnable = true
         super.onResume()
+    }
+
+
+    private fun requestReasonAndShow() {
+        ApiRepository.getInstance().requestAppConfig().compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribe(object : BaseLoadingObserver<BaseResult<SystemSetting?>>() {
+            override fun onRequestSuccess(entity: BaseResult<SystemSetting?>?) {
+                if (RequestConfig.REQUEST_CODE_SUCCESS == entity?.code || entity?.data != null) {
+                    showReason(entity.data?.reason)
+                } else {
+                    ToastUtil.showNormal(entity?.errMsg)
+                }
+            }
+
+            override fun onRequestError(throwable: Throwable?) {
+                super.onRequestError(throwable)
+                closeLoading()
+            }
+        })
+    }
+
+    private fun showReason(list: MutableList<String>?) {
+        if (list != null) {
+            reasonList.clear()
+            reasonList.addAll(list)
+        }
+        pvReasonOptions?.show()
+    }
+
+    private fun initReasonSelect() {
+        // 不联动的多级选项
+        if (pvReasonOptions == null) {
+            pvReasonOptions = OptionsPickerBuilder(this) { options1, options2, options3, v ->
+                if (reasonList.size <= options1) {
+                    return@OptionsPickerBuilder
+                }
+//                rightTextView?.text = reasonList[options1]
+                requestFlagArrears(recordId, reasonList[options1])
+            }.setContentTextSize(22).setCyclic(false, false, false).setItemVisibleCount(5).build()
+        }
+        pvReasonOptions!!.setNPicker(reasonList, null, null)
+
     }
 }

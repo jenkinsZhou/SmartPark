@@ -111,6 +111,7 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
         tvTollManName.text = data?.name
         tvTollManNum.text = data?.number
         tvTotalCarCount.text = data?.carNum
+        tvTotalDiscount.text =  StringUtil.getNotNullValue("¥ " + data?.discountedPrice)
         tvTotalShouldIncome.text = StringUtil.getNotNullValue("¥ " + data?.theoreticalIncome)
         tvTotalReallyIncome.text = StringUtil.getNotNullValue("¥ " + data?.actualIncome)
         tvOnlineIncome.text = StringUtil.getNotNullValue("¥ " + data?.onlineIncome)
@@ -212,6 +213,10 @@ class DailyFeeReportActivity : BaseTitleActivity(), EasyPermissions.PermissionCa
 
             textPrintLine.position = PrintLine.LEFT
             textPrintLine.content = "总应收(元):" + "¥" + certificate.theoreticalIncome
+            ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
+
+            textPrintLine.position = PrintLine.LEFT
+            textPrintLine.content = "总优惠(元):" + "¥" + certificate.discountedPrice
             ServiceManager.getInstence().printer.addPrintLine(textPrintLine)
 
             textPrintLine.position = PrintLine.LEFT
