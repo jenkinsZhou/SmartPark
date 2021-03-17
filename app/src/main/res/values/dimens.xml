@@ -38,6 +38,7 @@
     <dimen name="dp_m_40">-40dp</dimen>
     <dimen name="dp_m_35">-35dp</dimen>
     <dimen name="dp_m_30">-30dp</dimen>
+    <dimen name="dp_m_24">-24dp</dimen>
     <dimen name="dp_m_23">-23dp</dimen>
     <dimen name="dp_m_20">-20dp</dimen>
     <dimen name="dp_m_12">-12dp</dimen>
@@ -739,5 +740,5 @@
     <dimen name="alivc_common_font_29">29sp</dimen>
     <dimen name="alivc_common_font_32">32sp</dimen>
     <!--end-->
-
+    <dimen name="fab_margin">32.0000dp</dimen>
 </resources>

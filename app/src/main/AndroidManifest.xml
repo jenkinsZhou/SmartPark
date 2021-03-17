@@ -39,11 +39,11 @@
     <application
         android:name="com.tourcoo.SmartParkApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_app_logo"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:maxAspectRatio="2.4"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_app_logo"
         android:installLocation="internalOnly"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"

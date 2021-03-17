@@ -38,6 +38,7 @@ public class PredictorWrapper {
     public static boolean initLicense(Context context) {
         // 获取鉴权相关本地设备及应用相关信息
         try {
+
             BDLicenseLocalInfo bdLicenseLocalInfo = AndroidLicenser.getInstance().authGetLocalInfo(context, Predictor.getAlgorithmId());
             Log.d(TAG, "BDLicenseLocalInfo :" + bdLicenseLocalInfo.toString());
             // 使用申请的license-key 及 收钱文件进行本地授权
@@ -48,7 +49,7 @@ public class PredictorWrapper {
          /*   AndroidLicenser.ErrorCode ret = AndroidLicenser.getInstance().authFromFile(context, "ZPQG-GYCJ-CPCC-MKJL",
                     "", true, Predictor.getAlgorithmId());*/
             // 在线自动激活
-            int ret = BDLicenseActivator.initLicenseOnLine(context, "PUBR-EDDF-PXFY-QXVX",
+            int ret = BDLicenseActivator.initLicenseOnLine(context, "smart-park-offlinesdk-app",
                     "", Predictor.getAlgorithmId());
             if (ret != 0) {
                 LogUtils.e(TAG, "ErrorMsg :" + AndroidLicenser.getInstance().getErrorMsg(Predictor.getAlgorithmId()));
